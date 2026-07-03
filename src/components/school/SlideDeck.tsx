@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { setCurrentSlide } from "@/lib/session.functions";
-import { SLIDES } from "@/lib/slides";
+import { SLIDES, STAGE_DECKS, getDeckForIndex } from "@/lib/slides";
 import { ScaledSlide } from "@/components/school/ScaledSlide";
 import { Button } from "@/components/ui/button";
 
