@@ -142,7 +142,7 @@ function S4Page() {
         </div>
 
         {tab === "cases" && <TestCaseList userId={stored.userId} locked={confirmed} />}
-        {tab === "hints" && <TddHintPanel userId={stored.userId} enabled={completeCases >= 1} />}
+        {tab === "hints" && <TddHintPanel userId={stored.userId} enabled={totalCases >= 1} />}
         {tab === "prompt" && (
           <FirstPromptBuilder
             userId={stored.userId}
