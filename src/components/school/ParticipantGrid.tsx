@@ -1,4 +1,4 @@
-import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX, FileCheck2, MessagesSquare } from "lucide-react";
+import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX, FileCheck2, MessagesSquare, Mic, Presentation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
 
