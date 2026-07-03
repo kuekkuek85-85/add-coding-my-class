@@ -28,6 +28,7 @@ function ParticipantHome() {
   const fetchSnapshot = useServerFn(getSessionSnapshot);
   const fetchS1 = useServerFn(getMyS1State);
   const fetchS2 = useServerFn(getMyS2State);
+  const fetchS4 = useServerFn(getMyS4State);
 
   const { data } = useQuery({
     queryKey: ["snapshot", stored?.userId],
