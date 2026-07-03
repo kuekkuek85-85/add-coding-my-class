@@ -88,7 +88,8 @@ export const getMyS5State = createServerFn({ method: "POST" })
     if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
 
     const [
-      { data: cases },
+      { data: s4cases },
+      { data: s2cases },
       { data: results },
       { data: myPrompt },
       { data: revised },
@@ -101,8 +102,13 @@ export const getMyS5State = createServerFn({ method: "POST" })
         .eq("user_id", user.id)
         .order("order_index", { ascending: true }),
       supabaseAdmin
+        .from("s2_test_cases")
+        .select("id, title, given_when, expected_then, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true }),
+      supabaseAdmin
         .from("s5_checklist_results")
-        .select("test_case_id, status, note, updated_at")
+        .select("test_case_id, source, status, note, updated_at")
         .eq("user_id", user.id),
       supabaseAdmin
         .from("s4_prompts")
@@ -124,7 +130,7 @@ export const getMyS5State = createServerFn({ method: "POST" })
         .eq("reviewee_id", user.id),
     ]);
 
-    const completeCases = (cases ?? []).filter(
+    const completeS4 = (s4cases ?? []).filter(
       (c) =>
         (c.title ?? "").trim() &&
         (c.given ?? "").trim() &&
@@ -133,16 +139,38 @@ export const getMyS5State = createServerFn({ method: "POST" })
     );
 
     const resultMap = new Map(
-      (results ?? []).map((r) => [r.test_case_id, r] as const),
+      (results ?? []).map(
+        (r) => [`${r.source}:${r.test_case_id}`, r] as const,
+      ),
     );
-    const casesWithResult = completeCases.map((c) => ({
+
+    const s2Normalized = (s2cases ?? []).map((c) => ({
+      id: c.id as string,
+      source: "s2" as const,
+      title: (c.title ?? "") as string,
+      given: (c.given_when ?? "") as string,
+      when_step: "",
+      then_step: (c.expected_then ?? "") as string,
+      order_index: 0,
+    }));
+    const s4Normalized = completeS4.map((c) => ({
+      id: c.id as string,
+      source: "s4" as const,
+      title: c.title as string,
+      given: (c.given ?? "") as string,
+      when_step: (c.when_step ?? "") as string,
+      then_step: (c.then_step ?? "") as string,
+      order_index: (c.order_index ?? 0) as number,
+    }));
+    const merged = [...s2Normalized, ...s4Normalized];
+    const casesWithResult = merged.map((c) => ({
       ...c,
-      result: resultMap.get(c.id) ?? null,
+      result: resultMap.get(`${c.source}:${c.id}`) ?? null,
     }));
 
     const allChecked =
-      completeCases.length > 0 &&
-      completeCases.every((c) => resultMap.has(c.id));
+      merged.length > 0 &&
+      merged.every((c) => resultMap.has(`${c.source}:${c.id}`));
 
     const revisedFields: RevisedFields = {
       target: revised?.target ?? "",
@@ -171,6 +199,7 @@ export const getMyS5State = createServerFn({ method: "POST" })
     };
   });
 
+
 // -------- 체크리스트 결과 저장 --------
 
 export const setS5ChecklistResult = createServerFn({ method: "POST" })
@@ -178,6 +207,7 @@ export const setS5ChecklistResult = createServerFn({ method: "POST" })
     (input: {
       userId: string;
       testCaseId: string;
+      source: "s2" | "s4";
       status: "pass" | "fail" | "partial";
       note: string;
     }) =>
@@ -185,6 +215,7 @@ export const setS5ChecklistResult = createServerFn({ method: "POST" })
         .object({
           userId: uuid,
           testCaseId: uuid,
+          source: z.enum(["s2", "s4"]),
           status: z.enum(["pass", "fail", "partial"]),
           note: z.string().max(1000),
         })
@@ -197,18 +228,10 @@ export const setS5ChecklistResult = createServerFn({ method: "POST" })
     if (user.role !== "participant")
       return { ok: false as const, error: "참가자만 저장할 수 있습니다." };
 
-    // 확정 후엔 잠금
-    const { data: revised } = await supabaseAdmin
-      .from("s5_revised_prompts")
-      .select("confirmed_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (revised?.confirmed_at)
-      return { ok: false as const, error: "S5 게이트 통과 후에는 수정할 수 없습니다." };
-
-    // 대상 테스트 케이스가 내 것인지 확인
+    // 대상 테스트 케이스가 내 것인지 확인 (source에 따라 테이블 분기)
+    const table = data.source === "s2" ? "s2_test_cases" : "s4_test_cases";
     const { data: tc } = await supabaseAdmin
-      .from("s4_test_cases")
+      .from(table)
       .select("user_id")
       .eq("id", data.testCaseId)
       .maybeSingle();
@@ -219,12 +242,13 @@ export const setS5ChecklistResult = createServerFn({ method: "POST" })
       {
         user_id: user.id,
         test_case_id: data.testCaseId,
+        source: data.source,
         session_id: user.session_id,
         status: data.status,
         note: data.note,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "user_id,test_case_id" },
+      { onConflict: "user_id,source,test_case_id" },
     );
     if (error) return { ok: false as const, error: "저장에 실패했습니다." };
     return { ok: true as const };

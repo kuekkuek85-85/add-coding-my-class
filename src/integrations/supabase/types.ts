@@ -419,6 +419,7 @@ export type Database = {
         Row: {
           note: string
           session_id: string
+          source: string
           status: string
           test_case_id: string
           updated_at: string
@@ -427,6 +428,7 @@ export type Database = {
         Insert: {
           note?: string
           session_id: string
+          source?: string
           status: string
           test_case_id: string
           updated_at?: string
@@ -435,6 +437,7 @@ export type Database = {
         Update: {
           note?: string
           session_id?: string
+          source?: string
           status?: string
           test_case_id?: string
           updated_at?: string
@@ -446,13 +449,6 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "s5_checklist_results_test_case_id_fkey"
-            columns: ["test_case_id"]
-            isOneToOne: false
-            referencedRelation: "s4_test_cases"
             referencedColumns: ["id"]
           },
           {
