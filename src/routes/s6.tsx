@@ -72,7 +72,7 @@ function S6Page() {
         <Lock className="mx-auto mb-3 h-8 w-8 text-muted-foreground" aria-hidden />
         <h1 className="mb-2 font-display text-xl font-bold">S5 확정이 필요합니다</h1>
         <p className="mb-4 text-sm text-muted-foreground">
-          5교시에서 수정 프롬프트를 확정한 뒤 S6를 진행할 수 있어요.
+          5교시에서 수정 PRD 프롬프트를 확정한 뒤 S6를 진행할 수 있어요.
         </p>
         <Button asChild variant="outline"><Link to="/s5">S5로 이동</Link></Button>
       </main>

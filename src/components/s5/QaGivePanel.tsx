@@ -76,7 +76,7 @@ export function QaGivePanel({ userId }: { userId: string }) {
   if (asn.status === "need_s4") {
     return (
       <div className="rounded-2xl border-2 border-dashed border-border/70 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
-        S4에서 첫 프롬프트를 확정해야 교차 QA가 배정됩니다.
+        S4에서 첫 PRD 프롬프트를 확정해야 교차 QA가 배정됩니다.
       </div>
     );
   }
@@ -135,7 +135,7 @@ export function QaGivePanel({ userId }: { userId: string }) {
             )}
           </div>
 
-          <h3 className="mb-2 font-display text-sm font-bold text-primary">대상자의 첫 프롬프트</h3>
+          <h3 className="mb-2 font-display text-sm font-bold text-primary">대상자의 첫 PRD 프롬프트</h3>
           <dl className="grid gap-2 text-xs">
             <PromptRow label="역할" value={bundle.prompt.role} />
             <PromptRow label="컨텍스트" value={bundle.prompt.context} />

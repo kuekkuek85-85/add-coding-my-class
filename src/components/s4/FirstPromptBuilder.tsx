@@ -160,7 +160,7 @@ export function FirstPromptBuilder({
         <div className="mb-3 flex items-baseline justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">S4 · 4교시</p>
-            <h2 className="font-display text-xl font-bold text-foreground">첫 프롬프트 조립</h2>
+            <h2 className="font-display text-xl font-bold text-foreground">첫 PRD 프롬프트 조립</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               5칸을 직접 채웁니다. AI는 이 문장을 대신 써주지 않습니다.
             </p>
@@ -214,7 +214,7 @@ export function FirstPromptBuilder({
       {/* 확정 바 */}
       <div className="flex items-center justify-between rounded-2xl border-2 border-primary/30 bg-accent/30 p-4">
         <div>
-          <p className="font-display text-sm font-bold text-primary">첫 프롬프트 확정</p>
+          <p className="font-display text-sm font-bold text-primary">첫 PRD 프롬프트 확정</p>
           <p className="text-xs text-muted-foreground">
             확정하면 S4 게이트를 통과합니다. 확정 후에도 테스트 케이스는 계속 다듬을 수 있습니다.
           </p>

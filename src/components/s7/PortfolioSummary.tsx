@@ -148,7 +148,7 @@ export function PortfolioSummary({ portfolio }: { portfolio: PortfolioLike }) {
 
       <Card
         code="S4"
-        title="첫 프롬프트"
+        title="첫 PRD 프롬프트"
         icon={MessageSquare}
         done={portfolio.stamps.s4}
       >
@@ -160,13 +160,13 @@ export function PortfolioSummary({ portfolio }: { portfolio: PortfolioLike }) {
             <Row k="비기능" v={portfolio.s4.prompt.nonfunctional} />
           </dl>
         ) : (
-          <p className="text-xs text-muted-foreground">아직 첫 프롬프트가 없습니다.</p>
+          <p className="text-xs text-muted-foreground">아직 첫 PRD 프롬프트가 없습니다.</p>
         )}
       </Card>
 
       <Card
         code="S5"
-        title="실행 체크 & 수정 프롬프트"
+        title="실행 체크 & 수정 PRD 프롬프트"
         icon={ListChecks}
         done={portfolio.stamps.s5}
       >
@@ -198,7 +198,7 @@ export function PortfolioSummary({ portfolio }: { portfolio: PortfolioLike }) {
           </dl>
         ) : (
           <p className="mt-2 text-xs text-muted-foreground">
-            아직 수정 프롬프트가 없습니다.
+            아직 수정 PRD 프롬프트가 없습니다.
           </p>
         )}
       </Card>

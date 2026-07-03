@@ -126,7 +126,7 @@ export function RevisedPromptBuilder({
   async function copyPreview() {
     try {
       await navigator.clipboard.writeText(preview);
-      toast.success("수정 프롬프트를 복사했습니다.");
+      toast.success("수정 PRD 프롬프트를 복사했습니다.");
     } catch {
       toast.error("복사에 실패했습니다. 텍스트를 직접 선택해 주세요.");
     }
@@ -138,13 +138,13 @@ export function RevisedPromptBuilder({
         <div className="mb-3 flex items-baseline justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">
-              S5 · 다음 번 수정 프롬프트
+              S5 · 다음 번 수정 PRD 프롬프트
             </p>
             <h2 className="font-display text-xl font-bold text-foreground">
-              수정 프롬프트 조립기
+              수정 PRD 프롬프트 조립기
             </h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              실행 체크리스트와 교차 QA 결과를 바탕으로, 다음 번 AI/개발자에게 넘길 수정 프롬프트를 직접 씁니다.
+              실행 체크리스트와 교차 QA 결과를 바탕으로, 다음 번 AI/개발자에게 넘길 수정 PRD 프롬프트를 직접 씁니다.
               도우미는 없어요 — 문장은 여러분이 씁니다.
             </p>
           </div>
@@ -161,7 +161,7 @@ export function RevisedPromptBuilder({
         {confirmed && (
           <div className="mb-3 flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-50/60 p-2.5 text-xs text-emerald-900">
             <Lock className="h-3.5 w-3.5" aria-hidden />
-            확정된 수정 프롬프트입니다. 더 이상 편집할 수 없어요.
+            확정된 수정 PRD 프롬프트입니다. 더 이상 편집할 수 없어요.
           </div>
         )}
 

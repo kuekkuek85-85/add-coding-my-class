@@ -49,7 +49,7 @@ export function ChecklistPanel({ userId, locked }: { userId: string; locked: boo
   if (data?.ok && !data.s4Confirmed) {
     return (
       <div className="rounded-2xl border-2 border-dashed border-border/70 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
-        S4에서 첫 프롬프트를 확정해야 실행 체크리스트가 열립니다.
+        S4에서 첫 PRD 프롬프트를 확정해야 실행 체크리스트가 열립니다.
       </div>
     );
   }

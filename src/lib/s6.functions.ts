@@ -315,9 +315,9 @@ const DRAFT_SYSTEM = `너는 교사 연수 "내 수업에 코딩 한 스푼" 참
 슬라이드 6장의 목적은 다음 순서로 고정:
 1) 표지: 발표 주제(한 줄) + 본인 이름(주어짐).
 2) 문제 정의: PRD의 문제/사용자 요약.
-3) 첫 프롬프트: PRD → 첫 프롬프트로 넘어간 핵심.
+3) 첫 PRD 프롬프트: PRD → 첫 PRD 프롬프트로 넘어간 핵심.
 4) 실행에서 배운 것: 테스트 결과에서 관찰한 것.
-5) 개선한 프롬프트: 수정 프롬프트의 핵심.
+5) 개선한 프롬프트: 수정 PRD 프롬프트의 핵심.
 6) 다음에 해볼 것: 수업 현장에서 다음에 시도할 것.
 - 각 슬라이드 heading은 10자 이내, body는 2~4문장(120자 이내).
 - 학생용이 아니라 성인 교사 청중용 톤(친근하지만 존댓말, 이모지 없음).
@@ -446,7 +446,7 @@ export const generateSlideDraft = createServerFn({ method: "POST" })
       `사용자: ${prd?.users ?? ""}`,
       `핵심 기능: ${prd?.features ?? ""}`,
       "",
-      "## 첫 프롬프트",
+      "## 첫 PRD 프롬프트",
       `역할: ${prompt?.role ?? ""}`,
       `컨텍스트: ${prompt?.context ?? ""}`,
       `할 일: ${prompt?.task ?? ""}`,
@@ -455,7 +455,7 @@ export const generateSlideDraft = createServerFn({ method: "POST" })
       "## 실행 체크(테스트 결과)",
       caseLines || "(없음)",
       "",
-      "## 수정 프롬프트",
+      "## 수정 PRD 프롬프트",
       `대상: ${revised?.target ?? ""}`,
       `근거: ${revised?.evidence ?? ""}`,
       `유지: ${revised?.keep_list ?? ""}`,

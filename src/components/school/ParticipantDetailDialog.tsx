@@ -321,7 +321,7 @@ function S4View({
           </ol>
         )}
       </Section>
-      <Section title={`첫 프롬프트${s4.prompt?.confirmedAt ? " (확정)" : ""}`}>
+      <Section title={`첫 PRD 프롬프트${s4.prompt?.confirmedAt ? " (확정)" : ""}`}>
         {!s4.prompt ? (
           <Empty text="아직 프롬프트를 작성하지 않았습니다." />
         ) : (
@@ -405,9 +405,9 @@ function S5View({
           </ul>
         )}
       </Section>
-      <Section title={`수정 프롬프트${s5.revised?.confirmedAt ? " (확정)" : ""}`}>
+      <Section title={`수정 PRD 프롬프트${s5.revised?.confirmedAt ? " (확정)" : ""}`}>
         {!s5.revised ? (
-          <Empty text="아직 수정 프롬프트를 작성하지 않았습니다." />
+          <Empty text="아직 수정 PRD 프롬프트를 작성하지 않았습니다." />
         ) : (
           <div>
             <Field label="다음 대상" value={s5.revised.target} />
