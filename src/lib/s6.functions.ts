@@ -182,7 +182,7 @@ export const getParticipantBundle = createServerFn({ method: "POST" })
 
     const { data: target } = await supabaseAdmin
       .from("app_users")
-      .select("id, nickname, session_id")
+      .select("id, nickname, session_id, deployed_url")
       .eq("id", data.targetId)
       .maybeSingle();
     if (!target || target.session_id !== caller.session_id)
@@ -220,6 +220,7 @@ export const getParticipantBundle = createServerFn({ method: "POST" })
     return {
       ok: true as const,
       nickname: target.nickname,
+      deployedUrl: (target as { deployed_url?: string | null }).deployed_url ?? null,
       prd: prd ?? null,
       prompt: prompt ?? null,
       revised: revised ?? null,
@@ -232,6 +233,7 @@ export const getParticipantBundle = createServerFn({ method: "POST" })
       })),
     };
   });
+
 
 // -------- 슬라이드 저장 --------
 
