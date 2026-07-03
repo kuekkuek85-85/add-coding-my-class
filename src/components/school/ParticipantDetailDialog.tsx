@@ -109,6 +109,29 @@ function Empty({ text }: { text: string }) {
   );
 }
 
+function DeployedUrlBanner({ url }: { url: string | null | undefined }) {
+  const trimmed = (url ?? "").trim();
+  if (!trimmed) {
+    return (
+      <p className="rounded-lg border border-dashed border-border/60 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        아직 배포 URL이 제출되지 않았습니다.
+      </p>
+    );
+  }
+  return (
+    <a
+      href={trimmed}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-primary/5 px-3 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10"
+    >
+      <ExternalLink className="h-4 w-4 shrink-0" aria-hidden />
+      <span className="truncate">{trimmed}</span>
+    </a>
+  );
+}
+
+
 function S1View({
   s1,
 }: {
