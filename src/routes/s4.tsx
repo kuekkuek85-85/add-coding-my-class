@@ -111,9 +111,6 @@ function S4Page() {
       </header>
 
       <section className="mx-auto max-w-4xl px-4 py-5">
-        <div className="mb-4">
-          <PrdReadOnly prd={prd} />
-        </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
           {tabs.map((t) => {
