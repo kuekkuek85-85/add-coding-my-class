@@ -194,7 +194,7 @@ export function ParticipantGrid({
                         ? "bg-accent/40 text-primary"
                         : "bg-muted text-muted-foreground",
                     )}
-                    aria-label={`오전 메모 ${pr?.memoCount ?? 0}건`}
+                    aria-label={`S1 메모 ${pr?.memoCount ?? 0}건`}
                   >
                     <StickyNote className="h-3 w-3" aria-hidden />
                     {pr?.memoCount ?? 0}
