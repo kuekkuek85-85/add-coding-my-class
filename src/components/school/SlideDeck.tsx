@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
@@ -17,46 +17,75 @@ type Props = {
 
 /**
  * 강사 전용 강의 슬라이드 컨트롤러.
- * - 강의 시작 → 슬라이드 0번 노출 (참가자 화면 동기화)
- * - 이전/다음/종료
- * - 키보드: ←, →, Esc
+ * 낙관적 로컬 인덱스로 빠른 연속 클릭에도 스택 없이 반영.
  */
 export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: Props) {
   const queryClient = useQueryClient();
   const changeSlide = useServerFn(setCurrentSlide);
 
-  const active = currentSlideIndex !== null;
+  // total은 아래 idx 계산에서 SLIDES.length로 직접 사용
+  // 서버 값과 낙관적 값 중 최신 것을 로컬 상태로 유지
+  const [localIndex, setLocalIndex] = useState<number | null>(currentSlideIndex);
+  const localRef = useRef<number | null>(currentSlideIndex);
+  const pendingRef = useRef(0);
+
+  // 서버 값이 바뀌면 로컬 값을 동기화 — 단, 진행 중인 mutation이 없을 때만
+  // (연속 클릭 중에 서버 응답이 낙관적 값을 덮어쓰지 않도록)
+  useEffect(() => {
+    if (pendingRef.current > 0) return;
+    if (currentSlideIndex !== localRef.current) {
+      localRef.current = currentSlideIndex;
+      setLocalIndex(currentSlideIndex);
+    }
+  }, [currentSlideIndex]);
+
+  const active = localIndex !== null;
+  const idx = active ? Math.min(localIndex!, SLIDES.length - 1) : 0;
   const total = SLIDES.length;
-  const idx = active ? Math.min(currentSlideIndex!, total - 1) : 0;
   const slide = SLIDES[idx];
 
   const mut = useMutation({
     mutationFn: (slideIndex: number | null) =>
       changeSlide({ data: { userId, slideIndex } }),
-    onSuccess: (res) => {
-      if (!res.ok) {
+    onMutate: () => {
+      pendingRef.current += 1;
+    },
+    onSettled: (res) => {
+      pendingRef.current = Math.max(0, pendingRef.current - 1);
+      if (res && !res.ok) {
         toast.error(res.error);
         return;
       }
-      queryClient.invalidateQueries({ queryKey: snapshotKey });
+      if (pendingRef.current === 0) {
+        queryClient.invalidateQueries({ queryKey: snapshotKey });
+      }
     },
     onError: () => toast.error("슬라이드 전송에 실패했습니다."),
   });
 
+  function push(next: number | null) {
+    localRef.current = next;
+    setLocalIndex(next);
+    mut.mutate(next);
+  }
+  function stepBy(delta: number) {
+    const cur = localRef.current ?? 0;
+    const next = Math.max(0, Math.min(SLIDES.length - 1, cur + delta));
+    if (next !== cur) push(next);
+  }
+
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") {
-        if (idx < total - 1) mut.mutate(idx + 1);
-      } else if (e.key === "ArrowLeft") {
-        if (idx > 0) mut.mutate(idx - 1);
-      } else if (e.key === "Escape") {
-        mut.mutate(null);
-      }
+      if (e.key === "ArrowRight") stepBy(1);
+      else if (e.key === "ArrowLeft") stepBy(-1);
+      else if (e.key === "Escape") push(null);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active, idx, total, mut]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+
 
   if (!active) {
     return (
@@ -70,7 +99,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           </div>
           <Button
             size="sm"
-            onClick={() => mut.mutate(0)}
+            onClick={() => push(0)}
             disabled={mut.isPending}
             className="gap-1.5"
           >
@@ -97,16 +126,16 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           <Button
             size="sm"
             variant="outline"
-            onClick={() => mut.mutate(Math.max(0, idx - 1))}
-            disabled={mut.isPending || idx === 0}
+            onClick={() => stepBy(-1)}
+            disabled={idx === 0}
             aria-label="이전 슬라이드"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
-            onClick={() => mut.mutate(Math.min(total - 1, idx + 1))}
-            disabled={mut.isPending || idx === total - 1}
+            onClick={() => stepBy(1)}
+            disabled={idx === total - 1}
             aria-label="다음 슬라이드"
           >
             다음
@@ -115,7 +144,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => mut.mutate(null)}
+            onClick={() => push(null)}
             disabled={mut.isPending}
             className="gap-1"
             aria-label="강의 종료"
