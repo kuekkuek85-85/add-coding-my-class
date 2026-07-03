@@ -1,3 +1,4 @@
+import { ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -10,6 +11,7 @@ export function SlidePreview({
   page,
   total,
   presenterName,
+  deployedUrl,
   width = 320,
   height = 180,
   variant = "default",
@@ -20,6 +22,7 @@ export function SlidePreview({
   page: number;
   total: number;
   presenterName?: string;
+  deployedUrl?: string | null;
   width?: number;
   height?: number;
   variant?: "default" | "cover";
@@ -55,6 +58,17 @@ export function SlidePreview({
                 <p className="slide-subtitle mt-8 text-muted-foreground">
                   발표자 · {presenterName}
                 </p>
+              )}
+              {deployedUrl && (
+                <a
+                  href={deployedUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="slide-body-lg mt-10 inline-flex max-w-full items-center gap-4 rounded-2xl bg-primary/10 px-8 py-5 font-semibold text-primary underline decoration-2 underline-offset-4 hover:bg-primary/15"
+                >
+                  <ExternalLink className="h-10 w-10 shrink-0" aria-hidden />
+                  <span className="break-all">{deployedUrl}</span>
+                </a>
               )}
             </div>
             <div className="flex items-end justify-between">
