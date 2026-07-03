@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX, FileCheck2, MessagesSquare, Mic, Presentation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
+import { ParticipantDetailDialog } from "./ParticipantDetailDialog";
 
 export type S1Progress = {
   userId: string;
