@@ -2,10 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Users, KeyRound, CircleAlert, CircleX, CircleCheck } from "lucide-react";
+import { LogOut, Users, KeyRound, CircleAlert, CircleX, CircleCheck, RotateCcw } from "lucide-react";
 
-import { getSessionSnapshot, setCurrentStage } from "@/lib/session.functions";
-import { getInstructorS1Summary } from "@/lib/s1.functions";
+import { getSessionSnapshot, setCurrentStage, resetSessionData } from "@/lib/session.functions";
 import { getInstructorS2Summary } from "@/lib/s2.functions";
 import { getSessionS3Overview } from "@/lib/s3.functions";
 import { getSessionS4Overview } from "@/lib/s4.functions";
