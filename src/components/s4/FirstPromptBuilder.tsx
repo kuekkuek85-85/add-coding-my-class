@@ -200,7 +200,7 @@ export function FirstPromptBuilder({
       {/* 미리보기 */}
       <div className="rounded-2xl border-2 border-primary/20 bg-card p-5 shadow-sm">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="font-display text-sm font-bold text-primary">최종 프롬프트 미리보기</h3>
+          <h3 className="font-display text-sm font-bold text-primary">최종 PRD 프롬프트 미리보기</h3>
           <Button size="sm" variant="outline" onClick={copyPrompt}>
             <Copy className="mr-1 h-3.5 w-3.5" aria-hidden />
             복사
