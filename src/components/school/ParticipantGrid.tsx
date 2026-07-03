@@ -113,6 +113,9 @@ export function ParticipantGrid({
   const s5Map = new Map<string, S5Progress>();
   for (const p of s5Progress ?? []) s5Map.set(p.userId, p);
 
+  const s6Map = new Map<string, S6Progress>();
+  for (const p of s6Progress ?? []) s6Map.set(p.userId, p);
+
 
 
 
