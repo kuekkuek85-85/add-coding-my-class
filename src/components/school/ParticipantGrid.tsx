@@ -69,6 +69,7 @@ export function ParticipantGrid({
   s3Progress,
   s4Progress,
   s5Progress,
+  s6Progress,
   helpMap,
   morningEarnedMap,
 }: {
@@ -81,6 +82,7 @@ export function ParticipantGrid({
   s3Progress?: S3Progress[];
   s4Progress?: S4Progress[];
   s5Progress?: S5Progress[];
+  s6Progress?: S6Progress[];
   helpMap?: Map<string, HelpRow>;
   morningEarnedMap?: Map<string, boolean>;
 }) {
