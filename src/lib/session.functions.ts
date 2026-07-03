@@ -136,3 +136,41 @@ export const getSessionSnapshot = createServerFn({ method: "POST" })
       members: members ?? [],
     };
   });
+
+export const setCurrentStage = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; stageNo: number }) =>
+    z
+      .object({
+        userId: z.string().uuid(),
+        stageNo: z.number().int().min(1).max(6),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Verify caller is instructor
+    const { data: caller } = await supabaseAdmin
+      .from("app_users")
+      .select("id, role, session_id")
+      .eq("id", data.userId)
+      .maybeSingle();
+
+    if (!caller) {
+      return { ok: false as const, error: "세션이 만료되었습니다." };
+    }
+    if (caller.role !== "instructor") {
+      return { ok: false as const, error: "강사만 스테이지를 열 수 있습니다." };
+    }
+
+    const { error } = await supabaseAdmin
+      .from("sessions")
+      .update({ current_stage: data.stageNo })
+      .eq("id", caller.session_id);
+
+    if (error) {
+      return { ok: false as const, error: "스테이지 변경에 실패했습니다." };
+    }
+
+    return { ok: true as const, currentStage: data.stageNo };
+  });
