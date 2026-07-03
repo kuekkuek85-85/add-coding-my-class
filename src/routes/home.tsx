@@ -8,6 +8,7 @@ import { getSessionSnapshot } from "@/lib/session.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
+import { S1Panel } from "@/components/school/S1Panel";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/home")({
@@ -73,7 +74,13 @@ function ParticipantHome() {
       </header>
 
       <section className="mx-auto max-w-5xl px-4 py-6">
-        <div className="mb-6">
+        {currentStage >= 1 && (
+          <div className="mb-8">
+            <S1Panel userId={stored.userId} currentStage={currentStage} />
+          </div>
+        )}
+
+        <div className="mb-4">
           <h1 className="font-display text-2xl font-bold text-foreground">오늘의 시간표</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             게이트를 통과하면 다음 교시가 열립니다. 순서대로 하나씩.
@@ -89,7 +96,7 @@ function ParticipantHome() {
                 const st = statusFor(s.no);
                 if (st === "locked") {
                   toast("아직 열리지 않았습니다.");
-                } else {
+                } else if (s.no !== 1) {
                   toast(`${s.code} · ${s.title} — 준비 중입니다.`);
                 }
               }}
