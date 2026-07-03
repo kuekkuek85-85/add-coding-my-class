@@ -8,8 +8,6 @@ import { getSessionSnapshot } from "@/lib/session.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
-import { S1Panel } from "@/components/school/S1Panel";
-import { S2Panel } from "@/components/school/S2Panel";
 import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
 import { getMyS4State } from "@/lib/s4.functions";
@@ -192,18 +190,7 @@ function ParticipantHome() {
         <MorningStamp earned={morningEarned} className="mb-6" />
 
 
-        {currentStage >= 1 && (
-          <div className="mb-8">
-            <S1Panel userId={stored.userId} currentStage={currentStage} />
-          </div>
-        )}
 
-
-        {currentStage >= 2 && (
-          <div className="mb-8">
-            <S2Panel userId={stored.userId} />
-          </div>
-        )}
 
         <div className="mb-4">
           <h1 className="font-display text-2xl font-bold text-foreground">오늘의 시간표</h1>
@@ -229,6 +216,10 @@ function ParticipantHome() {
                   } else {
                     toast("아직 열리지 않았습니다.");
                   }
+                } else if (s.no === 1) {
+                  navigate({ to: "/s1" });
+                } else if (s.no === 2) {
+                  navigate({ to: "/s2" });
                 } else if (s.no === 3) {
                   navigate({ to: "/s3" });
                 } else if (s.no === 4) {
@@ -238,6 +229,7 @@ function ParticipantHome() {
                 } else if (s.no === 6) {
                   navigate({ to: "/s6" });
                 }
+
               }}
             />
           ))}
