@@ -19,11 +19,12 @@ async function getUser(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("app_users")
-    .select("id, role, session_id, nickname")
+    .select("id, role, session_id, nickname, deployed_url")
     .eq("id", userId)
     .maybeSingle();
   return data;
 }
+
 
 // ---------- 참가자: 포트폴리오 (내 산출물 모아보기) ----------
 
