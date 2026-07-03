@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, User, FileText, ChevronRight } from "lucide-react";
+import { CheckCircle2, User, FileText, ChevronRight, ExternalLink } from "lucide-react";
 
 import { getGallery, getParticipantBundle } from "@/lib/s6.functions";
 import { Button } from "@/components/ui/button";
