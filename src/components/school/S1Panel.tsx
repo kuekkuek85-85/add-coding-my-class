@@ -101,7 +101,7 @@ export function S1Panel({
               S1 · 1교시
             </p>
             <h2 className="font-display text-xl font-bold text-foreground">
-              글쌤봇 따라하기 — 체크포인트
+              기본 기능 떠올리기 — 체크포인트
             </h2>
           </div>
           <div className="text-sm font-semibold text-primary">
