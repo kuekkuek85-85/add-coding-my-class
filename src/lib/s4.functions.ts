@@ -370,14 +370,7 @@ export const saveMyS4Prompt = createServerFn({ method: "POST" })
     if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
     if (user.role !== "participant") return { ok: false as const, error: "참가자만 저장할 수 있습니다." };
 
-    const { data: existing } = await supabaseAdmin
-      .from("s4_prompts")
-      .select("confirmed_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (existing?.confirmed_at) {
-      return { ok: false as const, error: "확정된 프롬프트는 수정할 수 없습니다." };
-    }
+    // 확정 이후에도 초안 PRD 텍스트는 계속 다듬을 수 있게 허용한다.
 
     const { error } = await supabaseAdmin.from("s4_prompts").upsert(
       {
