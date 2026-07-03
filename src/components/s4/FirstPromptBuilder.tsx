@@ -148,7 +148,7 @@ export function FirstPromptBuilder({
   async function copyPrompt() {
     try {
       await navigator.clipboard.writeText(finalPrompt);
-      toast.success("프롬프트를 클립보드에 복사했습니다.");
+      toast.success("PRD 프롬프트를 클립보드에 복사했습니다.");
     } catch {
       toast.error("복사에 실패했습니다. 텍스트를 직접 선택해 복사해 주세요.");
     }
