@@ -124,3 +124,29 @@
 [data-sonner-toast] * {
   font-family: var(--font-body) !important;
 }
+
+/* 슬라이드 캔버스 — 1920x1080 좌표 기준 */
+.slide-content {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  position: relative;
+  --slide-title-lg: 128px;
+  --slide-title: 96px;
+  --slide-subtitle: 56px;
+  --slide-body-lg: 44px;
+  --slide-body: 36px;
+  --slide-caption: 28px;
+  --slide-kicker: 28px;
+  --slide-chrome: 26px;
+}
+.slide-title-lg { font-size: var(--slide-title-lg); line-height: 1.0; letter-spacing: -0.04em; }
+.slide-title    { font-size: var(--slide-title);    line-height: 1.05; letter-spacing: -0.03em; }
+.slide-subtitle { font-size: var(--slide-subtitle); line-height: 1.2; letter-spacing: -0.02em; }
+.slide-body-lg  { font-size: var(--slide-body-lg);  line-height: 1.3; }
+.slide-body     { font-size: var(--slide-body);     line-height: 1.35; }
+.slide-caption  { font-size: var(--slide-caption);  line-height: 1.3; }
+.slide-kicker   { font-size: var(--slide-kicker);   line-height: 1.1; letter-spacing: 0.18em; text-transform: uppercase; }
+.slide-chrome, .slide-page, .slide-footer {
+  font-size: var(--slide-chrome); line-height: 1.15; white-space: nowrap;
+}
