@@ -212,8 +212,11 @@ function InstructorHome() {
             currentStage={currentStage}
             s1Progress={s1?.ok ? s1.progress : []}
             s1Total={s1?.ok ? s1.totalCheckpoints : 0}
+            s2Progress={s2Progress}
+            s2Min={s2Min}
           />
         </div>
+
 
         {/* 시간표(참고) */}
         <div className="mt-8">
