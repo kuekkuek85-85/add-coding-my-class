@@ -126,7 +126,6 @@ export function FirstPromptBuilder({
   }
 
   function resetToDraft() {
-    if (readOnly) return;
     if (!confirm("현재 편집 내용을 초안 PRD로 되돌립니다. 계속할까요?")) return;
     update(draftSeed);
   }
