@@ -87,7 +87,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           </div>
           <Button
             size="sm"
-            onClick={() => mut.mutate(0)}
+            onClick={() => push(0)}
             disabled={mut.isPending}
             className="gap-1.5"
           >
@@ -114,7 +114,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           <Button
             size="sm"
             variant="outline"
-            onClick={() => mut.mutate(Math.max(0, idx - 1))}
+            onClick={() => push(Math.max(0, idx - 1))}
             disabled={mut.isPending || idx === 0}
             aria-label="이전 슬라이드"
           >
@@ -122,7 +122,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           </Button>
           <Button
             size="sm"
-            onClick={() => mut.mutate(Math.min(total - 1, idx + 1))}
+            onClick={() => push(Math.min(total - 1, idx + 1))}
             disabled={mut.isPending || idx === total - 1}
             aria-label="다음 슬라이드"
           >
@@ -132,7 +132,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => mut.mutate(null)}
+            onClick={() => push(null)}
             disabled={mut.isPending}
             className="gap-1"
             aria-label="강의 종료"
