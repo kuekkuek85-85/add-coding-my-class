@@ -174,14 +174,10 @@ export function FirstPromptBuilder({
 
         <Textarea
           value={text}
-          readOnly={readOnly}
           onChange={(e) => update(e.target.value)}
           rows={22}
           spellCheck={false}
-          className={cn(
-            "min-h-[420px] whitespace-pre-wrap font-mono text-sm leading-relaxed",
-            readOnly && "opacity-70",
-          )}
+          className="min-h-[420px] whitespace-pre-wrap font-mono text-sm leading-relaxed"
         />
 
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
@@ -192,7 +188,6 @@ export function FirstPromptBuilder({
               variant="ghost"
               size="sm"
               onClick={resetToDraft}
-              disabled={readOnly}
               className="h-7 px-2 text-[11px]"
             >
               <RotateCcw className="mr-1 h-3 w-3" aria-hidden />
