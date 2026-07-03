@@ -1,0 +1,1 @@
+UPDATE public.sessions SET instructor_code = 'TEACHER1' WHERE instructor_code = 'TEACH1';
