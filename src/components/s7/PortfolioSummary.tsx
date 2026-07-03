@@ -83,7 +83,7 @@ export function PortfolioSummary({ portfolio }: { portfolio: PortfolioLike }) {
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <Card
         code="S1"
-        title="글쌤봇 따라하기"
+        title="기본 기능 떠올리기"
         icon={ShieldCheck}
         done={portfolio.stamps.s1}
       >
