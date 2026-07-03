@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Send, UserRound } from "lucide-react";
+import { CheckCircle2, ExternalLink, Send, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import {
