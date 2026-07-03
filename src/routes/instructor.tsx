@@ -97,6 +97,24 @@ function InstructorHome() {
   const s2AllPassed = participants.length > 0 && s2PassedCount === participants.length;
   const blockNext = currentStage === 2 && !s2AllPassed;
 
+  const helpSignals = help?.ok ? help.signals : [];
+  const helpMap = new Map(helpSignals.map((h) => [h.userId, h]));
+  const activeHelp = helpSignals
+    .filter((h) => h.level !== "green")
+    .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))
+    .slice(0, 5);
+
+  const s1Progress = s1?.ok ? s1.progress : [];
+  const s1Total = s1?.ok ? s1.totalCheckpoints : 0;
+  const morningEarnedMap = new Map<string, boolean>();
+  for (const p of participants) {
+    const cp = s1Progress.find((x) => x.userId === p.id);
+    const sp = s2Progress.find((x) => x.userId === p.id);
+    const done = s1Total > 0 && (cp?.checked ?? 0) >= s1Total && !!sp?.passed;
+    morningEarnedMap.set(p.id, done);
+  }
+
+
   function handleLogout() {
     clearStoredSession();
     navigate({ to: "/" });
