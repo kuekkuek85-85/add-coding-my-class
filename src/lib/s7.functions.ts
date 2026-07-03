@@ -191,7 +191,9 @@ export const getMyPortfolio = createServerFn({ method: "POST" })
         checkedCount: s5CheckedCount,
         totalCases: (s4cases ?? []).length,
         confirmed: s5Confirmed,
+        deployedUrl: (user as { deployed_url?: string | null }).deployed_url ?? null,
       },
+
       s6: {
         title: deck?.title ?? "",
         slides: Array.isArray(deck?.slides) ? deck?.slides : [],
