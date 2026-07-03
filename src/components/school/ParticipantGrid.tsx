@@ -1,4 +1,4 @@
-import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
 
@@ -14,9 +14,16 @@ export type S2Progress = {
   passed: boolean;
 };
 
+export type HelpRow = {
+  userId: string;
+  level: "green" | "yellow" | "red";
+  note: string | null;
+};
+
 /**
  * 강사 대시보드: 참가자 × 6교시 그리드.
  * S1 셀은 체크포인트 통과 개수(N/M)를, 오전 메모 개수를 사이드에 표시한다.
+ * 이름 왼쪽에 신호등 뱃지, 오른쪽에 오전 완료 도장.
  */
 export function ParticipantGrid({
   participants,
@@ -25,6 +32,8 @@ export function ParticipantGrid({
   s1Total,
   s2Progress,
   s2Min,
+  helpMap,
+  morningEarnedMap,
 }: {
   participants: Array<{ id: string; nickname: string }>;
   currentStage: number;
@@ -32,6 +41,8 @@ export function ParticipantGrid({
   s1Total?: number;
   s2Progress?: S2Progress[];
   s2Min?: number;
+  helpMap?: Map<string, HelpRow>;
+  morningEarnedMap?: Map<string, boolean>;
 }) {
   if (participants.length === 0) {
     return (
@@ -50,6 +61,7 @@ export function ParticipantGrid({
   const s2Map = new Map<string, S2Progress>();
   for (const p of s2Progress ?? []) s2Map.set(p.userId, p);
   const s2Threshold = s2Min ?? 2;
+
 
   return (
     <div className="overflow-x-auto rounded-2xl border-2 border-primary/15 bg-card">
