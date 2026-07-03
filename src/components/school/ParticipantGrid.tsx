@@ -84,6 +84,10 @@ export function ParticipantGrid({
   const s3Map = new Map<string, S3Progress>();
   for (const p of s3Progress ?? []) s3Map.set(p.userId, p);
 
+  const s4Map = new Map<string, S4Progress>();
+  for (const p of s4Progress ?? []) s4Map.set(p.userId, p);
+
+
 
   return (
     <div className="overflow-x-auto rounded-2xl border-2 border-primary/15 bg-card">
