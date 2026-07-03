@@ -42,10 +42,10 @@ export function MorningStamp({
     >
       <div>
         <p className="font-display text-xs font-bold uppercase tracking-widest text-primary/70">
-          오전 완료
+          중간 도장 완료
         </p>
         <p className="mt-0.5 font-display text-base font-bold text-primary">
-          S1 · S2 게이트 통과 — 오후 세션에서 뵐게요.
+          S1 · S2 게이트 통과 — 쉬는 시간 뒤에 다시 뵐게요.
         </p>
       </div>
       <div
