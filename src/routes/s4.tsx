@@ -133,7 +133,7 @@ function S4Page() {
                       : "border-border/40 bg-muted text-muted-foreground opacity-60",
                 )}
               >
-                {t.id === "hints" && completeCases >= 1 && <Sparkles className="h-3 w-3" aria-hidden />}
+                {t.id === "hints" && totalCases >= 1 && <Sparkles className="h-3 w-3" aria-hidden />}
                 {t.id === "prompt" && confirmed && <CheckCircle2 className="h-3 w-3" aria-hidden />}
                 {t.label}
               </button>
