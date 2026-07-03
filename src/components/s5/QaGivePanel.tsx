@@ -135,13 +135,14 @@ export function QaGivePanel({ userId }: { userId: string }) {
             )}
           </div>
 
-          <h3 className="mb-2 font-display text-sm font-bold text-primary">대상자의 첫 PRD 프롬프트</h3>
-          <dl className="grid gap-2 text-xs">
-            <PromptRow label="역할" value={bundle.prompt.role} />
-            <PromptRow label="컨텍스트" value={bundle.prompt.context} />
-            <PromptRow label="해야 할 일" value={bundle.prompt.task} />
-            <PromptRow label="비기능" value={bundle.prompt.nonfunctional} />
-          </dl>
+          <h3 className="mb-2 font-display text-sm font-bold text-primary">대상자가 수정한 PRD 프롬프트</h3>
+          {bundle.prompt.context?.trim() ? (
+            <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-lg border border-border/40 bg-muted/30 p-2 text-xs leading-relaxed text-foreground">
+{bundle.prompt.context}
+            </pre>
+          ) : (
+            <p className="text-xs text-muted-foreground">아직 수정된 PRD가 없습니다.</p>
+          )}
 
           <h3 className="mb-2 mt-4 font-display text-sm font-bold text-primary">
             대상자의 테스트 케이스와 실행 결과
