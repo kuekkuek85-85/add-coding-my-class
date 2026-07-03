@@ -270,3 +270,73 @@ function InstructorHome() {
   );
 }
 
+type HelpRow = {
+  userId: string;
+  nickname: string;
+  level: "green" | "yellow" | "red";
+  note: string | null;
+  updatedAt: string | null;
+};
+
+function HelpStream({ signals, total }: { signals: HelpRow[]; total: number }) {
+  const empty = signals.length === 0;
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border-2 p-4 shadow-sm",
+        empty
+          ? "border-emerald-500/30 bg-emerald-50/60"
+          : "border-amber-500/40 bg-amber-50/70",
+      )}
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 font-display text-sm font-bold text-primary">
+          {empty ? (
+            <CircleCheck className="h-4 w-4 text-emerald-600" aria-hidden />
+          ) : (
+            <CircleAlert className="h-4 w-4 text-amber-600" aria-hidden />
+          )}
+          도움 요청 (신호등)
+        </div>
+        <span className="text-xs text-muted-foreground">
+          {empty ? `${total}명 모두 초록` : `최근 ${signals.length}건`}
+        </span>
+      </div>
+      {empty ? (
+        <p className="text-sm text-muted-foreground">
+          현재 노랑·빨강 신호가 없습니다.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-1.5">
+          {signals.map((s) => {
+            const isRed = s.level === "red";
+            const Icon = isRed ? CircleX : CircleAlert;
+            return (
+              <li
+                key={s.userId}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm",
+                  isRed
+                    ? "border-rose-300 bg-rose-100/70 text-rose-950"
+                    : "border-amber-300 bg-amber-100/70 text-amber-950",
+                )}
+              >
+                <Icon
+                  className={cn("h-4 w-4", isRed ? "text-rose-600" : "text-amber-600")}
+                  aria-hidden
+                />
+                <span className="font-semibold">{s.nickname}</span>
+                <span className="text-xs opacity-70">
+                  {isRed ? "막혔어요" : "잠깐 봐주세요"}
+                </span>
+                {s.note && <span className="ml-auto truncate text-xs">{s.note}</span>}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+
