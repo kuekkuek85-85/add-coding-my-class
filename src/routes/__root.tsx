@@ -84,13 +84,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "14명의 교사가 하루 6교시 동안 자기 수업 도구를 설계·구현·발표까지 완주하는 심화반 연수 운영 플랫폼",
       },
-      { property: "og:title", content: "내 수업에 코딩 한 스푼 · 심화반" },
+      { property: "og:title", content: "내 수업에 코딩 한 스푼 · 심화반 연수 플랫폼" },
       {
         property: "og:description",
         content: "단계별 게이트로 사고를 강제하고 실시간 대시보드로 전 과정을 관리하는 연수 플랫폼",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "내 수업에 코딩 한 스푼 · 심화반 연수 플랫폼" },
+      { name: "description", content: "A web platform for educators to integrate coding into their curriculum." },
+      { property: "og:description", content: "A web platform for educators to integrate coding into their curriculum." },
+      { name: "twitter:description", content: "A web platform for educators to integrate coding into their curriculum." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c51a1476-1144-40b1-b342-3ef07ad87745/id-preview-a0d355ad--9c9b5863-41d1-4681-a253-ab0c58377467.lovable.app-1783097832168.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c51a1476-1144-40b1-b342-3ef07ad87745/id-preview-a0d355ad--9c9b5863-41d1-4681-a253-ab0c58377467.lovable.app-1783097832168.png" },
     ],
     links: [
       {
