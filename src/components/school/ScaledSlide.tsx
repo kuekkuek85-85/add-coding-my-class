@@ -77,7 +77,7 @@ function SlideBody({ slide, index, total }: { slide: SlideDef; index: number; to
       </div>
 
       {/* 본문 */}
-      <div className="flex flex-1 flex-col justify-center px-24">
+      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-hidden px-24 py-6">
         {slide.kicker && (
           <p className="slide-kicker mb-8 font-display font-bold text-accent">
             {slide.kicker}
@@ -175,29 +175,45 @@ function SlideBody({ slide, index, total }: { slide: SlideDef; index: number; to
               </p>
             )}
             {slide.bullets && slide.bullets.length > 0 && (
-              <ul className="mt-12 flex flex-col gap-6">
+              <ul
+                className={cn(
+                  "flex flex-col",
+                  slide.kind === "steps" ? "mt-8 gap-4" : "mt-12 gap-6",
+                )}
+              >
                 {slide.bullets.map((raw, i) => {
                   const b = typeof raw === "string" ? { title: raw } : raw;
+                  const isSteps = slide.kind === "steps";
                   return (
                     <li key={i} className="flex items-start gap-6">
                       <span
                         className={cn(
-                          "mt-2 inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full font-display font-bold",
-                          slide.kind === "steps"
-                            ? "bg-accent text-primary"
-                            : "bg-chalk/15 text-accent",
+                          "inline-flex shrink-0 items-center justify-center rounded-full font-display font-bold",
+                          isSteps
+                            ? "mt-1 h-12 w-12 bg-accent text-primary"
+                            : "mt-2 h-14 w-14 bg-chalk/15 text-accent",
                         )}
-                        style={{ fontSize: 30 }}
+                        style={{ fontSize: isSteps ? 26 : 30 }}
                         aria-hidden
                       >
-                        {slide.kind === "steps" ? i + 1 : "·"}
+                        {isSteps ? i + 1 : "·"}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="slide-body-lg font-display font-bold text-chalk">
+                        <p
+                          className={cn(
+                            "font-display font-bold text-chalk",
+                            isSteps ? "slide-body" : "slide-body-lg",
+                          )}
+                        >
                           {b.title}
                         </p>
                         {b.caption && (
-                          <p className="slide-body mt-2 text-chalk/75">
+                          <p
+                            className={cn(
+                              "mt-1 text-chalk/75",
+                              isSteps ? "slide-caption" : "slide-body",
+                            )}
+                          >
                             {b.caption}
                           </p>
                         )}
