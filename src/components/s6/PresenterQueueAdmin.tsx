@@ -249,6 +249,13 @@ export function PresenterQueueAdmin({ userId }: { userId: string }) {
             : ""}
         </p>
       )}
+
+      {showFullscreen && (
+        <PresentationFullscreen
+          userId={userId}
+          onClose={() => setShowFullscreen(false)}
+        />
+      )}
     </div>
   );
 }
