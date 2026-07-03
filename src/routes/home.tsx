@@ -9,6 +9,8 @@ import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { S1Panel } from "@/components/school/S1Panel";
+import { S2Panel } from "@/components/school/S2Panel";
+import { getMyS2State } from "@/lib/s2.functions";
 import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
 import { Button } from "@/components/ui/button";
 
