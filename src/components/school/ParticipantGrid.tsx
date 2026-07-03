@@ -62,6 +62,7 @@ export type HelpRow = {
  * 이름 왼쪽에 신호등 뱃지, 오른쪽에 오전 완료 도장.
  */
 export function ParticipantGrid({
+  instructorUserId,
   participants,
   currentStage,
   s1Progress,
@@ -75,6 +76,7 @@ export function ParticipantGrid({
   helpMap,
   morningEarnedMap,
 }: {
+  instructorUserId: string;
   participants: Array<{ id: string; nickname: string }>;
   currentStage: number;
   s1Progress?: S1Progress[];
@@ -88,6 +90,11 @@ export function ParticipantGrid({
   helpMap?: Map<string, HelpRow>;
   morningEarnedMap?: Map<string, boolean>;
 }) {
+  const [detail, setDetail] = useState<{
+    userId: string;
+    nickname: string;
+    stageNo: number;
+  } | null>(null);
   if (participants.length === 0) {
     return (
       <div className="rounded-2xl border-2 border-dashed border-border/70 p-8 text-center">
