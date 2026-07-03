@@ -119,7 +119,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           <Button
             size="sm"
             variant="outline"
-            onClick={() => push(Math.max(0, idx - 1))}
+            onClick={() => stepBy(-1)}
             disabled={idx === 0}
             aria-label="이전 슬라이드"
           >
@@ -127,7 +127,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           </Button>
           <Button
             size="sm"
-            onClick={() => push(Math.min(total - 1, idx + 1))}
+            onClick={() => stepBy(1)}
             disabled={idx === total - 1}
             aria-label="다음 슬라이드"
           >
