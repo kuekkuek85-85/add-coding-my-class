@@ -130,7 +130,7 @@ export const getGallery = createServerFn({ method: "POST" })
         .in("user_id", memberIds),
       supabaseAdmin
         .from("s4_prompts")
-        .select("user_id, role, task, confirmed_at")
+        .select("user_id, role, context, task, confirmed_at")
         .in("user_id", memberIds),
       supabaseAdmin
         .from("s5_revised_prompts")
