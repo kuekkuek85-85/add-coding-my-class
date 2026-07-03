@@ -72,9 +72,10 @@ export const getMyPortfolio = createServerFn({ method: "POST" })
         .order("created_at", { ascending: true }),
       supabaseAdmin
         .from("s2_test_cases")
-        .select("title, given_when, expected_then, created_at")
+        .select("id, title, given_when, expected_then, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: true }),
+
       supabaseAdmin
         .from("s3_prd_drafts")
         .select(
