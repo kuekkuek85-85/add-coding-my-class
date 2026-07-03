@@ -12,11 +12,12 @@ async function getUser(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("app_users")
-    .select("id, role, session_id, nickname")
+    .select("id, role, session_id, nickname, deployed_url")
     .eq("id", userId)
     .maybeSingle();
   return data;
 }
+
 
 export const getParticipantStageDetail = createServerFn({ method: "POST" })
   .inputValidator(
