@@ -190,7 +190,7 @@ const S1: SlideDef[] = [
 ];
 
 // ────────────────────────────────────────────────────────────────────
-// S2 · 2교시 — 글쌤봇 확장 (테스트 케이스 먼저)
+// S2 · 2교시 — 확장 기능 떠올리기 (테스트 케이스 먼저)
 // ────────────────────────────────────────────────────────────────────
 const S2: SlideDef[] = [
   {
@@ -646,7 +646,7 @@ export type StageDeck = {
 
 const RAW_DECKS: Array<{ no: number; code: string; title: string; slides: SlideDef[] }> = [
   { no: 1, code: "S1", title: "기본 기능 떠올리기", slides: S1 },
-  { no: 2, code: "S2", title: "글쌤봇 확장", slides: S2 },
+  { no: 2, code: "S2", title: "확장 기능 떠올리기", slides: S2 },
   { no: 3, code: "S3", title: "PRD 작성·검증", slides: S3 },
   { no: 4, code: "S4", title: "TDD + 구현", slides: S4 },
   { no: 5, code: "S5", title: "교차 QA + 개선", slides: S5 },
