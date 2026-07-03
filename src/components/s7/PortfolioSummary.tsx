@@ -170,9 +170,25 @@ export function PortfolioSummary({ portfolio }: { portfolio: PortfolioLike }) {
         icon={ListChecks}
         done={portfolio.stamps.s5}
       >
+        {portfolio.s5.deployedUrl ? (
+          <a
+            href={portfolio.s5.deployedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-2 flex items-center gap-1.5 rounded-lg border-2 border-primary/30 bg-primary/5 px-2 py-1.5 text-xs font-semibold text-primary transition hover:border-primary hover:bg-primary/10"
+          >
+            <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span className="truncate">{portfolio.s5.deployedUrl}</span>
+          </a>
+        ) : (
+          <p className="mb-2 rounded-lg border border-dashed border-border/60 bg-muted/30 px-2 py-1.5 text-[11px] text-muted-foreground">
+            아직 배포 URL이 제출되지 않았습니다.
+          </p>
+        )}
         <p className="text-xs text-muted-foreground">
           체크리스트 {portfolio.s5.checkedCount}/{portfolio.s5.totalCases}건 기록
         </p>
+
         {portfolio.s5.revised ? (
           <dl className="mt-2 space-y-1 text-xs">
             <Row k="대상" v={portfolio.s5.revised.target} />
