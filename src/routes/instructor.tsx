@@ -19,6 +19,8 @@ import { StageControls } from "@/components/school/StageControls";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
 import { InstructorSlideDeck } from "@/components/school/SlideDeck";
 import { PresenterQueueAdmin } from "@/components/s6/PresenterQueueAdmin";
+import { RetrospectiveWall } from "@/components/s7/RetrospectiveWall";
+import { SessionCloseControl } from "@/components/s7/SessionCloseControl";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -283,6 +285,15 @@ function InstructorHome() {
             <PresenterQueueAdmin userId={stored.userId} />
           </div>
         )}
+
+        {/* 연수 마무리 (S6 이후 언제든 확인 가능) */}
+        {currentStage >= 6 && (
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <RetrospectiveWall userId={stored.userId} />
+            <SessionCloseControl userId={stored.userId} />
+          </div>
+        )}
+
 
         {/* 참가자 진행 그리드 */}
         <div className="mt-8">

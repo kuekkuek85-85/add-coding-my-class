@@ -13,6 +13,7 @@ import { Route as S6RouteImport } from './routes/s6'
 import { Route as S5RouteImport } from './routes/s5'
 import { Route as S4RouteImport } from './routes/s4'
 import { Route as S3RouteImport } from './routes/s3'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
@@ -37,6 +38,11 @@ const S3Route = S3RouteImport.update({
   path: '/s3',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstructorRoute = InstructorRouteImport.update({
   id: '/instructor',
   path: '/instructor',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/portfolio': typeof PortfolioRoute
   '/s3': typeof S3Route
   '/s4': typeof S4Route
   '/s5': typeof S5Route
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/portfolio': typeof PortfolioRoute
   '/s3': typeof S3Route
   '/s4': typeof S4Route
   '/s5': typeof S5Route
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/portfolio': typeof PortfolioRoute
   '/s3': typeof S3Route
   '/s4': typeof S4Route
   '/s5': typeof S5Route
@@ -83,16 +92,42 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/instructor' | '/s3' | '/s4' | '/s5' | '/s6'
+  fullPaths:
+    | '/'
+    | '/home'
+    | '/instructor'
+    | '/portfolio'
+    | '/s3'
+    | '/s4'
+    | '/s5'
+    | '/s6'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/instructor' | '/s3' | '/s4' | '/s5' | '/s6'
-  id: '__root__' | '/' | '/home' | '/instructor' | '/s3' | '/s4' | '/s5' | '/s6'
+  to:
+    | '/'
+    | '/home'
+    | '/instructor'
+    | '/portfolio'
+    | '/s3'
+    | '/s4'
+    | '/s5'
+    | '/s6'
+  id:
+    | '__root__'
+    | '/'
+    | '/home'
+    | '/instructor'
+    | '/portfolio'
+    | '/s3'
+    | '/s4'
+    | '/s5'
+    | '/s6'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HomeRoute: typeof HomeRoute
   InstructorRoute: typeof InstructorRoute
+  PortfolioRoute: typeof PortfolioRoute
   S3Route: typeof S3Route
   S4Route: typeof S4Route
   S5Route: typeof S5Route
@@ -129,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof S3RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/instructor': {
       id: '/instructor'
       path: '/instructor'
@@ -157,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HomeRoute: HomeRoute,
   InstructorRoute: InstructorRoute,
+  PortfolioRoute: PortfolioRoute,
   S3Route: S3Route,
   S4Route: S4Route,
   S5Route: S5Route,
