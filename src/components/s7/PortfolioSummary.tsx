@@ -193,6 +193,47 @@ export function PortfolioSummary({ portfolio }: { portfolio: PortfolioLike }) {
           체크리스트 {portfolio.s5.checkedCount}/{portfolio.s5.totalCases}건 기록
         </p>
 
+        {portfolio.s5.items && portfolio.s5.items.length > 0 && (
+          <ul className="mt-2 space-y-1 text-[11px]">
+            {portfolio.s5.items.map((it, i) => {
+              const status = it.result?.status;
+              const badge =
+                status === "pass"
+                  ? { label: "통과", cls: "bg-primary/15 text-primary border-primary/40" }
+                  : status === "partial"
+                    ? { label: "부분", cls: "bg-accent/20 text-accent-foreground border-accent/50" }
+                    : status === "fail"
+                      ? { label: "실패", cls: "bg-destructive/10 text-destructive border-destructive/40" }
+                      : { label: "미기록", cls: "bg-muted text-muted-foreground border-border" };
+              return (
+                <li
+                  key={`${it.source}-${i}`}
+                  className="rounded-lg border border-border/60 bg-background/60 px-2 py-1.5"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span className="rounded-sm bg-muted px-1 text-[10px] font-semibold uppercase text-muted-foreground">
+                      {it.source === "s2" ? "2교시" : "4교시"}
+                    </span>
+                    <span className="flex-1 truncate font-semibold text-foreground">{it.title}</span>
+                    <span className={`rounded-full border px-1.5 py-0.5 text-[10px] font-semibold ${badge.cls}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+                  {it.detail?.trim() && (
+                    <div className="mt-0.5 whitespace-pre-wrap text-muted-foreground">{it.detail}</div>
+                  )}
+                  {it.result?.note?.trim() && (
+                    <div className="mt-0.5 whitespace-pre-wrap text-foreground/80">
+                      메모: {it.result.note}
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+
+
         {portfolio.s5.revised ? (
           <dl className="mt-2 space-y-1 text-xs">
             <Row k="대상" v={portfolio.s5.revised.target} />
