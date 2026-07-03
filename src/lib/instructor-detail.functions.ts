@@ -338,7 +338,7 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
           deck: deck
             ? {
                 title: (deck.title ?? "") as string,
-                slides: (deck.slides ?? null) as unknown,
+                slides: deck.slides ?? null,
                 confirmedAt: (deck.confirmed_at ?? null) as string | null,
               }
             : null,
