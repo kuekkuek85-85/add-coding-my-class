@@ -89,7 +89,18 @@
     background-image:
       radial-gradient(circle at 20% 10%, oklch(0.97 0.03 85 / 0.4) 0, transparent 40%),
       radial-gradient(circle at 90% 80%, oklch(0.96 0.04 155 / 0.35) 0, transparent 45%);
+    /* 한글은 어절 단위로만 개행되도록 (단어 중간 잘림 방지) */
+    word-break: keep-all;
+    /* URL·해시 등 아주 긴 토큰은 필요 시 어디서든 감싸도록 */
+    overflow-wrap: anywhere;
+    line-break: strict;
   }
+  /* 폼 컨트롤도 동일 규칙 상속 */
+  input, textarea, select, button {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
   h1, h2, h3, .font-display {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
