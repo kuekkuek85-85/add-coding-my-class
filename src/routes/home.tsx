@@ -13,6 +13,7 @@ import { S2Panel } from "@/components/school/S2Panel";
 import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
 import { getMyS4State } from "@/lib/s4.functions";
+import { getMyS6State } from "@/lib/s6.functions";
 import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
 import { TrafficLight } from "@/components/school/TrafficLight";
 import { MorningStamp } from "@/components/school/MorningStamp";
@@ -29,6 +30,7 @@ function ParticipantHome() {
   const fetchS1 = useServerFn(getMyS1State);
   const fetchS2 = useServerFn(getMyS2State);
   const fetchS4 = useServerFn(getMyS4State);
+  const fetchS6 = useServerFn(getMyS6State);
 
   const { data } = useQuery({
     queryKey: ["snapshot", stored?.userId],
@@ -54,6 +56,13 @@ function ParticipantHome() {
   const { data: s4 } = useQuery({
     queryKey: ["s4-state", stored?.userId],
     queryFn: () => fetchS4({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 15_000,
+  });
+
+  const { data: s6 } = useQuery({
+    queryKey: ["s6-state", stored?.userId],
+    queryFn: () => fetchS6({ data: { userId: stored!.userId } }),
     enabled: !!stored?.userId,
     refetchInterval: 15_000,
   });
