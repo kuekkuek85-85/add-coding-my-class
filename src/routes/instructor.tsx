@@ -26,9 +26,11 @@ function InstructorHome() {
   const fetchSnapshot = useServerFn(getSessionSnapshot);
   const changeStage = useServerFn(setCurrentStage);
   const fetchS1 = useServerFn(getInstructorS1Summary);
+  const fetchS2 = useServerFn(getInstructorS2Summary);
 
   const snapshotKey = ["snapshot", stored?.userId];
   const s1Key = ["instructor-s1", stored?.userId];
+  const s2Key = ["instructor-s2", stored?.userId];
 
   const { data } = useQuery({
     queryKey: snapshotKey,
@@ -43,6 +45,14 @@ function InstructorHome() {
     enabled: !!stored?.userId,
     refetchInterval: 5_000,
   });
+
+  const { data: s2 } = useQuery({
+    queryKey: s2Key,
+    queryFn: () => fetchS2({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 5_000,
+  });
+
 
   const stageMutation = useMutation({
     mutationFn: (stageNo: number) =>
