@@ -2,9 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Users, KeyRound, CircleAlert, CircleX, CircleCheck } from "lucide-react";
+import { LogOut, Users, KeyRound, CircleAlert, CircleX, CircleCheck, RotateCcw } from "lucide-react";
 
-import { getSessionSnapshot, setCurrentStage } from "@/lib/session.functions";
+import { getSessionSnapshot, setCurrentStage, resetSessionData } from "@/lib/session.functions";
 import { getInstructorS1Summary } from "@/lib/s1.functions";
 import { getInstructorS2Summary } from "@/lib/s2.functions";
 import { getSessionS3Overview } from "@/lib/s3.functions";
@@ -22,6 +22,17 @@ import { PresenterQueueAdmin } from "@/components/s6/PresenterQueueAdmin";
 import { RetrospectiveWall } from "@/components/s7/RetrospectiveWall";
 import { SessionCloseControl } from "@/components/s7/SessionCloseControl";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/instructor")({
@@ -125,6 +136,20 @@ function InstructorHome() {
     onError: () => toast.error("스테이지 변경에 실패했습니다."),
   });
 
+  const resetFn = useServerFn(resetSessionData);
+  const resetMutation = useMutation({
+    mutationFn: () => resetFn({ data: { userId: stored!.userId } }),
+    onSuccess: (res) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success("세션 데이터가 초기화되었습니다.");
+      queryClient.invalidateQueries();
+    },
+    onError: () => toast.error("초기화에 실패했습니다."),
+  });
+
   if (!ready || !stored) return <div className="min-h-screen" />;
 
   if (data && !data.ok) {
@@ -181,6 +206,38 @@ function InstructorHome() {
           </div>
           <div className="flex items-center gap-2">
             <Nametag nickname={stored.nickname} role="instructor" />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-9 gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <RotateCcw className="h-4 w-4" aria-hidden />
+                  <span className="hidden sm:inline">데이터 초기화</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>세션 데이터를 초기화할까요?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    참가자 계정과 모든 교시 산출물(체크포인트, 테스트 케이스, PRD,
+                    프롬프트, 리뷰, 발표, 회고 등)이 삭제됩니다. 강사 계정과 세션
+                    입장 코드는 유지됩니다. 이 작업은 되돌릴 수 없습니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => resetMutation.mutate()}
+                    disabled={resetMutation.isPending}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {resetMutation.isPending ? "초기화 중…" : "초기화"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button
               size="sm"
               variant="ghost"
