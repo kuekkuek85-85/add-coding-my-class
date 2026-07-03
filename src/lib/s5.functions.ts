@@ -346,7 +346,7 @@ export const getRevieweeS4Bundle = createServerFn({ method: "POST" })
     if (pairs.get(user.id) !== data.revieweeId)
       return { ok: false as const, error: "배정된 리뷰 대상자가 아닙니다." };
 
-    const [{ data: prompt }, { data: cases }, { data: results }] = await Promise.all([
+    const [{ data: prompt }, { data: cases }, { data: results }, { data: reviewee }] = await Promise.all([
       supabaseAdmin
         .from("s4_prompts")
         .select("role, context, task, nonfunctional, confirmed_at")
@@ -361,6 +361,11 @@ export const getRevieweeS4Bundle = createServerFn({ method: "POST" })
         .from("s5_checklist_results")
         .select("test_case_id, status, note")
         .eq("user_id", data.revieweeId),
+      supabaseAdmin
+        .from("app_users")
+        .select("deployed_url")
+        .eq("id", data.revieweeId)
+        .maybeSingle(),
     ]);
     if (!prompt?.confirmed_at)
       return { ok: false as const, error: "대상자가 아직 S4를 확정하지 않았습니다." };
@@ -374,6 +379,7 @@ export const getRevieweeS4Bundle = createServerFn({ method: "POST" })
         task: prompt.task,
         nonfunctional: prompt.nonfunctional,
       },
+      deployedUrl: reviewee?.deployed_url ?? "",
       cases: (cases ?? []).map((c) => ({
         id: c.id,
         title: c.title,
