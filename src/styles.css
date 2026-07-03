@@ -117,3 +117,10 @@
   font-weight: 500;
   box-shadow: 0 2px 0 var(--primary);
 }
+
+/* sonner 토스트가 자체 폰트 스택을 사용해 한글이 깨지는 문제 방지 */
+[data-sonner-toaster],
+[data-sonner-toast],
+[data-sonner-toast] * {
+  font-family: var(--font-body) !important;
+}
