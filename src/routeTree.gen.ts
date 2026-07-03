@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as S5RouteImport } from './routes/s5'
 import { Route as S4RouteImport } from './routes/s4'
 import { Route as S3RouteImport } from './routes/s3'
 import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
 
+const S5Route = S5RouteImport.update({
+  id: '/s5',
+  path: '/s5',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const S4Route = S4RouteImport.update({
   id: '/s4',
   path: '/s4',
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/instructor': typeof InstructorRoute
   '/s3': typeof S3Route
   '/s4': typeof S4Route
+  '/s5': typeof S5Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/instructor': typeof InstructorRoute
   '/s3': typeof S3Route
   '/s4': typeof S4Route
+  '/s5': typeof S5Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,14 @@ export interface FileRoutesById {
   '/instructor': typeof InstructorRoute
   '/s3': typeof S3Route
   '/s4': typeof S4Route
+  '/s5': typeof S5Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/instructor' | '/s3' | '/s4'
+  fullPaths: '/' | '/home' | '/instructor' | '/s3' | '/s4' | '/s5'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/instructor' | '/s3' | '/s4'
-  id: '__root__' | '/' | '/home' | '/instructor' | '/s3' | '/s4'
+  to: '/' | '/home' | '/instructor' | '/s3' | '/s4' | '/s5'
+  id: '__root__' | '/' | '/home' | '/instructor' | '/s3' | '/s4' | '/s5'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,10 +86,18 @@ export interface RootRouteChildren {
   InstructorRoute: typeof InstructorRoute
   S3Route: typeof S3Route
   S4Route: typeof S4Route
+  S5Route: typeof S5Route
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/s5': {
+      id: '/s5'
+      path: '/s5'
+      fullPath: '/s5'
+      preLoaderRoute: typeof S5RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/s4': {
       id: '/s4'
       path: '/s4'
@@ -125,6 +142,7 @@ const rootRouteChildren: RootRouteChildren = {
   InstructorRoute: InstructorRoute,
   S3Route: S3Route,
   S4Route: S4Route,
+  S5Route: S5Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

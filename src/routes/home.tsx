@@ -12,6 +12,7 @@ import { S1Panel } from "@/components/school/S1Panel";
 import { S2Panel } from "@/components/school/S2Panel";
 import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
+import { getMyS4State } from "@/lib/s4.functions";
 import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
 import { TrafficLight } from "@/components/school/TrafficLight";
 import { MorningStamp } from "@/components/school/MorningStamp";
