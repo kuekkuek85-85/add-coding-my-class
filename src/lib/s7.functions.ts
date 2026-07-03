@@ -19,11 +19,12 @@ async function getUser(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("app_users")
-    .select("id, role, session_id, nickname")
+    .select("id, role, session_id, nickname, deployed_url")
     .eq("id", userId)
     .maybeSingle();
   return data;
 }
+
 
 // ---------- 참가자: 포트폴리오 (내 산출물 모아보기) ----------
 
@@ -190,7 +191,9 @@ export const getMyPortfolio = createServerFn({ method: "POST" })
         checkedCount: s5CheckedCount,
         totalCases: (s4cases ?? []).length,
         confirmed: s5Confirmed,
+        deployedUrl: (user as { deployed_url?: string | null }).deployed_url ?? null,
       },
+
       s6: {
         title: deck?.title ?? "",
         slides: Array.isArray(deck?.slides) ? deck?.slides : [],

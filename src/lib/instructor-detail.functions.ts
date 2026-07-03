@@ -12,11 +12,12 @@ async function getUser(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("app_users")
-    .select("id, role, session_id, nickname")
+    .select("id, role, session_id, nickname, deployed_url")
     .eq("id", userId)
     .maybeSingle();
   return data;
 }
+
 
 export const getParticipantStageDetail = createServerFn({ method: "POST" })
   .inputValidator(
@@ -268,6 +269,8 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
         nickname,
         stage: 5 as const,
         s5: {
+          deployedUrl:
+            (target as { deployed_url?: string | null }).deployed_url ?? null,
           results: (results ?? []).map((r) => ({
             testCaseId: r.test_case_id as string,
             source: (r.source ?? "s4") as "s2" | "s4",
@@ -300,6 +303,7 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
         },
       };
     }
+
 
     if (stage === 6) {
       const [{ data: deck }, { data: queue }, { data: comments }] = await Promise.all([
@@ -335,6 +339,8 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
         nickname,
         stage: 6 as const,
         s6: {
+          deployedUrl:
+            (target as { deployed_url?: string | null }).deployed_url ?? null,
           deck: deck
             ? {
                 title: (deck.title ?? "") as string,
@@ -358,6 +364,7 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
         },
       };
     }
+
 
     return { ok: false as const, error: "지원하지 않는 스테이지입니다." };
   });

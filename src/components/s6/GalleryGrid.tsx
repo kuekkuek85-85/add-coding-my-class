@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, User, FileText, ChevronRight } from "lucide-react";
+import { CheckCircle2, User, FileText, ChevronRight, ExternalLink } from "lucide-react";
 
 import { getGallery, getParticipantBundle } from "@/lib/s6.functions";
 import { Button } from "@/components/ui/button";
@@ -117,7 +117,7 @@ function BundleDialog({ userId, targetId }: { userId: string; targetId: string }
     </DialogContent>
   );
 
-  const { nickname, prd, prompt, revised, cases } = data;
+  const { nickname, prd, prompt, revised, cases, deployedUrl } = data;
   return (
     <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
       <DialogHeader>
@@ -126,6 +126,8 @@ function BundleDialog({ userId, targetId }: { userId: string; targetId: string }
         </DialogTitle>
       </DialogHeader>
       <div className="space-y-4 text-sm">
+        <DeployedLinkBanner url={deployedUrl} />
+
         <Section title="PRD">
           <Field label="문제">{prd?.problem}</Field>
           <Field label="사용자">{prd?.users}</Field>
@@ -192,3 +194,26 @@ function Field({ label, children }: { label: string; children?: string | null })
     </div>
   );
 }
+
+export function DeployedLinkBanner({ url }: { url: string | null | undefined }) {
+  const trimmed = (url ?? "").trim();
+  if (!trimmed) {
+    return (
+      <div className="rounded-lg border border-dashed border-border/60 bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+        아직 배포 URL이 제출되지 않았습니다.
+      </div>
+    );
+  }
+  return (
+    <a
+      href={trimmed}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-primary/5 px-3 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10"
+    >
+      <ExternalLink className="h-4 w-4 shrink-0" aria-hidden />
+      <span className="truncate">{trimmed}</span>
+    </a>
+  );
+}
+
