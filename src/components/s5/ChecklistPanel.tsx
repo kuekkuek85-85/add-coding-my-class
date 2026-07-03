@@ -61,7 +61,7 @@ export function ChecklistPanel({ userId, locked }: { userId: string; locked: boo
           <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">S5 · 5교시</p>
           <h2 className="font-display text-xl font-bold text-foreground">실행 체크리스트</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            S4에서 만든 테스트 케이스를 실제로 실행해 보고 <b>통과 / 부분 / 실패</b>를 표시합니다.
+            2교시·4교시에서 작성한 테스트 케이스를 하나씩 돌려보고 <b>통과 / 부분 / 실패</b>를 표시합니다.
           </p>
         </div>
         <p
