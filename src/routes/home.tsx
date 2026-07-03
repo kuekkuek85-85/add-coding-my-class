@@ -8,8 +8,6 @@ import { getSessionSnapshot } from "@/lib/session.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
-import { S1Panel } from "@/components/school/S1Panel";
-import { S2Panel } from "@/components/school/S2Panel";
 import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
 import { getMyS4State } from "@/lib/s4.functions";
