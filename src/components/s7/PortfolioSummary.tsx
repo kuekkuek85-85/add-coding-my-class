@@ -148,19 +148,16 @@ export function PortfolioSummary({ portfolio }: { portfolio: PortfolioLike }) {
 
       <Card
         code="S4"
-        title="첫 PRD 프롬프트"
+        title="수정한 PRD 프롬프트"
         icon={MessageSquare}
         done={portfolio.stamps.s4}
       >
-        {portfolio.s4.prompt ? (
-          <dl className="space-y-1 text-xs">
-            <Row k="역할" v={portfolio.s4.prompt.role} />
-            <Row k="컨텍스트" v={portfolio.s4.prompt.context} />
-            <Row k="할 일" v={portfolio.s4.prompt.task} />
-            <Row k="비기능" v={portfolio.s4.prompt.nonfunctional} />
-          </dl>
+        {portfolio.s4.prompt?.context?.trim() ? (
+          <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-border/40 bg-muted/30 p-2 text-[11px] leading-relaxed text-foreground">
+{portfolio.s4.prompt.context}
+          </pre>
         ) : (
-          <p className="text-xs text-muted-foreground">아직 첫 PRD 프롬프트가 없습니다.</p>
+          <p className="text-xs text-muted-foreground">아직 수정한 PRD 프롬프트가 없습니다.</p>
         )}
       </Card>
 

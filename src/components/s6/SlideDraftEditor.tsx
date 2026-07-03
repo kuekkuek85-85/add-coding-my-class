@@ -20,7 +20,7 @@ import { SlidePreview } from "./SlidePreview";
 const SECTION_LABELS = [
   "1. 표지",
   "2. 문제 정의",
-  "3. 첫 PRD 프롬프트",
+  "3. 수정한 PRD 프롬프트",
   "4. 실행에서 배운 것",
   "5. 개선한 프롬프트",
   "6. 다음에 해볼 것",

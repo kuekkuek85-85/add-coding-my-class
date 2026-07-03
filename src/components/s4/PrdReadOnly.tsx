@@ -31,7 +31,7 @@ export function PrdReadOnly({ prd }: { prd: Prd | null }) {
       <summary className="flex cursor-pointer list-none items-center justify-between gap-2 p-4">
         <div className="flex items-center gap-2 font-display text-sm font-bold text-primary">
           <FileText className="h-4 w-4" aria-hidden />
-          내 확정 PRD 다시 보기
+          내 초안 PRD 다시 보기
         </div>
         <span className="text-xs text-muted-foreground">펼치기</span>
       </summary>

@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 /**
- * S4(4교시 TDD + 첫 PRD 프롬프트) 서버 함수.
+ * S4(4교시 TDD + PRD 프롬프트) 서버 함수.
  *
  * 원칙:
  * - TDD 도우미와 프롬프트 조립기 모두 참가자의 문장을 대신 쓰지 않는다.
@@ -60,12 +60,8 @@ function isCompleteCase(c: {
 }
 
 function isPromptComplete(p: PromptFields) {
-  return (
-    p.role.trim().length > 0 &&
-    p.context.trim().length > 0 &&
-    p.task.trim().length > 0 &&
-    p.nonfunctional.trim().length > 0
-  );
+  // 초안 PRD 수정 방식: 단일 텍스트(context) 하나만 필수.
+  return p.context.trim().length > 0;
 }
 
 // -------- 상태 조회 --------
@@ -428,7 +424,7 @@ export const confirmMyS4Prompt = createServerFn({ method: "POST" })
     if (totalCount < 3) {
       return { ok: false as const, error: "테스트 케이스가 총 3개 이상 필요합니다. (2교시 케이스 포함)" };
     }
-    if (!prompt) return { ok: false as const, error: "프롬프트를 먼저 저장해 주세요." };
+    if (!prompt) return { ok: false as const, error: "초안 PRD를 먼저 수정·저장해 주세요." };
     if (
       !isPromptComplete({
         role: prompt.role,
@@ -437,7 +433,7 @@ export const confirmMyS4Prompt = createServerFn({ method: "POST" })
         nonfunctional: prompt.nonfunctional,
       })
     ) {
-      return { ok: false as const, error: "프롬프트 5칸을 모두 채워 주세요." };
+      return { ok: false as const, error: "초안 PRD 내용을 입력해 주세요." };
     }
 
     const now = new Date().toISOString();

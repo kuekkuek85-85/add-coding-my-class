@@ -130,7 +130,7 @@ export const getGallery = createServerFn({ method: "POST" })
         .in("user_id", memberIds),
       supabaseAdmin
         .from("s4_prompts")
-        .select("user_id, role, task, confirmed_at")
+        .select("user_id, role, context, task, confirmed_at")
         .in("user_id", memberIds),
       supabaseAdmin
         .from("s5_revised_prompts")
@@ -157,7 +157,7 @@ export const getGallery = createServerFn({ method: "POST" })
         nickname: m.nickname,
         prdProblem: (prd?.problem ?? "").slice(0, 240),
         promptRole: pr?.role ?? "",
-        promptTask: (pr?.task ?? "").slice(0, 240),
+        promptTask: ((pr?.context ?? "").trim().split(/\n+/).find((l) => l.trim() && !l.startsWith("#")) ?? "").slice(0, 240),
         promptConfirmed: !!pr?.confirmed_at,
         revisedTarget: rv?.target ?? "",
         revisedAdd: (rv?.add_list ?? "").slice(0, 240),
@@ -315,7 +315,7 @@ const DRAFT_SYSTEM = `너는 교사 연수 "내 수업에 코딩 한 스푼" 참
 슬라이드 6장의 목적은 다음 순서로 고정:
 1) 표지: 발표 주제(한 줄) + 본인 이름(주어짐).
 2) 문제 정의: PRD의 문제/사용자 요약.
-3) 첫 PRD 프롬프트: PRD → 첫 PRD 프롬프트로 넘어간 핵심.
+3) 수정한 PRD 프롬프트: 초안 PRD를 어떻게 다듬었는지 핵심.
 4) 실행에서 배운 것: 테스트 결과에서 관찰한 것.
 5) 개선한 프롬프트: 수정 PRD 프롬프트의 핵심.
 6) 다음에 해볼 것: 수업 현장에서 다음에 시도할 것.
@@ -446,11 +446,8 @@ export const generateSlideDraft = createServerFn({ method: "POST" })
       `사용자: ${prd?.users ?? ""}`,
       `핵심 기능: ${prd?.features ?? ""}`,
       "",
-      "## 첫 PRD 프롬프트",
-      `역할: ${prompt?.role ?? ""}`,
-      `컨텍스트: ${prompt?.context ?? ""}`,
-      `할 일: ${prompt?.task ?? ""}`,
-      `비기능: ${prompt?.nonfunctional ?? ""}`,
+      "## 수정한 PRD 프롬프트",
+      prompt?.context ?? "",
       "",
       "## 실행 체크(테스트 결과)",
       caseLines || "(없음)",

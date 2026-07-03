@@ -321,16 +321,13 @@ function S4View({
           </ol>
         )}
       </Section>
-      <Section title={`첫 PRD 프롬프트${s4.prompt?.confirmedAt ? " (확정)" : ""}`}>
-        {!s4.prompt ? (
-          <Empty text="아직 프롬프트를 작성하지 않았습니다." />
+      <Section title={`수정한 PRD 프롬프트${s4.prompt?.confirmedAt ? " (확정)" : ""}`}>
+        {!s4.prompt?.context?.trim() ? (
+          <Empty text="아직 초안 PRD를 수정하지 않았습니다." />
         ) : (
-          <div>
-            <Field label="역할" value={s4.prompt.role} />
-            <Field label="컨텍스트" value={s4.prompt.context} />
-            <Field label="해야 할 일" value={s4.prompt.task} />
-            <Field label="비기능 요구" value={s4.prompt.nonfunctional} />
-          </div>
+          <pre className="max-h-80 overflow-auto whitespace-pre-wrap rounded-lg border border-border/40 bg-muted/30 p-2 text-xs leading-relaxed text-foreground">
+{s4.prompt.context}
+          </pre>
         )}
       </Section>
     </div>
