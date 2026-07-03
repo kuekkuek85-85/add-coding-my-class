@@ -112,6 +112,48 @@ export type Database = {
         }
         Relationships: []
       }
+      help_signals: {
+        Row: {
+          id: string
+          level: string
+          note: string | null
+          session_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          level?: string
+          note?: string | null
+          session_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          level?: string
+          note?: string | null
+          session_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "help_signals_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "help_signals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       morning_memos: {
         Row: {
           created_at: string
