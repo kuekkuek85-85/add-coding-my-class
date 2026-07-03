@@ -196,18 +196,23 @@ export function ParticipantGrid({
                 </td>
 
                 <td className="px-2 py-2 text-center">
-                  <span
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDetail({ userId: p.id, nickname: p.nickname, stageNo: 1 })
+                    }
                     className={cn(
-                      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs",
+                      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                       (pr?.memoCount ?? 0) > 0
                         ? "bg-accent/40 text-primary"
                         : "bg-muted text-muted-foreground",
                     )}
-                    aria-label={`S1 메모 ${pr?.memoCount ?? 0}건`}
+                    aria-label={`${p.nickname}의 아침 메모 ${pr?.memoCount ?? 0}건 자세히 보기`}
+                    title={`${p.nickname} · 아침 메모 자세히 보기`}
                   >
                     <StickyNote className="h-3 w-3" aria-hidden />
                     {pr?.memoCount ?? 0}
-                  </span>
+                  </button>
                 </td>
                 {STAGES.map((s) => {
                   const st: "done" | "open" | "locked" =
