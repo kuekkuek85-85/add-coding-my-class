@@ -22,12 +22,20 @@ function ParticipantHome() {
   const navigate = useNavigate();
   const { ready, session: stored } = useStoredSession({ requireRole: "participant" });
   const fetchSnapshot = useServerFn(getSessionSnapshot);
+  const fetchS2 = useServerFn(getMyS2State);
 
   const { data } = useQuery({
     queryKey: ["snapshot", stored?.userId],
     queryFn: () => fetchSnapshot({ data: { userId: stored!.userId } }),
     enabled: !!stored?.userId,
     refetchInterval: 5_000,
+  });
+
+  const { data: s2 } = useQuery({
+    queryKey: ["s2-state", stored?.userId],
+    queryFn: () => fetchS2({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 15_000,
   });
 
   if (!ready || !stored) return <div className="min-h-screen" />;
@@ -40,6 +48,7 @@ function ParticipantHome() {
 
   const currentStage = data?.ok ? data.session.current_stage : 1;
   const currentSlideIndex = data?.ok ? data.session.current_slide_index : null;
+  const s2Passed = s2?.ok ? s2.passed : false;
 
   function handleLogout() {
     clearStoredSession();
@@ -47,10 +56,13 @@ function ParticipantHome() {
   }
 
   function statusFor(stageNo: number): StageStatus {
+    // S3는 S2 미니 게이트(테스트 케이스 2건) 통과 전까지 강제로 잠금
+    if (stageNo === 3 && !s2Passed) return "locked";
     if (stageNo < currentStage) return "done";
     if (stageNo === currentStage) return "open";
     return "locked";
   }
+
 
   return (
     <main className="min-h-screen">
