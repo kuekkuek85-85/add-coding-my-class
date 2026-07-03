@@ -594,10 +594,27 @@ export const getPresentationState = createServerFn({ method: "POST" })
       finishedAt: q.finished_at,
     }));
     const current = rows.find((r) => r.state === "current") ?? null;
+
+    let currentDeck: { title: string; slides: Slide[] } | null = null;
+    if (current) {
+      const { data: deck } = await supabaseAdmin
+        .from("s6_slide_decks")
+        .select("title, slides")
+        .eq("user_id", current.userId)
+        .maybeSingle();
+      if (deck) {
+        currentDeck = {
+          title: (deck.title ?? "").trim() || `${current.nickname} 님의 발표`,
+          slides: normalizeSlides(deck.slides),
+        };
+      }
+    }
+
     return {
       ok: true as const,
       queue: rows,
       current,
+      currentDeck,
       timerStartedAt: sessionRow?.s6_timer_started_at ?? null,
     };
   });
