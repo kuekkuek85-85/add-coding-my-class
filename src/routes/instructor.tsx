@@ -239,11 +239,20 @@ function InstructorHome() {
             )}
           </div>
         </div>
-        {/* 도움 요청 스트림 */}
-        <div className="mt-4">
-          <HelpStream signals={activeHelp} total={participants.length} />
+        {/* 오늘의 시간표 */}
+        <div className="mt-6">
+          <h2 className="mb-3 font-display text-xl font-bold text-foreground">오늘의 시간표</h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {STAGES.map((s) => (
+              <TimetableCard key={s.code} stage={s} status={statusFor(s.no)} />
+            ))}
+          </div>
         </div>
 
+        {/* 도움 요청 스트림 */}
+        <div className="mt-6">
+          <HelpStream signals={activeHelp} total={participants.length} />
+        </div>
 
         {/* 스테이지 개폐 컨트롤 */}
         <div className="mt-6">
@@ -253,10 +262,7 @@ function InstructorHome() {
             busy={stageMutation.isPending}
             onChange={(next) => stageMutation.mutate(next)}
           />
-
-
         </div>
-
 
         {/* 강의 슬라이드 */}
         <div className="mt-6">
@@ -266,22 +272,6 @@ function InstructorHome() {
             snapshotKey={snapshotKey}
           />
         </div>
-
-        {/* S6 발표 진행 (6교시일 때만 노출) */}
-        {currentStage >= 6 && (
-          <div className="mt-6">
-            <PresenterQueueAdmin userId={stored.userId} />
-          </div>
-        )}
-
-        {/* 연수 마무리 (S6 이후 언제든 확인 가능) */}
-        {currentStage >= 6 && (
-          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <RetrospectiveWall userId={stored.userId} />
-            <SessionCloseControl userId={stored.userId} />
-          </div>
-        )}
-
 
         {/* 참가자 진행 그리드 */}
         <div className="mt-8">
@@ -306,19 +296,22 @@ function InstructorHome() {
             helpMap={helpMap}
             morningEarnedMap={morningEarnedMap}
           />
-
         </div>
 
-
-        {/* 시간표(참고) */}
-        <div className="mt-8">
-          <h2 className="mb-3 font-display text-xl font-bold text-foreground">오늘의 시간표</h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {STAGES.map((s) => (
-              <TimetableCard key={s.code} stage={s} status={statusFor(s.no)} />
-            ))}
+        {/* S6 발표 진행 (6교시일 때만 노출) */}
+        {currentStage >= 6 && (
+          <div className="mt-6">
+            <PresenterQueueAdmin userId={stored.userId} />
           </div>
-        </div>
+        )}
+
+        {/* 오늘의 회고 모음 + 연수 마무리 (S6 이후 언제든 확인 가능) */}
+        {currentStage >= 6 && (
+          <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <RetrospectiveWall userId={stored.userId} />
+            <SessionCloseControl userId={stored.userId} />
+          </div>
+        )}
       </section>
     </main>
   );
