@@ -21,15 +21,24 @@ type Prd = {
 };
 
 type CaseLike = { title: string; given: string; when_step: string; then_step: string };
+type S2CaseLike = { title: string; given_when: string; expected_then: string };
 
-function buildDraftText(prd: Prd | null, cases: CaseLike[]): string {
-  const casesText = cases
+const SEED_MARKER = "# 통과해야 할 테스트 케이스";
+
+function buildDraftText(prd: Prd | null, s4Cases: CaseLike[], s2Cases: S2CaseLike[]): string {
+  const s4Lines = s4Cases
     .filter((c) => c.title.trim() && c.given.trim() && c.when_step.trim() && c.then_step.trim())
     .map(
       (c, i) =>
         `${i + 1}. ${c.title}\n   - 주어진: ${c.given}\n   - 할 때: ${c.when_step}\n   - 그러면: ${c.then_step}`,
-    )
-    .join("\n");
+    );
+  const s2Lines = s2Cases
+    .filter((c) => c.title.trim() && c.given_when.trim() && c.expected_then.trim())
+    .map(
+      (c, i) =>
+        `${s4Lines.length + i + 1}. [2교시] ${c.title}\n   - 상황/입력: ${c.given_when}\n   - 기대 출력: ${c.expected_then}`,
+    );
+  const casesText = [...s4Lines, ...s2Lines].join("\n");
 
   const sections = prd
     ? [
@@ -40,10 +49,10 @@ function buildDraftText(prd: Prd | null, cases: CaseLike[]): string {
         `# 성공 지표\n${prd.success_metric}`,
         `# 범위 밖\n${prd.out_of_scope}`,
       ]
-    : ["# 초안 PRD\n(3교시에서 PRD를 확정하면 여기에 초안이 채워집니다.)"];
+    : ["# 초안 PRD\n(3교시에서 PRD 2차 제출을 확정하면 여기에 초안이 채워집니다.)"];
 
   sections.push(
-    `# 통과해야 할 테스트 케이스\n${casesText || "(테스트 케이스 없음 — 앞 탭에서 추가하세요.)"}`,
+    `${SEED_MARKER}\n${casesText || "(테스트 케이스 없음 — 앞 탭에서 추가하세요.)"}`,
   );
   return sections.join("\n\n");
 }
@@ -79,14 +88,17 @@ export function FirstPromptBuilder({
 
   const prd = data?.ok ? data.prd : null;
   const cases = data?.ok ? data.cases : [];
+  const s2Cases = data?.ok ? data.s2Cases : [];
   const readOnly = !!data?.ok && data.confirmed;
 
-  const draftSeed = useMemo(() => buildDraftText(prd, cases), [prd, cases]);
+  const draftSeed = useMemo(() => buildDraftText(prd, cases, s2Cases), [prd, cases, s2Cases]);
 
   useEffect(() => {
     if (data?.ok && !initializedRef.current) {
-      const saved = data.prompt.context;
-      setText(saved && saved.trim().length > 0 ? saved : draftSeed);
+      const saved = (data.prompt.context ?? "").trim();
+      // 새 방식(전체 문서) 저장본만 그대로 사용. 비어 있거나 5칸 방식 잔여물이면 초안 시드로 채움.
+      const looksLikeFullDraft = saved.length > 0 && saved.includes(SEED_MARKER);
+      setText(looksLikeFullDraft ? data.prompt.context : draftSeed);
       initializedRef.current = true;
     }
   }, [data, draftSeed]);
