@@ -227,10 +227,12 @@ function SlideDeckViewer({
   title,
   slides,
   presenterName,
+  deployedUrl,
 }: {
   title: string;
   slides: Array<{ heading: string; body: string }>;
   presenterName: string;
+  deployedUrl?: string | null;
 }) {
   const [index, setIndex] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
