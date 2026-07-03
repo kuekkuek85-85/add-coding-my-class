@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 /**
- * S2(글쌤봇 확장) 미니 게이트.
+ * S2(확장 기능 떠올리기) 미니 게이트.
  *
  * PRD 원칙:
  * - 참가자는 확장 기능을 구현하기 "전에" 테스트 케이스를 2개 이상 작성해야 한다.
