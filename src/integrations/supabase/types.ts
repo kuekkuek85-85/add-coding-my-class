@@ -337,6 +337,84 @@ export type Database = {
         }
         Relationships: []
       }
+      s4_prompts: {
+        Row: {
+          confirmed_at: string | null
+          context: string
+          created_at: string
+          id: string
+          nonfunctional: string
+          role: string
+          session_id: string
+          task: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          context?: string
+          created_at?: string
+          id?: string
+          nonfunctional?: string
+          role?: string
+          session_id: string
+          task?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          context?: string
+          created_at?: string
+          id?: string
+          nonfunctional?: string
+          role?: string
+          session_id?: string
+          task?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      s4_test_cases: {
+        Row: {
+          created_at: string
+          given: string
+          id: string
+          order_index: number
+          session_id: string
+          then_step: string
+          title: string
+          updated_at: string
+          user_id: string
+          when_step: string
+        }
+        Insert: {
+          created_at?: string
+          given?: string
+          id?: string
+          order_index?: number
+          session_id: string
+          then_step?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+          when_step?: string
+        }
+        Update: {
+          created_at?: string
+          given?: string
+          id?: string
+          order_index?: number
+          session_id?: string
+          then_step?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          when_step?: string
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           created_at: string
