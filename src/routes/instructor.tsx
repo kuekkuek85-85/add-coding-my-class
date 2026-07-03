@@ -167,7 +167,12 @@ function InstructorHome() {
               14명 × 6교시 그리드. 도장은 통과한 스테이지를 나타냅니다.
             </p>
           </div>
-          <ParticipantGrid participants={participants} currentStage={currentStage} />
+          <ParticipantGrid
+            participants={participants}
+            currentStage={currentStage}
+            s1Progress={s1?.ok ? s1.progress : []}
+            s1Total={s1?.ok ? s1.totalCheckpoints : 0}
+          />
         </div>
 
         {/* 시간표(참고) */}
