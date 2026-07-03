@@ -202,3 +202,76 @@ export const setCurrentSlide = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, error: "슬라이드 변경에 실패했습니다." };
     return { ok: true as const, slideIndex: data.slideIndex };
   });
+
+export const resetSessionData = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string }) =>
+    z.object({ userId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: caller } = await supabaseAdmin
+      .from("app_users")
+      .select("id, role, session_id")
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (!caller) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (caller.role !== "instructor") {
+      return { ok: false as const, error: "강사만 데이터를 초기화할 수 있습니다." };
+    }
+    const sessionId = caller.session_id;
+
+    // Tables scoped by session_id
+    const sessionScoped = [
+      "help_signals",
+      "morning_memos",
+      "s2_test_cases",
+      "s3_grill_questions",
+      "s3_prd_drafts",
+      "s3_reviews",
+      "s4_prompts",
+      "s4_test_cases",
+      "s5_checklist_results",
+      "s5_qa_reviews",
+      "s5_revised_prompts",
+      "s6_comments",
+      "s6_presentation_queue",
+      "s6_slide_decks",
+      "s7_retrospectives",
+    ] as const;
+
+    for (const t of sessionScoped) {
+      const { error } = await supabaseAdmin.from(t).delete().eq("session_id", sessionId);
+      if (error) return { ok: false as const, error: `${t} 초기화 실패: ${error.message}` };
+    }
+
+    // checkpoint_progress: only has user_id — scope via participants in this session
+    const { data: participants } = await supabaseAdmin
+      .from("app_users")
+      .select("id")
+      .eq("session_id", sessionId)
+      .eq("role", "participant");
+    const participantIds = (participants ?? []).map((p) => p.id);
+    if (participantIds.length > 0) {
+      const { error } = await supabaseAdmin
+        .from("checkpoint_progress")
+        .delete()
+        .in("user_id", participantIds);
+      if (error) return { ok: false as const, error: `checkpoint_progress 초기화 실패: ${error.message}` };
+    }
+
+    // Remove participant accounts (keep instructor)
+    const { error: delUsersErr } = await supabaseAdmin
+      .from("app_users")
+      .delete()
+      .eq("session_id", sessionId)
+      .eq("role", "participant");
+    if (delUsersErr) return { ok: false as const, error: `참가자 초기화 실패: ${delUsersErr.message}` };
+
+    // Reset session pointers
+    await supabaseAdmin
+      .from("sessions")
+      .update({ current_stage: 1, current_slide_index: null })
+      .eq("id", sessionId);
+
+    return { ok: true as const };
+  });
