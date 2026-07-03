@@ -1,4 +1,4 @@
-import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX } from "lucide-react";
+import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX, FileCheck2, MessagesSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
 
@@ -12,6 +12,14 @@ export type S2Progress = {
   userId: string;
   cases: number;
   passed: boolean;
+};
+
+export type S3Progress = {
+  userId: string;
+  v1: boolean;
+  v2: boolean;
+  reviewGiven: boolean;
+  reviewReceived: number;
 };
 
 export type HelpRow = {
@@ -32,6 +40,7 @@ export function ParticipantGrid({
   s1Total,
   s2Progress,
   s2Min,
+  s3Progress,
   helpMap,
   morningEarnedMap,
 }: {
@@ -41,6 +50,7 @@ export function ParticipantGrid({
   s1Total?: number;
   s2Progress?: S2Progress[];
   s2Min?: number;
+  s3Progress?: S3Progress[];
   helpMap?: Map<string, HelpRow>;
   morningEarnedMap?: Map<string, boolean>;
 }) {
@@ -61,6 +71,9 @@ export function ParticipantGrid({
   const s2Map = new Map<string, S2Progress>();
   for (const p of s2Progress ?? []) s2Map.set(p.userId, p);
   const s2Threshold = s2Min ?? 2;
+
+  const s3Map = new Map<string, S3Progress>();
+  for (const p of s3Progress ?? []) s3Map.set(p.userId, p);
 
 
   return (
@@ -149,6 +162,8 @@ export function ParticipantGrid({
                     s.no < currentStage ? "done" : s.no === currentStage ? "open" : "locked";
                   const showS1Count = s.no === 1 && total > 0 && st !== "locked";
                   const showS2Gate = s.no === 2 && st !== "locked";
+                  const s3 = s3Map.get(p.id);
+                  const showS3 = s.no === 3 && (st !== "locked" || s3?.v1 || s3?.v2);
                   return (
                     <td key={s.code} className="px-2 py-2 text-center">
                       {showS1Count ? (
@@ -158,6 +173,14 @@ export function ParticipantGrid({
                           cases={s2?.cases ?? 0}
                           min={s2Threshold}
                           passed={s2?.passed ?? false}
+                        />
+                      ) : showS3 ? (
+                        <S3Cell
+                          v1={!!s3?.v1}
+                          v2={!!s3?.v2}
+                          reviewGiven={!!s3?.reviewGiven}
+                          reviewReceived={s3?.reviewReceived ?? 0}
+                          status={st}
                         />
                       ) : (
                         <StageCell status={st} />
@@ -250,3 +273,45 @@ function StageCell({ status }: { status: "done" | "open" | "locked" }) {
     </span>
   );
 }
+
+function S3Cell({
+  v1,
+  v2,
+  reviewGiven,
+  reviewReceived,
+  status,
+}: {
+  v1: boolean;
+  v2: boolean;
+  reviewGiven: boolean;
+  reviewReceived: number;
+  status: "done" | "open" | "locked";
+}) {
+  if (v2) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground"
+        aria-label="S3 2차 제출 완료"
+        title="S3 게이트 통과"
+      >
+        <Stamp className="h-3 w-3" aria-hidden />
+        v2
+      </span>
+    );
+  }
+  if (v1) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-900"
+        aria-label={`S3 1차 제출 · 받은 리뷰 ${reviewReceived}건${reviewGiven ? " · 리뷰 완료" : ""}`}
+        title={`받은 리뷰 ${reviewReceived}건${reviewGiven ? ", 내가 리뷰 완료" : ""}`}
+      >
+        <FileCheck2 className="h-3 w-3" aria-hidden />
+        v1
+        {reviewGiven && <MessagesSquare className="ml-0.5 h-3 w-3" aria-hidden />}
+      </span>
+    );
+  }
+  return <StageCell status={status} />;
+}
+

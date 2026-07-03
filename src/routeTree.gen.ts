@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as S3RouteImport } from './routes/s3'
 import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
 
+const S3Route = S3RouteImport.update({
+  id: '/s3',
+  path: '/s3',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstructorRoute = InstructorRouteImport.update({
   id: '/instructor',
   path: '/instructor',
@@ -33,34 +39,45 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/s3': typeof S3Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/s3': typeof S3Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/s3': typeof S3Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/instructor'
+  fullPaths: '/' | '/home' | '/instructor' | '/s3'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/instructor'
-  id: '__root__' | '/' | '/home' | '/instructor'
+  to: '/' | '/home' | '/instructor' | '/s3'
+  id: '__root__' | '/' | '/home' | '/instructor' | '/s3'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HomeRoute: typeof HomeRoute
   InstructorRoute: typeof InstructorRoute
+  S3Route: typeof S3Route
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/s3': {
+      id: '/s3'
+      path: '/s3'
+      fullPath: '/s3'
+      preLoaderRoute: typeof S3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/instructor': {
       id: '/instructor'
       path: '/instructor'
@@ -89,17 +106,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HomeRoute: HomeRoute,
   InstructorRoute: InstructorRoute,
+  S3Route: S3Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
