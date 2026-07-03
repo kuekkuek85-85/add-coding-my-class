@@ -162,6 +162,14 @@
   font-size: var(--slide-chrome); line-height: 1.15; white-space: nowrap;
 }
 
+/* 슬라이드 본문 텍스트도 한글 어절 단위 개행 (chrome/page/footer 제외) */
+.slide-content :where(h1, h2, h3, p, li, span, a, div):not(.slide-chrome):not(.slide-page):not(.slide-footer) {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-break: strict;
+}
+
+
 /* 오전 완료 도장 애니메이션 — 회전 후 확대 착지(단발) */
 @keyframes stamp {
   0%   { transform: scale(2.4) rotate(-18deg); opacity: 0; }
