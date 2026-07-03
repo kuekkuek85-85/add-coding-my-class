@@ -350,6 +350,7 @@ function S5View({
   s5,
 }: {
   s5: {
+    deployedUrl?: string | null;
     results: Array<{
       testCaseId: string;
       source: "s2" | "s4";
@@ -371,7 +372,11 @@ function S5View({
 }) {
   return (
     <div>
+      <Section title="배포 URL">
+        <DeployedUrlBanner url={s5.deployedUrl} />
+      </Section>
       <Section title={`실행 체크리스트 결과 (${s5.results.length})`}>
+
         {s5.results.length === 0 ? (
           <Empty text="아직 기록된 결과가 없습니다." />
         ) : (
