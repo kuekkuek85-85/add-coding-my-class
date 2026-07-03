@@ -245,11 +245,14 @@ function InstructorHome() {
           <ParticipantGrid
             participants={participants}
             currentStage={currentStage}
-            s1Progress={s1?.ok ? s1.progress : []}
-            s1Total={s1?.ok ? s1.totalCheckpoints : 0}
+            s1Progress={s1Progress}
+            s1Total={s1Total}
             s2Progress={s2Progress}
             s2Min={s2Min}
+            helpMap={helpMap}
+            morningEarnedMap={morningEarnedMap}
           />
+
         </div>
 
 
