@@ -9,6 +9,7 @@ import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { S1Panel } from "@/components/school/S1Panel";
+import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/home")({
@@ -36,6 +37,7 @@ function ParticipantHome() {
   }
 
   const currentStage = data?.ok ? data.session.current_stage : 1;
+  const currentSlideIndex = data?.ok ? data.session.current_slide_index : null;
 
   function handleLogout() {
     clearStoredSession();
@@ -50,6 +52,9 @@ function ParticipantHome() {
 
   return (
     <main className="min-h-screen">
+      {currentSlideIndex !== null && (
+        <ParticipantSlideOverlay slideIndex={currentSlideIndex} />
+      )}
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div>

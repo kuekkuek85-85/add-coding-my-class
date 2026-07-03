@@ -11,6 +11,7 @@ import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { StageControls } from "@/components/school/StageControls";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
+import { InstructorSlideDeck } from "@/components/school/SlideDeck";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/instructor")({
@@ -156,6 +157,15 @@ function InstructorHome() {
             maxStage={STAGES.length}
             busy={stageMutation.isPending}
             onChange={(next) => stageMutation.mutate(next)}
+          />
+        </div>
+
+        {/* 강의 슬라이드 */}
+        <div className="mt-6">
+          <InstructorSlideDeck
+            userId={stored.userId}
+            currentSlideIndex={data?.ok ? data.session.current_slide_index : null}
+            snapshotKey={snapshotKey}
           />
         </div>
 
