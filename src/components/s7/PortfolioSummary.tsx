@@ -152,7 +152,7 @@ export function PortfolioSummary({ portfolio }: { portfolio: PortfolioLike }) {
         icon={MessageSquare}
         done={portfolio.stamps.s4}
       >
-        {portfolio.s4.prompt && portfolio.s4.prompt.context.trim() ? (
+        {portfolio.s4.prompt?.context?.trim() ? (
           <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-border/40 bg-muted/30 p-2 text-[11px] leading-relaxed text-foreground">
 {portfolio.s4.prompt.context}
           </pre>
