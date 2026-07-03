@@ -196,6 +196,11 @@ function InstructorHome() {
             )}
           </div>
         </div>
+        {/* 도움 요청 스트림 */}
+        <div className="mt-4">
+          <HelpStream signals={activeHelp} total={participants.length} />
+        </div>
+
 
         {/* 스테이지 개폐 컨트롤 */}
         <div className="mt-6">
