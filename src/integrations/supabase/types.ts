@@ -678,8 +678,54 @@ export type Database = {
         }
         Relationships: []
       }
+      s7_retrospectives: {
+        Row: {
+          id: string
+          learned: string
+          next_try: string | null
+          session_id: string
+          submitted_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          learned: string
+          next_try?: string | null
+          session_id: string
+          submitted_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          learned?: string
+          next_try?: string | null
+          session_id?: string
+          submitted_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s7_retrospectives_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s7_retrospectives_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
+          closed_at: string | null
           created_at: string
           current_slide_index: number | null
           current_stage: number
@@ -690,6 +736,7 @@ export type Database = {
           s6_timer_started_at: string | null
         }
         Insert: {
+          closed_at?: string | null
           created_at?: string
           current_slide_index?: number | null
           current_stage?: number
@@ -700,6 +747,7 @@ export type Database = {
           s6_timer_started_at?: string | null
         }
         Update: {
+          closed_at?: string | null
           created_at?: string
           current_slide_index?: number | null
           current_stage?: number

@@ -1,64 +1,67 @@
-# Step 7 · S6 「갤러리 발표」 (6교시)
+# Step 8 · 연수 마무리 「수료식과 명찰 완성」
 
-S1~S5까지 완료된 참가자들이 자신의 여정(PRD → 첫 프롬프트 → 실행 체크 → 수정 프롬프트)을 정리해 **3분 발표**하고, 청중은 **좋은 점 코멘트**를 실시간으로 남기는 마지막 스테이지입니다.
+S1~S6를 모두 통과한 참가자가 **오늘의 여정을 한 화면에 모아 보고, 회고를 남기고, 수료 도장을 받는** 마지막 단계입니다. 강사는 연수를 공식 종료할 수 있습니다.
 
 ## 완료 기준
 
-- **갤러리**: S5 확정한 참가자 카드 목록. 각 카드는 닉네임 + PRD 제목 + 프롬프트/수정 프롬프트 미리보기 + "펼쳐보기". 서로의 산출물을 자유롭게 열람.
-- **발표 슬라이드 초안 생성기**: 참가자가 자기 카드에서 "슬라이드 초안 만들기" → Lovable AI로 6장 초안(표지 / PRD 한 문장 / 첫 프롬프트 요약 / 실행 체크에서 배운 것 / 수정 프롬프트 핵심 / 다음에 해볼 것) 생성. **초안은 반드시 교사(=자기 자신)가 각 슬라이드 문장을 편집 후 "발표 준비 완료" 버튼을 눌러야 확정.** 이 예외는 프로젝트 원칙에 명시.
-- **발표 순서**: 강사가 발표 큐에 참가자를 등록/재정렬/현재 발표자 지정. "지금 발표 중" 표시가 모든 참가자 화면에 실시간 반영.
-- **청중 코멘트**: 발표 중인 참가자에게 다른 참가자들이 "좋은 점"(필수 5자 이상) + "질문/제안"(선택) 코멘트 남김. 발표자 카드 하단에 실시간 누적.
-- **강사 대시보드**: 발표 큐 관리(추가/제거/순서 변경/다음), 3분 타이머(시작/일시정지/리셋), 참가자별 발표 완료 도장, S6 진행표.
-- **최종 게이트**: 자기 슬라이드 확정 + 발표 완료 표시(강사가 눌러줌) → S6 도장 → 그리드 전 스테이지 완료.
+- **내 산출물 모아보기 (`/portfolio`)** — 참가자용 한 페이지에 아침 메모 → S2 테스트 케이스 → S3 PRD → S4 첫 프롬프트 → S5 실행 체크·수정 프롬프트 → S6 슬라이드·받은 코멘트 요약. 스테이지별 도장 상태 배지. 인쇄 친화 레이아웃.
+- **회고 카드** — 포트폴리오 상단에 "오늘 배운 것 1문장(필수, 10자+)" + "다음 수업에 시도할 것 1문장(선택)" 폼. 강사 대시보드에 실시간 모음 뷰.
+- **최종 게이트 · 수료 도장판** — S1 아침 도장 + S2~S6 6개 도장 + 회고 제출이 모두 완료되면 홈 화면에 "심화반 수료" 종합 스탬프(큰 도장 카드) 노출.
+- **수료증(명찰형)** — 닉네임 + 세션명 + 6개 도장 아이콘 + 수료 시각을 담은 카드. 브라우저 인쇄로 저장 가능(PDF 출력은 브라우저 기본 기능 이용, 별도 라이브러리 없음).
+- **강사 연수 종료 처리** — 강사 대시보드에 "연수 종료" 버튼. `sessions.state = 'closed'` 로 전환하면 참가자 홈이 수료 모드로 잠기고 새 편집이 막힘(뷰만 허용).
 
 ## 데이터 (마이그레이션 1건)
 
-- `s6_slide_decks` — 참가자별 1행. `user_id`, `session_id`, `title`, `slides` (jsonb: `[{heading, body}]` 6개), `draft_generated_at`, `confirmed_at`.
-- `s6_comments` — 청중 코멘트. `presenter_id`, `commenter_id`, `session_id`, `good`(필수), `question`.
-- `s6_presentation_queue` — 발표 순서. `session_id`, `user_id`, `order_index`, `state`(waiting/current/done), `started_at`, `finished_at`. `(session_id, user_id)` unique.
-- 세 테이블 모두 Deny-all + `service_role` GRANT, 서버 함수 경유.
-- `sessions` 컬럼 추가: `s6_timer_started_at` (nullable) — 강사 타이머 서버 시각.
+- `s7_retrospectives` — 참가자별 1행. `user_id`, `session_id`, `learned`(text, not null, 10자+), `next_try`(text, nullable), `submitted_at`. `(session_id, user_id)` unique.
+- `sessions` 컬럼 추가: `closed_at` (nullable timestamptz).
+- Deny-all RLS + `service_role` GRANT, 서버 함수 경유(기존 스테이지들과 동일 패턴).
 
-## 서버 함수 (`src/lib/s6.functions.ts`)
+## 서버 함수 (`src/lib/s7.functions.ts`, `session.functions.ts` 확장)
 
-- 참가자: `getMyS6State`, `getGallery`(닉네임/PRD/프롬프트/수정 프롬프트 목록), `getParticipantBundle(userId)`(상세), `generateSlideDraft`(Lovable AI, 초안만), `saveMySlides`, `confirmMySlides`(6장 모두 heading+body 있음 필수), `submitComment`(좋은 점 5자+), `getMyReceivedComments`, `getCurrentPresenter`.
-- 강사: `getSessionS6Overview`, `addToQueue`, `removeFromQueue`, `reorderQueue`, `setCurrentPresenter`, `markPresenterDone`, `startTimer`, `resetTimer`.
-- 전부 `requireSupabaseAuth` + role 검증.
+- 참가자:
+  - `getMyPortfolio(userId)` — S1 메모/S2 케이스/S3 PRD/S4 프롬프트/S5 수정본/S6 슬라이드+받은 코멘트+도장 상태를 하나의 DTO로 반환.
+  - `getMyRetrospective`, `saveMyRetrospective` (10자 검증).
+  - `getMyCompletion` — 6개 도장 + 회고 제출 여부 + 완료 시각 계산.
+- 강사:
+  - `getSessionRetrospectives` — 참가자별 회고 모음(닉네임 + 두 문장 + 시각).
+  - `getSessionCompletion` — 참가자별 완료 여부 요약.
+  - `closeSession` / `reopenSession` — `sessions.closed_at` 토글, admin 역할 검증.
+
+전부 `requireSupabaseAuth` + 역할 검증. Lovable AI 호출 없음(대필 금지 원칙).
 
 ## UI
 
-- 신규 라우트 `src/routes/s6.tsx` — 참가자용, 3개 탭: **1. 갤러리 → 2. 내 발표 슬라이드 → 3. 발표 진행(청중 코멘트)**.
-- 컴포넌트 (`src/components/s6/`):
-  - `GalleryGrid.tsx` — 참가자 카드 목록 + 상세 다이얼로그.
-  - `SlideDraftEditor.tsx` — 6장 슬라이드 편집기(제목/본문 textarea × 6). 상단에 "초안 만들기"(AI) 버튼 + "AI 초안은 반드시 편집·확정 후 제출됩니다" 안내. 확정 시 잠금.
-  - `SlidePreview.tsx` — 슬라이드 미리보기(1920×1080 스케일, `slides-app` 가이드 준수: `.slide-content` + `slide-title` / `slide-body` 시맨틱 클래스).
-  - `PresentationStage.tsx` — 현재 발표자 표시 + 청중 코멘트 폼(내가 발표자가 아닐 때) 또는 받은 코멘트 실시간 목록(내가 발표자일 때).
-  - `PresenterQueueAdmin.tsx`(강사용) — 큐 관리 + 타이머 + 완료 버튼.
-- `src/routes/instructor.tsx`에 **S6 발표 진행** 섹션 추가 (`PresenterQueueAdmin` 사용).
-- `src/components/school/ParticipantGrid.tsx` — S6 셀: 슬라이드 확정(회색 도장) → 발표 완료(초록 도장) 2단계.
-- `src/routes/home.tsx` 6교시 카드에 "S6 열기" 버튼(S5 확정자만).
-- 실시간 폴링: 발표 진행 상태 3초, 받은 코멘트 4초 간격 `refetchInterval`.
+- 신규 라우트 `src/routes/portfolio.tsx` — 참가자용 포트폴리오+회고+수료증 한 페이지, 인쇄 스타일(@media print) 포함.
+- 컴포넌트 (`src/components/s7/`):
+  - `PortfolioSummary.tsx` — 스테이지별 카드 6개 요약(펼치기 없이 요점만).
+  - `RetrospectiveForm.tsx` — 두 문장 입력 폼, 저장 후 잠금(수정은 세션 종료 전까지 허용).
+  - `CompletionStamp.tsx` — 수료 상태 큰 도장 카드(미완료 시 남은 항목 안내).
+  - `CertificateCard.tsx` — 명찰형 수료증(인쇄 최적화, 세션명·닉네임·6도장·수료 시각).
+  - `RetrospectiveWall.tsx`(강사용) — 실시간 회고 모음 그리드.
+  - `SessionCloseControl.tsx`(강사용) — 종료/재개 토글 + 확인 다이얼로그.
+- `src/routes/home.tsx` — 홈 상단에 `CompletionStamp` + "내 산출물 모아보기 열기" 버튼(S6 완료자만 활성). 세션 종료 시 시간표 카드 편집 잠금 문구.
+- `src/routes/instructor.tsx` — 「연수 마무리」 섹션 추가(회고 모음 + 종료 버튼).
+- `src/components/school/ParticipantGrid.tsx` — 마지막 열에 "회고" + "수료" 상태 컬럼 추가.
 
 ## 규칙 준수
 
-- **AI 대필 예외**: 슬라이드 초안 생성만 허용. UI에 "AI 초안은 참고용 — 반드시 직접 편집·확정 후 발표합니다" 문구 상단 고정.
-- 청중 코멘트 "좋은 점" 필수(5자 이상), 빈 값 제출 불가.
-- 발표 순서·현재 발표자·완료 처리 권한은 강사만.
-- 자기 슬라이드 확정 없이는 발표 큐 등록 불가.
-- 한국어 UI, 학교 톤, 이모지 없음. 색약 접근성: 도장 상태는 색+아이콘+텍스트 병행.
+- AI 대필 금지: 회고·포트폴리오 어디에도 AI 자동 작성 없음.
+- 회고 "배운 것" 필수(10자 이상), 빈 값 제출 불가.
+- 세션 종료 권한은 강사(admin)만.
+- 세션 종료 이후 참가자 서버 함수는 `session.closed_at != null` 이면 편집 계열(save/confirm/submit)을 거부, 조회는 허용.
+- 한국어 UI, 학교 톤. 도장 상태는 색+아이콘+텍스트 병행. 모바일 우선 레이아웃.
 
 ## 기술 메모
 
-- 슬라이드 미리보기는 편집기 우측에 320×180 축소판. 발표 스테이지에서는 큰 미리보기(960×540)로 렌더.
-- 슬라이드 데이터는 `slides: [{heading, body}]` 형태의 jsonb 6원소 배열로 고정 저장.
-- 타이머는 클라이언트 로컬 카운트(강사 화면만) — 서버 저장 최소화, `s6_timer_started_at` 만 저장해 새로고침 복원.
-- 실시간은 기존 스테이지들과 동일한 폴링 방식.
+- 수료증 인쇄는 `window.print()` + `@media print { ... }` CSS만 사용. PDF 라이브러리 도입 없음.
+- 실시간은 기존 스테이지와 동일한 폴링 방식(`refetchInterval`).
+- 데이터 시딩은 별도로 하지 않음(리허설용 4명은 이미 존재).
 
 ## 이번 턴에 하지 않는 것
 
-- 실제 프로젝터 풀스크린 프레젠테이션 모드(F5 등) — 강사 화면의 큰 미리보기로 대체.
-- 슬라이드 드래그 재정렬 / 추가 슬라이드(6장 고정).
-- 발표 녹화 / 발표 후 회고 카드.
-- 슬라이드를 PDF/이미지로 내보내기.
+- 수료증 이미지/PDF 서버 생성, 이메일 발송.
+- 강사용 CSV 내보내기, 참가자별 상세 분석 리포트.
+- 발표 녹화, 슬라이드 PDF 내보내기(계획 파일에 이미 보류로 명시된 항목).
+- 헬프 신호 히스토리 뷰(별도 후속 작업).
 
 이대로 진행할까요?

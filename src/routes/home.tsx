@@ -1,8 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut } from "lucide-react";
+import { LogOut, Award } from "lucide-react";
 
 import { getSessionSnapshot } from "@/lib/session.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
@@ -14,9 +14,11 @@ import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
 import { getMyS4State } from "@/lib/s4.functions";
 import { getMyS6State } from "@/lib/s6.functions";
+import { getMyCompletion } from "@/lib/s7.functions";
 import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
 import { TrafficLight } from "@/components/school/TrafficLight";
 import { MorningStamp } from "@/components/school/MorningStamp";
+import { CompletionStamp, type StampSet } from "@/components/s7/CompletionStamp";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/home")({
@@ -31,6 +33,7 @@ function ParticipantHome() {
   const fetchS2 = useServerFn(getMyS2State);
   const fetchS4 = useServerFn(getMyS4State);
   const fetchS6 = useServerFn(getMyS6State);
+  const fetchCompletion = useServerFn(getMyCompletion);
 
   const { data } = useQuery({
     queryKey: ["snapshot", stored?.userId],
@@ -67,6 +70,13 @@ function ParticipantHome() {
     refetchInterval: 15_000,
   });
 
+  const { data: completion } = useQuery({
+    queryKey: ["s7-completion", stored?.userId],
+    queryFn: () => fetchCompletion({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 20_000,
+  });
+
   if (!ready || !stored) return <div className="min-h-screen" />;
 
   if (data && !data.ok) {
@@ -83,6 +93,22 @@ function ParticipantHome() {
   const s1Checked = s1?.ok ? s1.checkedIds.length : 0;
   const s1Total = s1?.ok ? s1.checkpoints.length : 0;
   const morningEarned = s1Total > 0 && s1Checked >= s1Total && s2Passed;
+
+  type CompletionOk = {
+    ok: true;
+    session: { name: string; closedAt: string | null };
+    nickname: string;
+    stamps: StampSet;
+    stampCount: number;
+    retroSubmitted: boolean;
+    allDone: boolean;
+    completedAt: string | null;
+  };
+  const c: CompletionOk | null =
+    completion && (completion as { ok: boolean }).ok
+      ? (completion as unknown as CompletionOk)
+      : null;
+  const sessionClosed = !!c?.session.closedAt;
 
 
   function handleLogout() {
@@ -133,7 +159,38 @@ function ParticipantHome() {
       </header>
 
       <section className="mx-auto max-w-5xl px-4 py-6">
+        {sessionClosed && (
+          <div className="mb-4 rounded-2xl border-2 border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+            강사가 연수를 종료했습니다. 산출물은 계속 열람할 수 있지만 편집은
+            잠깁니다.
+          </div>
+        )}
+
+        {c && (
+          <div className="mb-6">
+            <CompletionStamp
+              stamps={c.stamps}
+              stampCount={c.stampCount}
+              retroSubmitted={c.retroSubmitted}
+              allDone={c.allDone}
+              nickname={c.nickname}
+              sessionName={c.session.name}
+              completedAt={c.completedAt}
+              closedAt={c.session.closedAt}
+            />
+            <div className="mt-3 flex justify-end">
+              <Button asChild variant="outline" size="sm">
+                <Link to="/portfolio">
+                  <Award className="mr-1 h-3.5 w-3.5" aria-hidden />
+                  내 산출물 모아보기 · 회고 · 수료증
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
+
         <MorningStamp earned={morningEarned} className="mb-6" />
+
 
         {currentStage >= 1 && (
           <div className="mb-8">
