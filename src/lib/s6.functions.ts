@@ -595,17 +595,27 @@ export const getPresentationState = createServerFn({ method: "POST" })
     }));
     const current = rows.find((r) => r.state === "current") ?? null;
 
-    let currentDeck: { title: string; slides: Slide[] } | null = null;
+    let currentDeck:
+      | { title: string; slides: Slide[]; deployedUrl: string | null }
+      | null = null;
     if (current) {
-      const { data: deck } = await supabaseAdmin
-        .from("s6_slide_decks")
-        .select("title, slides")
-        .eq("user_id", current.userId)
-        .maybeSingle();
+      const [{ data: deck }, { data: presenter }] = await Promise.all([
+        supabaseAdmin
+          .from("s6_slide_decks")
+          .select("title, slides")
+          .eq("user_id", current.userId)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("app_users")
+          .select("deployed_url")
+          .eq("id", current.userId)
+          .maybeSingle(),
+      ]);
       if (deck) {
         currentDeck = {
           title: (deck.title ?? "").trim() || `${current.nickname} 님의 발표`,
           slides: normalizeSlides(deck.slides),
+          deployedUrl: presenter?.deployed_url ?? null,
         };
       }
     }
