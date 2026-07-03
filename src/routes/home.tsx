@@ -85,7 +85,7 @@ function ParticipantHome() {
         <ParticipantSlideOverlay slideIndex={currentSlideIndex} />
       )}
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div>
             <p className="font-display text-sm font-bold text-primary">내 수업에 코딩 한 스푼</p>
             <p className="text-xs text-muted-foreground">
@@ -93,6 +93,7 @@ function ParticipantHome() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <TrafficLight userId={stored.userId} />
             <Nametag nickname={stored.nickname} role="participant" />
             <Button
               size="sm"
@@ -108,11 +109,14 @@ function ParticipantHome() {
       </header>
 
       <section className="mx-auto max-w-5xl px-4 py-6">
+        <MorningStamp earned={morningEarned} className="mb-6" />
+
         {currentStage >= 1 && (
           <div className="mb-8">
             <S1Panel userId={stored.userId} currentStage={currentStage} />
           </div>
         )}
+
 
         {currentStage >= 2 && (
           <div className="mb-8">
