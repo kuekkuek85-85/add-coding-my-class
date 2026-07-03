@@ -276,6 +276,7 @@ function SlideDeckViewer({
           page={clamped + 1}
           total={total}
           presenterName={presenterName}
+          deployedUrl={isCover ? deployedUrl : null}
           width={size.w}
           height={size.h}
           variant={isCover ? "cover" : "default"}
