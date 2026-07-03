@@ -99,6 +99,10 @@ export function ParticipantGrid({
   const s4Map = new Map<string, S4Progress>();
   for (const p of s4Progress ?? []) s4Map.set(p.userId, p);
 
+  const s5Map = new Map<string, S5Progress>();
+  for (const p of s5Progress ?? []) s5Map.set(p.userId, p);
+
+
 
 
   return (
