@@ -10,6 +10,7 @@ import { getInstructorS2Summary } from "@/lib/s2.functions";
 import { getSessionS3Overview } from "@/lib/s3.functions";
 import { getSessionS4Overview } from "@/lib/s4.functions";
 import { getSessionS5Overview } from "@/lib/s5.functions";
+import { getSessionS6Overview } from "@/lib/s6.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
@@ -17,6 +18,7 @@ import { STAGES, TimetableCard, type StageStatus } from "@/components/school/Tim
 import { StageControls } from "@/components/school/StageControls";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
 import { InstructorSlideDeck } from "@/components/school/SlideDeck";
+import { PresenterQueueAdmin } from "@/components/s6/PresenterQueueAdmin";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +37,7 @@ function InstructorHome() {
   const fetchS3 = useServerFn(getSessionS3Overview);
   const fetchS4 = useServerFn(getSessionS4Overview);
   const fetchS5 = useServerFn(getSessionS5Overview);
+  const fetchS6 = useServerFn(getSessionS6Overview);
   const fetchHelp = useServerFn(listSessionHelpSignals);
 
   const snapshotKey = ["snapshot", stored?.userId];
@@ -43,6 +46,7 @@ function InstructorHome() {
   const s3Key = ["instructor-s3", stored?.userId];
   const s4Key = ["instructor-s4", stored?.userId];
   const s5Key = ["instructor-s5", stored?.userId];
+  const s6Key = ["instructor-s6", stored?.userId];
   const helpKey = ["instructor-help", stored?.userId];
 
   const { data } = useQuery({
@@ -85,6 +89,13 @@ function InstructorHome() {
     queryFn: () => fetchS5({ data: { userId: stored!.userId } }),
     enabled: !!stored?.userId,
     refetchInterval: 15_000,
+  });
+
+  const { data: s6 } = useQuery({
+    queryKey: s6Key,
+    queryFn: () => fetchS6({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 10_000,
   });
 
 
@@ -266,6 +277,13 @@ function InstructorHome() {
           />
         </div>
 
+        {/* S6 발표 진행 (6교시일 때만 노출) */}
+        {currentStage >= 6 && (
+          <div className="mt-6">
+            <PresenterQueueAdmin userId={stored.userId} />
+          </div>
+        )}
+
         {/* 참가자 진행 그리드 */}
         <div className="mt-8">
           <div className="mb-3">
@@ -284,6 +302,7 @@ function InstructorHome() {
             s3Progress={s3?.ok ? s3.progress : []}
             s4Progress={s4?.ok ? s4.progress : []}
             s5Progress={s5?.ok ? s5.progress : []}
+            s6Progress={s6?.ok ? s6.progress : []}
             helpMap={helpMap}
             morningEarnedMap={morningEarnedMap}
           />

@@ -1,4 +1,4 @@
-import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX, FileCheck2, MessagesSquare } from "lucide-react";
+import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX, FileCheck2, MessagesSquare, Mic, Presentation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
 
@@ -39,6 +39,15 @@ export type S5Progress = {
   confirmed: boolean;
 };
 
+export type S6Progress = {
+  userId: string;
+  slidesConfirmed: boolean;
+  slidesFilled: boolean;
+  queueState: "waiting" | "current" | "done" | null;
+  orderIndex: number | null;
+  commentsReceived: number;
+};
+
 export type HelpRow = {
   userId: string;
   level: "green" | "yellow" | "red";
@@ -60,6 +69,7 @@ export function ParticipantGrid({
   s3Progress,
   s4Progress,
   s5Progress,
+  s6Progress,
   helpMap,
   morningEarnedMap,
 }: {
@@ -72,6 +82,7 @@ export function ParticipantGrid({
   s3Progress?: S3Progress[];
   s4Progress?: S4Progress[];
   s5Progress?: S5Progress[];
+  s6Progress?: S6Progress[];
   helpMap?: Map<string, HelpRow>;
   morningEarnedMap?: Map<string, boolean>;
 }) {
@@ -101,6 +112,9 @@ export function ParticipantGrid({
 
   const s5Map = new Map<string, S5Progress>();
   for (const p of s5Progress ?? []) s5Map.set(p.userId, p);
+
+  const s6Map = new Map<string, S6Progress>();
+  for (const p of s6Progress ?? []) s6Map.set(p.userId, p);
 
 
 
@@ -199,6 +213,10 @@ export function ParticipantGrid({
                   const showS5 =
                     s.no === 5 &&
                     (st !== "locked" || (s5?.checkedCases ?? 0) > 0 || s5?.confirmed || s5?.qaGiven);
+                  const s6 = s6Map.get(p.id);
+                  const showS6 =
+                    s.no === 6 &&
+                    (st !== "locked" || s6?.slidesConfirmed || s6?.slidesFilled || !!s6?.queueState);
                   return (
                     <td key={s.code} className="px-2 py-2 text-center">
                       {showS1Count ? (
@@ -231,6 +249,14 @@ export function ParticipantGrid({
                           qaGiven={!!s5?.qaGiven}
                           revisedFilled={!!s5?.revisedFilled}
                           confirmed={!!s5?.confirmed}
+                          status={st}
+                        />
+                      ) : showS6 ? (
+                        <S6Cell
+                          slidesConfirmed={!!s6?.slidesConfirmed}
+                          slidesFilled={!!s6?.slidesFilled}
+                          queueState={s6?.queueState ?? null}
+                          commentsReceived={s6?.commentsReceived ?? 0}
                           status={st}
                         />
                       ) : (
@@ -470,3 +496,65 @@ function S5Cell({
 
 
 
+
+function S6Cell({
+  slidesConfirmed,
+  slidesFilled,
+  queueState,
+  commentsReceived,
+  status,
+}: {
+  slidesConfirmed: boolean;
+  slidesFilled: boolean;
+  queueState: "waiting" | "current" | "done" | null;
+  commentsReceived: number;
+  status: "done" | "open" | "locked";
+}) {
+  if (queueState === "done") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground"
+        aria-label={`S6 발표 완료 · 코멘트 ${commentsReceived}건`}
+        title={`발표 완료 · 코멘트 ${commentsReceived}건`}
+      >
+        <Stamp className="h-3 w-3" aria-hidden />
+        발표
+      </span>
+    );
+  }
+  if (queueState === "current") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-300 px-2 py-0.5 text-xs font-semibold text-amber-950"
+        aria-label="지금 발표 중"
+      >
+        <Mic className="h-3 w-3" aria-hidden />
+        발표 중
+      </span>
+    );
+  }
+  if (slidesConfirmed) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-accent/60 px-2 py-0.5 text-xs font-semibold text-primary"
+        aria-label="슬라이드 확정 · 발표 대기"
+        title="슬라이드 확정 완료"
+      >
+        <Presentation className="h-3 w-3" aria-hidden />
+        슬라이드
+      </span>
+    );
+  }
+  if (slidesFilled) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-900"
+        aria-label="슬라이드 6장 채움"
+      >
+        <FileCheck2 className="h-3 w-3" aria-hidden />
+        6/6
+      </span>
+    );
+  }
+  return <StageCell status={status} />;
+}

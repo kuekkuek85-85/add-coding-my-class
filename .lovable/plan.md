@@ -1,43 +1,64 @@
-## 다음 단계: Step 5 — S4 「TDD + 구현」 (4교시)
+# Step 7 · S6 「갤러리 발표」 (6교시)
 
-지금까지 S1(글쌤봇 따라하기) · S2(확장 + 테스트 케이스) · S3(PRD 작성·검증) 세 스테이지와 오전 스탬프·신호등이 완성됐습니다. 남은 스테이지는 S4·S5·S6이고, 순서대로 다음은 **S4「TDD + 구현」** — S3에서 통과한 PRD를 근거로 테스트 케이스를 먼저 3개 이상 짜고, 그걸 기반으로 "첫 프롬프트"를 조립해 개발자(Lovable/AI 코딩 도구)에게 넘길 준비를 하는 스테이지입니다.
+S1~S5까지 완료된 참가자들이 자신의 여정(PRD → 첫 프롬프트 → 실행 체크 → 수정 프롬프트)을 정리해 **3분 발표**하고, 청중은 **좋은 점 코멘트**를 실시간으로 남기는 마지막 스테이지입니다.
 
-### 완료 기준
-- S4가 열린 참가자는 자신의 확정된 PRD를 읽기 전용으로 보며 **테스트 케이스**를 3개 이상 작성한다(주어진/할 때/그러면 구조).
-- **TDD 도우미**(AI)는 테스트 케이스를 대신 쓰지 않고, 누락된 관점(성공/실패/경계/접근성 등)만 짧게 지적한다.
-- 테스트 케이스가 3개 이상이 되면 **첫 프롬프트 조립기**가 열린다. 참가자는 (역할·컨텍스트·해야 할 일·테스트 케이스·비기능) 5칸을 직접 채우고 미리보기에서 최종 프롬프트를 확인·복사할 수 있다. 이 프롬프트 역시 AI가 대신 쓰지 않는다(플래그만).
-- 참가자가 "첫 프롬프트 확정" 버튼을 누르면 S4 게이트 통과 → 참가자 그리드 S4 도장.
-- 강사석에서 참가자별 S4 상태(테스트 N개 / 프롬프트 확정)를 실시간 확인한다.
+## 완료 기준
 
-### 데이터 (마이그레이션 1건)
-- `s4_test_cases` — 참가자별 여러 행. `user_id`, `session_id`, `title`, `given`, `when`, `then`, `order_index`.
-- `s4_prompts` — 참가자별 1행(upsert). `user_id`, `session_id`, `role`, `context`, `task`, `nonfunctional`, `confirmed_at`.
-- 두 테이블 모두 관례대로 `Deny all client access` + `service_role` GRANT, 서버 함수 경유.
+- **갤러리**: S5 확정한 참가자 카드 목록. 각 카드는 닉네임 + PRD 제목 + 프롬프트/수정 프롬프트 미리보기 + "펼쳐보기". 서로의 산출물을 자유롭게 열람.
+- **발표 슬라이드 초안 생성기**: 참가자가 자기 카드에서 "슬라이드 초안 만들기" → Lovable AI로 6장 초안(표지 / PRD 한 문장 / 첫 프롬프트 요약 / 실행 체크에서 배운 것 / 수정 프롬프트 핵심 / 다음에 해볼 것) 생성. **초안은 반드시 교사(=자기 자신)가 각 슬라이드 문장을 편집 후 "발표 준비 완료" 버튼을 눌러야 확정.** 이 예외는 프로젝트 원칙에 명시.
+- **발표 순서**: 강사가 발표 큐에 참가자를 등록/재정렬/현재 발표자 지정. "지금 발표 중" 표시가 모든 참가자 화면에 실시간 반영.
+- **청중 코멘트**: 발표 중인 참가자에게 다른 참가자들이 "좋은 점"(필수 5자 이상) + "질문/제안"(선택) 코멘트 남김. 발표자 카드 하단에 실시간 누적.
+- **강사 대시보드**: 발표 큐 관리(추가/제거/순서 변경/다음), 3분 타이머(시작/일시정지/리셋), 참가자별 발표 완료 도장, S6 진행표.
+- **최종 게이트**: 자기 슬라이드 확정 + 발표 완료 표시(강사가 눌러줌) → S6 도장 → 그리드 전 스테이지 완료.
 
-### 서버 함수 (`src/lib/s4.functions.ts`)
-- `getMyS4State` / `listMyTestCases` / `upsertTestCase` / `deleteTestCase` / `getTddHints`(Lovable AI, 힌트만) / `getMyPrompt` / `saveMyPrompt` / `confirmMyPrompt`(테스트 3개 이상 + 5칸 필수 검증) / `getSessionS4Overview`(강사용).
-- 모두 `requireSupabaseAuth` + 참가자 role 검증.
+## 데이터 (마이그레이션 1건)
 
-### UI
-- 새 라우트 `src/routes/s4.tsx` — 3개 탭: **테스트 케이스 → TDD 도우미 → 첫 프롬프트**. 이전 탭이 만족돼야 다음 탭 활성화.
-- 컴포넌트 (`src/components/s4/`): `PrdReadOnly.tsx`(내 PRD 요약), `TestCaseList.tsx`(추가/편집/삭제, 최소 3개 진행률), `TddHintPanel.tsx`(질문·지적만), `FirstPromptBuilder.tsx`(5칸 폼 + 미리보기 + 복사), `S4SubmitBar.tsx`.
-- `home.tsx` 4교시 카드에서 "지금 진행 가능"이면 **S4 열기** 버튼.
-- `instructor.tsx`에 **S4 진행표** 섹션 (참가자별 테스트 개수·프롬프트 확정 여부), `ParticipantGrid`의 S4 셀에 회색점(진행 중)/노랑(테스트 3+)/초록 도장(확정) 3단계.
+- `s6_slide_decks` — 참가자별 1행. `user_id`, `session_id`, `title`, `slides` (jsonb: `[{heading, body}]` 6개), `draft_generated_at`, `confirmed_at`.
+- `s6_comments` — 청중 코멘트. `presenter_id`, `commenter_id`, `session_id`, `good`(필수), `question`.
+- `s6_presentation_queue` — 발표 순서. `session_id`, `user_id`, `order_index`, `state`(waiting/current/done), `started_at`, `finished_at`. `(session_id, user_id)` unique.
+- 세 테이블 모두 Deny-all + `service_role` GRANT, 서버 함수 경유.
+- `sessions` 컬럼 추가: `s6_timer_started_at` (nullable) — 강사 타이머 서버 시각.
 
-### 규칙 준수
-- AI 대필 금지 — TDD 도우미와 프롬프트 조립기 모두 "질문·지적만, 문장은 여러분이 씁니다" 문구 명시.
-- 게이트 없이 다음 스테이지 진입 금지 — S5는 S4 확정된 사용자만 진입.
-- 한국어 UI, 밝은 학교 톤, 이모지 없음.
+## 서버 함수 (`src/lib/s6.functions.ts`)
 
-### 이번 턴에 하지 않는 것
-- S5(교차 QA + 개선), S6(갤러리 발표).
-- 참가자 간 프롬프트 공유·복사 갤러리.
-- Lovable/외부 코딩 도구로 실제 앱을 만드는 부분(참가자가 오프라인에서 진행).
-- 강사가 참가자 프롬프트를 직접 편집하는 기능.
+- 참가자: `getMyS6State`, `getGallery`(닉네임/PRD/프롬프트/수정 프롬프트 목록), `getParticipantBundle(userId)`(상세), `generateSlideDraft`(Lovable AI, 초안만), `saveMySlides`, `confirmMySlides`(6장 모두 heading+body 있음 필수), `submitComment`(좋은 점 5자+), `getMyReceivedComments`, `getCurrentPresenter`.
+- 강사: `getSessionS6Overview`, `addToQueue`, `removeFromQueue`, `reorderQueue`, `setCurrentPresenter`, `markPresenterDone`, `startTimer`, `resetTimer`.
+- 전부 `requireSupabaseAuth` + role 검증.
 
-### 다른 선택지 (원하시면 우선순위 변경 가능)
-1. **Step 6로 건너뛰기 — S5·S6 스텁 라우트만 먼저 만들기**: 강사가 남은 시간 배분을 미리 확인.
-2. **강사 도구 보강**: 참가자별 PRD·테스트·프롬프트를 강사가 열람할 수 있는 뷰(S3 후행 작업으로 미뤄둔 것).
-3. **오전 스탬프 후속** — 오후 시작 전에 노출되는 회고 카드(선택 사항).
+## UI
 
-기본 제안은 **Step 5(S4 「TDD + 구현」)** 이지만, 위 대안 중 하나가 더 급하면 말씀해 주세요.
+- 신규 라우트 `src/routes/s6.tsx` — 참가자용, 3개 탭: **1. 갤러리 → 2. 내 발표 슬라이드 → 3. 발표 진행(청중 코멘트)**.
+- 컴포넌트 (`src/components/s6/`):
+  - `GalleryGrid.tsx` — 참가자 카드 목록 + 상세 다이얼로그.
+  - `SlideDraftEditor.tsx` — 6장 슬라이드 편집기(제목/본문 textarea × 6). 상단에 "초안 만들기"(AI) 버튼 + "AI 초안은 반드시 편집·확정 후 제출됩니다" 안내. 확정 시 잠금.
+  - `SlidePreview.tsx` — 슬라이드 미리보기(1920×1080 스케일, `slides-app` 가이드 준수: `.slide-content` + `slide-title` / `slide-body` 시맨틱 클래스).
+  - `PresentationStage.tsx` — 현재 발표자 표시 + 청중 코멘트 폼(내가 발표자가 아닐 때) 또는 받은 코멘트 실시간 목록(내가 발표자일 때).
+  - `PresenterQueueAdmin.tsx`(강사용) — 큐 관리 + 타이머 + 완료 버튼.
+- `src/routes/instructor.tsx`에 **S6 발표 진행** 섹션 추가 (`PresenterQueueAdmin` 사용).
+- `src/components/school/ParticipantGrid.tsx` — S6 셀: 슬라이드 확정(회색 도장) → 발표 완료(초록 도장) 2단계.
+- `src/routes/home.tsx` 6교시 카드에 "S6 열기" 버튼(S5 확정자만).
+- 실시간 폴링: 발표 진행 상태 3초, 받은 코멘트 4초 간격 `refetchInterval`.
+
+## 규칙 준수
+
+- **AI 대필 예외**: 슬라이드 초안 생성만 허용. UI에 "AI 초안은 참고용 — 반드시 직접 편집·확정 후 발표합니다" 문구 상단 고정.
+- 청중 코멘트 "좋은 점" 필수(5자 이상), 빈 값 제출 불가.
+- 발표 순서·현재 발표자·완료 처리 권한은 강사만.
+- 자기 슬라이드 확정 없이는 발표 큐 등록 불가.
+- 한국어 UI, 학교 톤, 이모지 없음. 색약 접근성: 도장 상태는 색+아이콘+텍스트 병행.
+
+## 기술 메모
+
+- 슬라이드 미리보기는 편집기 우측에 320×180 축소판. 발표 스테이지에서는 큰 미리보기(960×540)로 렌더.
+- 슬라이드 데이터는 `slides: [{heading, body}]` 형태의 jsonb 6원소 배열로 고정 저장.
+- 타이머는 클라이언트 로컬 카운트(강사 화면만) — 서버 저장 최소화, `s6_timer_started_at` 만 저장해 새로고침 복원.
+- 실시간은 기존 스테이지들과 동일한 폴링 방식.
+
+## 이번 턴에 하지 않는 것
+
+- 실제 프로젝터 풀스크린 프레젠테이션 모드(F5 등) — 강사 화면의 큰 미리보기로 대체.
+- 슬라이드 드래그 재정렬 / 추가 슬라이드(6장 고정).
+- 발표 녹화 / 발표 후 회고 카드.
+- 슬라이드를 PDF/이미지로 내보내기.
+
+이대로 진행할까요?

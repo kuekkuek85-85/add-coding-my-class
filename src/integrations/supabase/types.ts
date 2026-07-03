@@ -576,6 +576,108 @@ export type Database = {
           },
         ]
       }
+      s6_comments: {
+        Row: {
+          commenter_id: string
+          created_at: string
+          good: string
+          id: string
+          presenter_id: string
+          question: string | null
+          session_id: string
+        }
+        Insert: {
+          commenter_id: string
+          created_at?: string
+          good: string
+          id?: string
+          presenter_id: string
+          question?: string | null
+          session_id: string
+        }
+        Update: {
+          commenter_id?: string
+          created_at?: string
+          good?: string
+          id?: string
+          presenter_id?: string
+          question?: string | null
+          session_id?: string
+        }
+        Relationships: []
+      }
+      s6_presentation_queue: {
+        Row: {
+          created_at: string
+          finished_at: string | null
+          id: string
+          order_index: number
+          session_id: string
+          started_at: string | null
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          order_index: number
+          session_id: string
+          started_at?: string | null
+          state?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          finished_at?: string | null
+          id?: string
+          order_index?: number
+          session_id?: string
+          started_at?: string | null
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      s6_slide_decks: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          draft_generated_at: string | null
+          id: string
+          session_id: string
+          slides: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          draft_generated_at?: string | null
+          id?: string
+          session_id: string
+          slides?: Json
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          draft_generated_at?: string | null
+          id?: string
+          session_id?: string
+          slides?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           created_at: string
@@ -585,6 +687,7 @@ export type Database = {
           instructor_code: string
           name: string
           participant_code: string
+          s6_timer_started_at: string | null
         }
         Insert: {
           created_at?: string
@@ -594,6 +697,7 @@ export type Database = {
           instructor_code: string
           name: string
           participant_code: string
+          s6_timer_started_at?: string | null
         }
         Update: {
           created_at?: string
@@ -603,6 +707,7 @@ export type Database = {
           instructor_code?: string
           name?: string
           participant_code?: string
+          s6_timer_started_at?: string | null
         }
         Relationships: []
       }
