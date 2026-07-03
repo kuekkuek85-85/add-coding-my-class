@@ -190,18 +190,7 @@ function ParticipantHome() {
         <MorningStamp earned={morningEarned} className="mb-6" />
 
 
-        {currentStage >= 1 && (
-          <div className="mb-8">
-            <S1Panel userId={stored.userId} currentStage={currentStage} />
-          </div>
-        )}
 
-
-        {currentStage >= 2 && (
-          <div className="mb-8">
-            <S2Panel userId={stored.userId} />
-          </div>
-        )}
 
         <div className="mb-4">
           <h1 className="font-display text-2xl font-bold text-foreground">오늘의 시간표</h1>
