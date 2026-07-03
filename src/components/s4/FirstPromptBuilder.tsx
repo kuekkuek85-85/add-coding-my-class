@@ -118,7 +118,6 @@ export function FirstPromptBuilder({
   });
 
   function update(next: string) {
-    if (readOnly) return;
     const clipped = next.slice(0, MAX_LEN);
     setText(clipped);
     setStatus("saving");
