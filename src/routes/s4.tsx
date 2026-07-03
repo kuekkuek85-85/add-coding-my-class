@@ -11,7 +11,7 @@ import { getMyS4State, confirmMyS4Prompt } from "@/lib/s4.functions";
 import { Button } from "@/components/ui/button";
 import { Nametag } from "@/components/school/Nametag";
 import { TrafficLight } from "@/components/school/TrafficLight";
-import { PrdReadOnly } from "@/components/s4/PrdReadOnly";
+
 import { TestCaseList } from "@/components/s4/TestCaseList";
 import { TddHintPanel } from "@/components/s4/TddHintPanel";
 import { FirstPromptBuilder } from "@/components/s4/FirstPromptBuilder";
