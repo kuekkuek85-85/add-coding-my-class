@@ -53,26 +53,31 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
     onError: () => toast.error("슬라이드 전송에 실패했습니다."),
   });
 
+  const localRef = useRef<number | null>(currentSlideIndex);
+  useEffect(() => { localRef.current = localIndex; }, [localIndex]);
+
   function push(next: number | null) {
+    localRef.current = next;
     setLocalIndex(next);
     mut.mutate(next);
+  }
+  function stepBy(delta: number) {
+    const cur = localRef.current ?? 0;
+    const next = Math.max(0, Math.min(total - 1, cur + delta));
+    if (next !== cur) push(next);
   }
 
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") {
-        if (idx < total - 1) push(idx + 1);
-      } else if (e.key === "ArrowLeft") {
-        if (idx > 0) push(idx - 1);
-      } else if (e.key === "Escape") {
-        push(null);
-      }
+      if (e.key === "ArrowRight") stepBy(1);
+      else if (e.key === "ArrowLeft") stepBy(-1);
+      else if (e.key === "Escape") push(null);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, idx, total]);
+  }, [active, total]);
 
 
   if (!active) {
