@@ -154,14 +154,8 @@ export const upsertS4TestCase = createServerFn({ method: "POST" })
     if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
     if (user.role !== "participant") return { ok: false as const, error: "참가자만 저장할 수 있습니다." };
 
-    const { data: prompt } = await supabaseAdmin
-      .from("s4_prompts")
-      .select("confirmed_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (prompt?.confirmed_at) {
-      return { ok: false as const, error: "S4 게이트 통과 후에는 수정할 수 없습니다." };
-    }
+    // 확정 이후에도 테스트 케이스는 자유롭게 추가·수정 가능
+
 
     if (data.id) {
       const { error } = await supabaseAdmin
@@ -213,14 +207,8 @@ export const deleteS4TestCase = createServerFn({ method: "POST" })
     const user = await getUser(data.userId);
     if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
 
-    const { data: prompt } = await supabaseAdmin
-      .from("s4_prompts")
-      .select("confirmed_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (prompt?.confirmed_at) {
-      return { ok: false as const, error: "S4 게이트 통과 후에는 삭제할 수 없습니다." };
-    }
+    // 확정 이후에도 테스트 케이스는 자유롭게 삭제 가능
+
 
     const { error } = await supabaseAdmin
       .from("s4_test_cases")
