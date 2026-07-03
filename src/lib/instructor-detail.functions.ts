@@ -305,31 +305,29 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
       const [{ data: deck }, { data: queue }, { data: comments }] = await Promise.all([
         supabaseAdmin
           .from("s6_slide_decks")
-          .select(
-            "hook, problem_change, evidence, next_step, share_call, confirmed_at, updated_at",
-          )
+          .select("title, slides, confirmed_at, updated_at")
           .eq("user_id", target.id)
           .maybeSingle(),
         supabaseAdmin
           .from("s6_presentation_queue")
-          .select("state, order_index, started_at, ended_at")
+          .select("state, order_index, started_at, finished_at")
           .eq("user_id", target.id)
           .maybeSingle(),
         supabaseAdmin
           .from("s6_comments")
-          .select("id, reviewer_id, text, created_at")
-          .eq("reviewee_id", target.id)
+          .select("id, commenter_id, good, question, created_at")
+          .eq("presenter_id", target.id)
           .order("created_at", { ascending: false }),
       ]);
-      const reviewerIds = Array.from(
-        new Set((comments ?? []).map((c) => c.reviewer_id as string)),
+      const commenterIds = Array.from(
+        new Set((comments ?? []).map((c) => c.commenter_id as string)),
       );
       const nickMap = new Map<string, string>();
-      if (reviewerIds.length > 0) {
+      if (commenterIds.length > 0) {
         const { data: people } = await supabaseAdmin
           .from("app_users")
           .select("id, nickname")
-          .in("id", reviewerIds);
+          .in("id", commenterIds);
         for (const p of people ?? []) nickMap.set(p.id as string, (p.nickname ?? "") as string);
       }
       return {
@@ -339,11 +337,8 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
         s6: {
           deck: deck
             ? {
-                hook: (deck.hook ?? "") as string,
-                problem_change: (deck.problem_change ?? "") as string,
-                evidence: (deck.evidence ?? "") as string,
-                next_step: (deck.next_step ?? "") as string,
-                share_call: (deck.share_call ?? "") as string,
+                title: (deck.title ?? "") as string,
+                slides: (deck.slides ?? null) as unknown,
                 confirmedAt: (deck.confirmed_at ?? null) as string | null,
               }
             : null,
@@ -352,12 +347,13 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
                 state: (queue.state ?? null) as "waiting" | "current" | "done" | null,
                 orderIndex: (queue.order_index ?? null) as number | null,
                 startedAt: (queue.started_at ?? null) as string | null,
-                endedAt: (queue.ended_at ?? null) as string | null,
+                finishedAt: (queue.finished_at ?? null) as string | null,
               }
             : null,
           comments: (comments ?? []).map((c) => ({
-            partnerNickname: nickMap.get(c.reviewer_id as string) ?? "동료",
-            text: (c.text ?? "") as string,
+            partnerNickname: nickMap.get(c.commenter_id as string) ?? "동료",
+            good: (c.good ?? "") as string,
+            question: (c.question ?? "") as string,
           })),
         },
       };
