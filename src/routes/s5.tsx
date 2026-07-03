@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Nametag } from "@/components/school/Nametag";
 import { TrafficLight } from "@/components/school/TrafficLight";
 import { ChecklistPanel } from "@/components/s5/ChecklistPanel";
+import { DeployedUrlCard } from "@/components/s5/DeployedUrlCard";
 import { QaGivePanel } from "@/components/s5/QaGivePanel";
 import { QaReceivedList } from "@/components/s5/QaReceivedList";
 import { RevisedPromptBuilder } from "@/components/s5/RevisedPromptBuilder";
