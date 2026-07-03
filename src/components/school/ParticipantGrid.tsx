@@ -1,4 +1,4 @@
-import { Stamp, CircleDot, Lock, StickyNote } from "lucide-react";
+import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
 
@@ -6,6 +6,12 @@ export type S1Progress = {
   userId: string;
   checked: number;
   memoCount: number;
+};
+
+export type S2Progress = {
+  userId: string;
+  cases: number;
+  passed: boolean;
 };
 
 /**
