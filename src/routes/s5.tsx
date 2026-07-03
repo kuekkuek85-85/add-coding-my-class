@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, Lock, MessageSquare, ClipboardList } from "lucide-react";
+import { ArrowLeft, Lock, MessageSquare, ClipboardList } from "lucide-react";
 
 import { useStoredSession, clearStoredSession } from "@/lib/local-session";
 import { getSessionSnapshot } from "@/lib/session.functions";
-import { getMyS5State, confirmMyS5Revised } from "@/lib/s5.functions";
+import { getMyS5State } from "@/lib/s5.functions";
 import { Button } from "@/components/ui/button";
 import { Nametag } from "@/components/school/Nametag";
 import { TrafficLight } from "@/components/school/TrafficLight";
@@ -15,23 +14,20 @@ import { ChecklistPanel } from "@/components/s5/ChecklistPanel";
 import { DeployedUrlCard } from "@/components/s5/DeployedUrlCard";
 import { QaGivePanel } from "@/components/s5/QaGivePanel";
 import { QaReceivedList } from "@/components/s5/QaReceivedList";
-import { RevisedPromptBuilder } from "@/components/s5/RevisedPromptBuilder";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/s5")({
   component: S5Page,
 });
 
-type Tab = "check" | "qa" | "received" | "revised";
+type Tab = "check" | "qa" | "received";
 
 function S5Page() {
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const { ready, session: stored } = useStoredSession({ requireRole: "participant" });
 
   const fetchSnapshot = useServerFn(getSessionSnapshot);
   const fetchState = useServerFn(getMyS5State);
-  const confirm = useServerFn(confirmMyS5Revised);
 
   const [tab, setTab] = useState<Tab>("check");
 
@@ -48,15 +44,6 @@ function S5Page() {
     queryFn: () => fetchState({ data: { userId: stored!.userId } }),
     enabled: !!stored?.userId,
     refetchInterval: 15_000,
-  });
-
-  const confirmMut = useMutation({
-    mutationFn: () => confirm({ data: { userId: stored!.userId } }),
-    onSuccess: (res) => {
-      if (!res.ok) return toast.error(res.error);
-      toast.success("수정 프롬프트 확정 — S5 게이트를 통과했습니다.");
-      qc.invalidateQueries({ queryKey: stateKey });
-    },
   });
 
   if (!ready || !stored) return <div className="min-h-screen" />;
@@ -80,7 +67,6 @@ function S5Page() {
 
   const s4Confirmed = state?.ok ? state.s4Confirmed : false;
   const allChecked = state?.ok ? state.allChecked : false;
-  const revisedComplete = state?.ok ? state.revisedComplete : false;
   const confirmed = state?.ok ? state.confirmed : false;
   const qaGiven = state?.ok ? state.qaGivenCount > 0 : false;
 
@@ -101,7 +87,6 @@ function S5Page() {
     { id: "check", label: "1. 실행 체크", enabled: true },
     { id: "qa", label: "2. 교차 QA(주기)", enabled: true },
     { id: "received", label: "3. 받은 QA", enabled: true },
-    { id: "revised", label: "4. 수정 프롬프트", enabled: allChecked },
   ];
 
   return (
@@ -113,9 +98,9 @@ function S5Page() {
               <Link to="/home" aria-label="홈으로"><ArrowLeft className="h-4 w-4" /></Link>
             </Button>
             <div>
-              <p className="font-display text-sm font-bold text-primary">S5 · 5교시 — 교차 QA + 개선</p>
+              <p className="font-display text-sm font-bold text-primary">S5 · 5교시 — 교차 QA</p>
               <p className="text-xs text-muted-foreground">
-                실행 체크 → 교차 QA → 받은 리뷰 → 수정 프롬프트 확정
+                배포 URL 공유 → 실행 체크 → 교차 QA → 받은 리뷰
               </p>
             </div>
           </div>
@@ -147,7 +132,6 @@ function S5Page() {
               >
                 {t.id === "qa" && qaGiven && <MessageSquare className="h-3 w-3" aria-hidden />}
                 {t.id === "check" && allChecked && <ClipboardList className="h-3 w-3" aria-hidden />}
-                {t.id === "revised" && confirmed && <CheckCircle2 className="h-3 w-3" aria-hidden />}
                 {t.label}
               </button>
             );
@@ -165,19 +149,10 @@ function S5Page() {
           <div className="rounded-2xl border-2 border-primary/20 bg-card p-5 shadow-sm">
             <h3 className="mb-2 font-display text-lg font-bold text-primary">내가 받은 교차 QA</h3>
             <p className="mb-3 text-xs text-muted-foreground">
-              동료의 관찰을 참고해 다음 탭에서 <b>수정 프롬프트</b>를 조립합니다.
+              동료의 관찰을 참고해 앱을 이어서 개선해 보세요.
             </p>
             <QaReceivedList userId={stored.userId} />
           </div>
-        )}
-        {tab === "revised" && (
-          <RevisedPromptBuilder
-            userId={stored.userId}
-            onConfirmClick={() => confirmMut.mutate()}
-            confirmDisabled={!allChecked || !revisedComplete || confirmed}
-            confirmBusy={confirmMut.isPending}
-            confirmLabel={confirmed ? "확정 완료" : "수정 프롬프트 확정"}
-          />
         )}
       </section>
     </main>
