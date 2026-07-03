@@ -99,6 +99,12 @@ function ParticipantHome() {
           </div>
         )}
 
+        {currentStage >= 2 && (
+          <div className="mb-8">
+            <S2Panel userId={stored.userId} />
+          </div>
+        )}
+
         <div className="mb-4">
           <h1 className="font-display text-2xl font-bold text-foreground">오늘의 시간표</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -114,8 +120,12 @@ function ParticipantHome() {
               onClick={() => {
                 const st = statusFor(s.no);
                 if (st === "locked") {
-                  toast("아직 열리지 않았습니다.");
-                } else if (s.no !== 1) {
+                  if (s.no === 3 && !s2Passed) {
+                    toast(`S2 게이트 미통과 — 테스트 케이스를 2개 이상 작성해야 열립니다.`);
+                  } else {
+                    toast("아직 열리지 않았습니다.");
+                  }
+                } else if (s.no > 2) {
                   toast(`${s.code} · ${s.title} — 준비 중입니다.`);
                 }
               }}
@@ -123,6 +133,7 @@ function ParticipantHome() {
           ))}
         </div>
       </section>
+
     </main>
   );
 }
