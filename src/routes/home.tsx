@@ -167,6 +167,8 @@ function ParticipantHome() {
                     toast(`S2 게이트 미통과 — 테스트 케이스를 2개 이상 작성해야 열립니다.`);
                   } else if (s.no === 5 && !s4Confirmed) {
                     toast(`S4 게이트 미통과 — 4교시 첫 프롬프트 확정 후 열립니다.`);
+                  } else if (s.no === 6 && !s5Confirmed) {
+                    toast(`S5 게이트 미통과 — 5교시 수정 프롬프트 확정 후 열립니다.`);
                   } else {
                     toast("아직 열리지 않았습니다.");
                   }
@@ -176,8 +178,8 @@ function ParticipantHome() {
                   navigate({ to: "/s4" });
                 } else if (s.no === 5) {
                   navigate({ to: "/s5" });
-                } else if (s.no > 5) {
-                  toast(`${s.code} · ${s.title} — 준비 중입니다.`);
+                } else if (s.no === 6) {
+                  navigate({ to: "/s6" });
                 }
               }}
             />
