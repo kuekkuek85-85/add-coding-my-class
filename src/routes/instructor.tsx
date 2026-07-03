@@ -6,6 +6,7 @@ import { LogOut, Users, KeyRound } from "lucide-react";
 
 import { getSessionSnapshot, setCurrentStage } from "@/lib/session.functions";
 import { getInstructorS1Summary } from "@/lib/s1.functions";
+import { getInstructorS2Summary } from "@/lib/s2.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
@@ -25,9 +26,11 @@ function InstructorHome() {
   const fetchSnapshot = useServerFn(getSessionSnapshot);
   const changeStage = useServerFn(setCurrentStage);
   const fetchS1 = useServerFn(getInstructorS1Summary);
+  const fetchS2 = useServerFn(getInstructorS2Summary);
 
   const snapshotKey = ["snapshot", stored?.userId];
   const s1Key = ["instructor-s1", stored?.userId];
+  const s2Key = ["instructor-s2", stored?.userId];
 
   const { data } = useQuery({
     queryKey: snapshotKey,
@@ -42,6 +45,14 @@ function InstructorHome() {
     enabled: !!stored?.userId,
     refetchInterval: 5_000,
   });
+
+  const { data: s2 } = useQuery({
+    queryKey: s2Key,
+    queryFn: () => fetchS2({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 5_000,
+  });
+
 
   const stageMutation = useMutation({
     mutationFn: (stageNo: number) =>
@@ -67,6 +78,12 @@ function InstructorHome() {
 
   const participants = (data?.ok ? data.members : []).filter((m) => m.role === "participant");
   const currentStage = data?.ok ? data.session.current_stage : 1;
+
+  const s2Progress = s2?.ok ? s2.progress : [];
+  const s2Min = s2?.ok ? s2.min : 2;
+  const s2PassedCount = s2Progress.filter((p) => p.passed).length;
+  const s2AllPassed = participants.length > 0 && s2PassedCount === participants.length;
+  const blockNext = currentStage === 2 && !s2AllPassed;
 
   function handleLogout() {
     clearStoredSession();
@@ -156,9 +173,22 @@ function InstructorHome() {
             currentStage={currentStage}
             maxStage={STAGES.length}
             busy={stageMutation.isPending}
-            onChange={(next) => stageMutation.mutate(next)}
+            blockNext={blockNext}
+            blockReason={
+              blockNext
+                ? `S2 미니 게이트: ${s2PassedCount}/${participants.length}명이 통과 (테스트 케이스 ${s2Min}건 이상)`
+                : undefined
+            }
+            onChange={(next) => {
+              if (blockNext && next > currentStage) {
+                toast.error("아직 모든 참가자가 S2 미니 게이트를 통과하지 못했습니다.");
+                return;
+              }
+              stageMutation.mutate(next);
+            }}
           />
         </div>
+
 
         {/* 강의 슬라이드 */}
         <div className="mt-6">
@@ -182,8 +212,11 @@ function InstructorHome() {
             currentStage={currentStage}
             s1Progress={s1?.ok ? s1.progress : []}
             s1Total={s1?.ok ? s1.totalCheckpoints : 0}
+            s2Progress={s2Progress}
+            s2Min={s2Min}
           />
         </div>
+
 
         {/* 시간표(참고) */}
         <div className="mt-8">

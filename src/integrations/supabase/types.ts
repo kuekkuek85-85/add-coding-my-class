@@ -154,6 +154,36 @@ export type Database = {
           },
         ]
       }
+      s2_test_cases: {
+        Row: {
+          created_at: string
+          expected_then: string
+          given_when: string
+          id: string
+          session_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expected_then: string
+          given_when: string
+          id?: string
+          session_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expected_then?: string
+          given_when?: string
+          id?: string
+          session_id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           created_at: string

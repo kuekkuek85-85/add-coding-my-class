@@ -1,4 +1,4 @@
-import { Stamp, CircleDot, Lock, StickyNote } from "lucide-react";
+import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
 
@@ -6,6 +6,12 @@ export type S1Progress = {
   userId: string;
   checked: number;
   memoCount: number;
+};
+
+export type S2Progress = {
+  userId: string;
+  cases: number;
+  passed: boolean;
 };
 
 /**
@@ -17,11 +23,15 @@ export function ParticipantGrid({
   currentStage,
   s1Progress,
   s1Total,
+  s2Progress,
+  s2Min,
 }: {
   participants: Array<{ id: string; nickname: string }>;
   currentStage: number;
   s1Progress?: S1Progress[];
   s1Total?: number;
+  s2Progress?: S2Progress[];
+  s2Min?: number;
 }) {
   if (participants.length === 0) {
     return (
@@ -37,9 +47,13 @@ export function ParticipantGrid({
   for (const p of s1Progress ?? []) progressMap.set(p.userId, p);
   const total = s1Total ?? 0;
 
+  const s2Map = new Map<string, S2Progress>();
+  for (const p of s2Progress ?? []) s2Map.set(p.userId, p);
+  const s2Threshold = s2Min ?? 2;
+
   return (
     <div className="overflow-x-auto rounded-2xl border-2 border-primary/15 bg-card">
-      <table className="w-full min-w-[560px] text-sm">
+      <table className="w-full min-w-[620px] text-sm">
         <thead>
           <tr className="border-b border-border/70 bg-muted/40 text-xs">
             <th className="px-3 py-2 text-left font-semibold text-muted-foreground">
@@ -62,6 +76,7 @@ export function ParticipantGrid({
         <tbody>
           {participants.map((p) => {
             const pr = progressMap.get(p.id);
+            const s2 = s2Map.get(p.id);
             return (
               <tr key={p.id} className="border-b border-border/40 last:border-0">
                 <td className="px-3 py-2.5 font-medium text-foreground">{p.nickname}</td>
@@ -83,10 +98,17 @@ export function ParticipantGrid({
                   const st: "done" | "open" | "locked" =
                     s.no < currentStage ? "done" : s.no === currentStage ? "open" : "locked";
                   const showS1Count = s.no === 1 && total > 0 && st !== "locked";
+                  const showS2Gate = s.no === 2 && st !== "locked";
                   return (
                     <td key={s.code} className="px-2 py-2 text-center">
                       {showS1Count ? (
                         <S1Cell checked={pr?.checked ?? 0} total={total} status={st} />
+                      ) : showS2Gate ? (
+                        <S2Cell
+                          cases={s2?.cases ?? 0}
+                          min={s2Threshold}
+                          passed={s2?.passed ?? false}
+                        />
                       ) : (
                         <StageCell status={st} />
                       )}
@@ -128,6 +150,29 @@ function S1Cell({
     >
       {complete && <Stamp className="h-3 w-3" aria-hidden />}
       {checked}/{total}
+    </span>
+  );
+}
+
+function S2Cell({ cases, min, passed }: { cases: number; min: number; passed: boolean }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex min-w-[52px] items-center justify-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold",
+        passed
+          ? "bg-primary text-primary-foreground"
+          : cases > 0
+            ? "bg-accent/50 text-primary"
+            : "bg-muted text-muted-foreground",
+      )}
+      aria-label={`S2 테스트 케이스 ${cases}/${min} ${passed ? "통과" : "미통과"}`}
+    >
+      {passed ? (
+        <ShieldCheck className="h-3 w-3" aria-hidden />
+      ) : (
+        <ShieldAlert className="h-3 w-3" aria-hidden />
+      )}
+      {cases}/{min}
     </span>
   );
 }

@@ -11,13 +11,17 @@ export function StageControls({
   maxStage,
   onChange,
   busy,
+  blockNext,
+  blockReason,
 }: {
   currentStage: number;
   maxStage: number;
   onChange: (nextStage: number) => void;
   busy?: boolean;
+  blockNext?: boolean;
+  blockReason?: string;
 }) {
-  const canOpenNext = currentStage < maxStage;
+  const canOpenNext = currentStage < maxStage && !blockNext;
   const canRollback = currentStage > 1;
 
   return (
@@ -33,6 +37,11 @@ export function StageControls({
           <p className="mt-1 text-xs text-muted-foreground">
             개방 즉시 참가자 화면에 반영됩니다(최대 15초 이내).
           </p>
+          {blockNext && blockReason && (
+            <p className="mt-1 text-xs font-semibold text-destructive">
+              {blockReason} — 통과 전에는 다음 교시를 열 수 없습니다.
+            </p>
+          )}
         </div>
         <div className="flex flex-shrink-0 items-center gap-2">
           <Button
