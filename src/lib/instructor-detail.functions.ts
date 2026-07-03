@@ -115,14 +115,14 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
             .maybeSingle(),
           supabaseAdmin
             .from("s3_reviews")
-            .select("id, reviewee_id, likes, questions, suggestions, created_at")
+            .select("id, reviewee_id, good, question, suggestion, submitted_at")
             .eq("reviewer_id", target.id)
-            .order("created_at", { ascending: false }),
+            .order("submitted_at", { ascending: false }),
           supabaseAdmin
             .from("s3_reviews")
-            .select("id, reviewer_id, likes, questions, suggestions, created_at")
+            .select("id, reviewer_id, good, question, suggestion, submitted_at")
             .eq("reviewee_id", target.id)
-            .order("created_at", { ascending: false }),
+            .order("submitted_at", { ascending: false }),
         ]);
       const partnerIds = Array.from(
         new Set([
@@ -157,15 +157,15 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
             : null,
           reviewsGiven: (reviewsGiven ?? []).map((r) => ({
             partnerNickname: nickMap.get(r.reviewee_id as string) ?? "동료",
-            likes: (r.likes ?? "") as string,
-            questions: (r.questions ?? "") as string,
-            suggestions: (r.suggestions ?? "") as string,
+            good: (r.good ?? "") as string,
+            question: (r.question ?? "") as string,
+            suggestion: (r.suggestion ?? "") as string,
           })),
           reviewsReceived: (reviewsReceived ?? []).map((r) => ({
             partnerNickname: nickMap.get(r.reviewer_id as string) ?? "동료",
-            likes: (r.likes ?? "") as string,
-            questions: (r.questions ?? "") as string,
-            suggestions: (r.suggestions ?? "") as string,
+            good: (r.good ?? "") as string,
+            question: (r.question ?? "") as string,
+            suggestion: (r.suggestion ?? "") as string,
           })),
         },
       };
