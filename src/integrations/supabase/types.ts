@@ -49,6 +49,111 @@ export type Database = {
           },
         ]
       }
+      checkpoint_progress: {
+        Row: {
+          checked_at: string
+          checkpoint_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          checked_at?: string
+          checkpoint_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          checked_at?: string
+          checkpoint_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkpoint_progress_checkpoint_id_fkey"
+            columns: ["checkpoint_id"]
+            isOneToOne: false
+            referencedRelation: "checkpoints"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkpoint_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      checkpoints: {
+        Row: {
+          created_at: string
+          hint: string | null
+          id: string
+          label: string
+          seq: number
+          stage_no: number
+        }
+        Insert: {
+          created_at?: string
+          hint?: string | null
+          id?: string
+          label: string
+          seq: number
+          stage_no: number
+        }
+        Update: {
+          created_at?: string
+          hint?: string | null
+          id?: string
+          label?: string
+          seq?: number
+          stage_no?: number
+        }
+        Relationships: []
+      }
+      morning_memos: {
+        Row: {
+          created_at: string
+          id: string
+          session_id: string
+          stage_no: number
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          session_id: string
+          stage_no: number
+          text: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          session_id?: string
+          stage_no?: number
+          text?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "morning_memos_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "morning_memos_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           created_at: string
