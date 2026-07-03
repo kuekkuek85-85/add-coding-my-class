@@ -88,7 +88,8 @@ export const getMyS5State = createServerFn({ method: "POST" })
     if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
 
     const [
-      { data: cases },
+      { data: s4cases },
+      { data: s2cases },
       { data: results },
       { data: myPrompt },
       { data: revised },
@@ -101,8 +102,13 @@ export const getMyS5State = createServerFn({ method: "POST" })
         .eq("user_id", user.id)
         .order("order_index", { ascending: true }),
       supabaseAdmin
+        .from("s2_test_cases")
+        .select("id, title, given_when, expected_then, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true }),
+      supabaseAdmin
         .from("s5_checklist_results")
-        .select("test_case_id, status, note, updated_at")
+        .select("test_case_id, source, status, note, updated_at")
         .eq("user_id", user.id),
       supabaseAdmin
         .from("s4_prompts")
@@ -124,7 +130,7 @@ export const getMyS5State = createServerFn({ method: "POST" })
         .eq("reviewee_id", user.id),
     ]);
 
-    const completeCases = (cases ?? []).filter(
+    const completeS4 = (s4cases ?? []).filter(
       (c) =>
         (c.title ?? "").trim() &&
         (c.given ?? "").trim() &&
@@ -133,16 +139,38 @@ export const getMyS5State = createServerFn({ method: "POST" })
     );
 
     const resultMap = new Map(
-      (results ?? []).map((r) => [r.test_case_id, r] as const),
+      (results ?? []).map(
+        (r) => [`${r.source}:${r.test_case_id}`, r] as const,
+      ),
     );
-    const casesWithResult = completeCases.map((c) => ({
+
+    const s2Normalized = (s2cases ?? []).map((c) => ({
+      id: c.id as string,
+      source: "s2" as const,
+      title: (c.title ?? "") as string,
+      given: (c.given_when ?? "") as string,
+      when_step: "",
+      then_step: (c.expected_then ?? "") as string,
+      order_index: 0,
+    }));
+    const s4Normalized = completeS4.map((c) => ({
+      id: c.id as string,
+      source: "s4" as const,
+      title: c.title as string,
+      given: (c.given ?? "") as string,
+      when_step: (c.when_step ?? "") as string,
+      then_step: (c.then_step ?? "") as string,
+      order_index: (c.order_index ?? 0) as number,
+    }));
+    const merged = [...s2Normalized, ...s4Normalized];
+    const casesWithResult = merged.map((c) => ({
       ...c,
-      result: resultMap.get(c.id) ?? null,
+      result: resultMap.get(`${c.source}:${c.id}`) ?? null,
     }));
 
     const allChecked =
-      completeCases.length > 0 &&
-      completeCases.every((c) => resultMap.has(c.id));
+      merged.length > 0 &&
+      merged.every((c) => resultMap.has(`${c.source}:${c.id}`));
 
     const revisedFields: RevisedFields = {
       target: revised?.target ?? "",
@@ -170,6 +198,7 @@ export const getMyS5State = createServerFn({ method: "POST" })
       qaReceivedCount,
     };
   });
+
 
 // -------- 체크리스트 결과 저장 --------
 
