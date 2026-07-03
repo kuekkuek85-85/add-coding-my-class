@@ -34,8 +34,10 @@ export function ChecklistPanel({ userId, locked }: { userId: string; locked: boo
   const [drafts, setDrafts] = useState<Record<string, { status: Status; note: string }>>({});
 
   const mut = useMutation({
-    mutationFn: (v: { testCaseId: string; status: Status; note: string }) =>
-      saveResult({ data: { userId, testCaseId: v.testCaseId, status: v.status, note: v.note } }),
+    mutationFn: (v: { testCaseId: string; source: "s2" | "s4"; status: Status; note: string }) =>
+      saveResult({
+        data: { userId, testCaseId: v.testCaseId, source: v.source, status: v.status, note: v.note },
+      }),
     onSuccess: (res) => {
       if (!res.ok) return toast.error(res.error);
       qc.invalidateQueries({ queryKey: key });
