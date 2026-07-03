@@ -304,14 +304,14 @@ const S3: SlideDef[] = [
         caption: "Product Requirements Document — '요구 정리서'로 이해하면 충분합니다.",
       },
       {
-        value: "체인 리뷰",
-        label: "정해진 순서대로 옆 선생님 것을 리뷰",
-        caption: "1→2→3→…→1. 누구 것을 볼지 헤매지 않습니다.",
-      },
-      {
         value: "Grill Me",
         label: "PRD를 향한 날카로운 질문 도우미",
         caption: "질문만 던집니다. 답은 대신 써주지 않습니다.",
+      },
+      {
+        value: "체인 리뷰",
+        label: "정해진 순서대로 옆 선생님 것을 리뷰",
+        caption: "1→2→3→…→1. 누구 것을 볼지 헤매지 않습니다.",
       },
     ],
   },
