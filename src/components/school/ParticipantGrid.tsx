@@ -154,6 +154,29 @@ function S1Cell({
   );
 }
 
+function S2Cell({ cases, min, passed }: { cases: number; min: number; passed: boolean }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex min-w-[52px] items-center justify-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold",
+        passed
+          ? "bg-primary text-primary-foreground"
+          : cases > 0
+            ? "bg-accent/50 text-primary"
+            : "bg-muted text-muted-foreground",
+      )}
+      aria-label={`S2 테스트 케이스 ${cases}/${min} ${passed ? "통과" : "미통과"}`}
+    >
+      {passed ? (
+        <ShieldCheck className="h-3 w-3" aria-hidden />
+      ) : (
+        <ShieldAlert className="h-3 w-3" aria-hidden />
+      )}
+      {cases}/{min}
+    </span>
+  );
+}
+
 function StageCell({ status }: { status: "done" | "open" | "locked" }) {
   return (
     <span
