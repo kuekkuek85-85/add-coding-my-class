@@ -90,36 +90,54 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
   if (!active) {
     return (
       <div className="rounded-2xl border-2 border-dashed border-primary/30 bg-card/70 p-5">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 className="font-display text-base font-bold text-foreground">강의 슬라이드</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              강의 모드를 시작하면 참가자 화면에 슬라이드가 자동으로 노출됩니다.
+              차시를 골라 시작하면 참가자 화면에 해당 차시 슬라이드가 자동으로 노출됩니다.
             </p>
           </div>
-          <Button
-            size="sm"
-            onClick={() => push(0)}
-            disabled={mut.isPending}
-            className="gap-1.5"
-          >
-            <Play className="h-4 w-4" aria-hidden />
-            강의 시작
-          </Button>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          {STAGE_DECKS.map((d) => (
+            <Button
+              key={d.code}
+              size="sm"
+              variant="outline"
+              onClick={() => push(d.offset)}
+              disabled={mut.isPending}
+              className="h-auto flex-col items-start gap-0.5 py-2 text-left"
+              title={`${d.title} (${d.count}장)`}
+            >
+              <span className="flex items-center gap-1 text-[11px] font-semibold text-primary">
+                <Play className="h-3 w-3" aria-hidden />
+                {d.no}교시 · {d.code}
+              </span>
+              <span className="w-full truncate text-xs font-normal text-foreground">
+                {d.title}
+              </span>
+            </Button>
+          ))}
         </div>
       </div>
     );
   }
 
+  const currentDeck = getDeckForIndex(idx);
+  const inDeckIndex = idx - currentDeck.offset + 1;
+
   return (
     <div className="rounded-2xl border-2 border-primary/30 bg-card p-4 shadow-sm">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground">
             강의 모드 ON
           </span>
-          <span className="text-sm text-muted-foreground">
-            {idx + 1} / {total} · <span className="font-mono">{slide.id}</span>
+          <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+            {currentDeck.no}교시 · {currentDeck.code} · {currentDeck.title}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            차시 {inDeckIndex}/{currentDeck.count} · 전체 {idx + 1}/{total}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -154,6 +172,27 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
           </Button>
         </div>
       </div>
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        {STAGE_DECKS.map((d) => {
+          const isCurrent = d.code === currentDeck.code;
+          return (
+            <button
+              key={d.code}
+              type="button"
+              onClick={() => push(d.offset)}
+              className={
+                "rounded-full border px-2.5 py-0.5 text-[11px] font-semibold transition " +
+                (isCurrent
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:text-primary")
+              }
+              title={`${d.title}로 이동`}
+            >
+              {d.no}교시
+            </button>
+          );
+        })}
+      </div>
       <ScaledSlide slide={slide} index={idx} total={total} />
       <p className="mt-2 text-xs text-muted-foreground">
         키보드: ← 이전, → 다음, Esc 종료. 참가자 화면은 최대 5초 이내 반영됩니다.
@@ -161,6 +200,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
     </div>
   );
 }
+
 
 /**
  * 참가자용 강의 오버레이. current_slide_index != null 이면 전체 화면 노출.
