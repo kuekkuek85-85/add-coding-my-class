@@ -22,6 +22,13 @@ export type S3Progress = {
   reviewReceived: number;
 };
 
+export type S4Progress = {
+  userId: string;
+  completeCases: number;
+  promptFilled: boolean;
+  confirmed: boolean;
+};
+
 export type HelpRow = {
   userId: string;
   level: "green" | "yellow" | "red";
