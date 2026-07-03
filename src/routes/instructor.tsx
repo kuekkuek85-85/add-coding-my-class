@@ -37,6 +37,7 @@ function InstructorHome() {
   const fetchS3 = useServerFn(getSessionS3Overview);
   const fetchS4 = useServerFn(getSessionS4Overview);
   const fetchS5 = useServerFn(getSessionS5Overview);
+  const fetchS6 = useServerFn(getSessionS6Overview);
   const fetchHelp = useServerFn(listSessionHelpSignals);
 
   const snapshotKey = ["snapshot", stored?.userId];
