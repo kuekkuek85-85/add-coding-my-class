@@ -154,7 +154,12 @@ function S5Page() {
           })}
         </div>
 
-        {tab === "check" && <ChecklistPanel userId={stored.userId} locked={confirmed} />}
+        {tab === "check" && (
+          <div className="flex flex-col gap-4">
+            <DeployedUrlCard userId={stored.userId} />
+            <ChecklistPanel userId={stored.userId} locked={confirmed} />
+          </div>
+        )}
         {tab === "qa" && <QaGivePanel userId={stored.userId} />}
         {tab === "received" && (
           <div className="rounded-2xl border-2 border-primary/20 bg-card p-5 shadow-sm">
