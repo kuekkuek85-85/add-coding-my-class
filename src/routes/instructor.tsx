@@ -138,9 +138,7 @@ function InstructorHome() {
 
   const s2Progress = s2?.ok ? s2.progress : [];
   const s2Min = s2?.ok ? s2.min : 2;
-  const s2PassedCount = s2Progress.filter((p) => p.passed).length;
-  const s2AllPassed = participants.length > 0 && s2PassedCount === participants.length;
-  const blockNext = currentStage === 2 && !s2AllPassed;
+
 
   const helpSignals = help?.ok ? help.signals : [];
   const helpMap = new Map(helpSignals.map((h) => [h.userId, h]));
