@@ -271,6 +271,7 @@ function InstructorHome() {
             s2Progress={s2Progress}
             s2Min={s2Min}
             s3Progress={s3?.ok ? s3.progress : []}
+            s4Progress={s4?.ok ? s4.progress : []}
             helpMap={helpMap}
             morningEarnedMap={morningEarnedMap}
           />
