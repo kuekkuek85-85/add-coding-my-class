@@ -138,9 +138,7 @@ function InstructorHome() {
 
   const s2Progress = s2?.ok ? s2.progress : [];
   const s2Min = s2?.ok ? s2.min : 2;
-  const s2PassedCount = s2Progress.filter((p) => p.passed).length;
-  const s2AllPassed = participants.length > 0 && s2PassedCount === participants.length;
-  const blockNext = currentStage === 2 && !s2AllPassed;
+
 
   const helpSignals = help?.ok ? help.signals : [];
   const helpMap = new Map(helpSignals.map((h) => [h.userId, h]));
@@ -253,20 +251,10 @@ function InstructorHome() {
             currentStage={currentStage}
             maxStage={STAGES.length}
             busy={stageMutation.isPending}
-            blockNext={blockNext}
-            blockReason={
-              blockNext
-                ? `S2 미니 게이트: ${s2PassedCount}/${participants.length}명이 통과 (테스트 케이스 ${s2Min}건 이상)`
-                : undefined
-            }
-            onChange={(next) => {
-              if (blockNext && next > currentStage) {
-                toast.error("아직 모든 참가자가 S2 미니 게이트를 통과하지 못했습니다.");
-                return;
-              }
-              stageMutation.mutate(next);
-            }}
+            onChange={(next) => stageMutation.mutate(next)}
           />
+
+
         </div>
 
 
