@@ -1,4 +1,4 @@
-import { StickyNote, ShieldCheck, FileText, MessageSquare, ListChecks, Presentation, Mic } from "lucide-react";
+import { StickyNote, ShieldCheck, FileText, MessageSquare, ListChecks, Presentation, Mic, ExternalLink } from "lucide-react";
 
 export type PortfolioLike = {
   ok: true;
