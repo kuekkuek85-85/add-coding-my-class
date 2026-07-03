@@ -228,15 +228,15 @@ export function FirstPromptBuilder({
       {/* 실행 안내 (Lovable로 옮기기) */}
       <div className="rounded-2xl border-4 border-primary bg-primary/10 p-6 text-center shadow-md">
         <p className="font-display text-2xl font-bold leading-snug text-primary sm:text-3xl">
-          이 프롬프트를 복사해서 <span className="underline decoration-accent decoration-4 underline-offset-4">Lovable</span>로 구현해 보세요.
+          이 PRD 프롬프트를 복사해서 <span className="underline decoration-accent decoration-4 underline-offset-4">Lovable</span>로 구현해 보세요.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          위 <b>복사</b> 버튼을 눌러 프롬프트 전문을 가져간 뒤, Lovable 새 프로젝트 첫 입력창에 붙여넣습니다.
+          위 <b>복사</b> 버튼을 눌러 PRD 프롬프트 전문을 가져간 뒤, Lovable 새 프로젝트 첫 입력창에 붙여넣습니다.
         </p>
         <div className="mt-4 flex justify-center">
           <Button size="lg" onClick={copyPrompt} className="text-base">
             <Copy className="mr-2 h-5 w-5" aria-hidden />
-            프롬프트 전체 복사
+            PRD 프롬프트 전체 복사
           </Button>
         </div>
       </div>
