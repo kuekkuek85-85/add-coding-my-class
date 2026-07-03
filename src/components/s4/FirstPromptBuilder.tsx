@@ -216,7 +216,7 @@ export function FirstPromptBuilder({
         <div>
           <p className="font-display text-sm font-bold text-primary">첫 프롬프트 확정</p>
           <p className="text-xs text-muted-foreground">
-            확정하면 S4 게이트를 통과합니다. 확정 후에는 테스트 케이스·프롬프트를 수정할 수 없습니다.
+            확정하면 S4 게이트를 통과합니다. 확정 후에도 테스트 케이스는 계속 다듬을 수 있습니다.
           </p>
         </div>
         <Button onClick={onConfirmClick} disabled={confirmDisabled || confirmBusy}>
@@ -224,6 +224,23 @@ export function FirstPromptBuilder({
           {confirmLabel}
         </Button>
       </div>
+
+      {/* 실행 안내 (Lovable로 옮기기) */}
+      <div className="rounded-2xl border-4 border-primary bg-primary/10 p-6 text-center shadow-md">
+        <p className="font-display text-2xl font-bold leading-snug text-primary sm:text-3xl">
+          이 프롬프트를 복사해서 <span className="underline decoration-accent decoration-4 underline-offset-4">Lovable</span>로 구현해 보세요.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          위 <b>복사</b> 버튼을 눌러 프롬프트 전문을 가져간 뒤, Lovable 새 프로젝트 첫 입력창에 붙여넣습니다.
+        </p>
+        <div className="mt-4 flex justify-center">
+          <Button size="lg" onClick={copyPrompt} className="text-base">
+            <Copy className="mr-2 h-5 w-5" aria-hidden />
+            프롬프트 전체 복사
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
+
