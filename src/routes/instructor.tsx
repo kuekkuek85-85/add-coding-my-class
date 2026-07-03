@@ -1,0 +1,134 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { LogOut, Users, KeyRound } from "lucide-react";
+
+import { getSessionSnapshot } from "@/lib/session.functions";
+import { clearStoredSession, useStoredSession } from "@/lib/local-session";
+import { Nametag } from "@/components/school/Nametag";
+import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
+import { Button } from "@/components/ui/button";
+
+export const Route = createFileRoute("/instructor")({
+  component: InstructorHome,
+});
+
+function InstructorHome() {
+  const navigate = useNavigate();
+  const { ready, session: stored } = useStoredSession({ requireRole: "instructor" });
+  const fetchSnapshot = useServerFn(getSessionSnapshot);
+
+  const { data } = useQuery({
+    queryKey: ["snapshot", stored?.userId],
+    queryFn: () => fetchSnapshot({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 5_000,
+  });
+
+  if (!ready || !stored) return <div className="min-h-screen" />;
+
+  if (data && !data.ok) {
+    clearStoredSession();
+    navigate({ to: "/" });
+    return null;
+  }
+
+  const participants = (data?.ok ? data.members : []).filter((m) => m.role === "participant");
+  const currentStage = data?.ok ? data.session.current_stage : 1;
+
+  function handleLogout() {
+    clearStoredSession();
+    navigate({ to: "/" });
+  }
+
+  function statusFor(stageNo: number): StageStatus {
+    if (stageNo < currentStage) return "done";
+    if (stageNo === currentStage) return "open";
+    return "locked";
+  }
+
+  return (
+    <main className="min-h-screen">
+      <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <div>
+            <p className="font-display text-sm font-bold text-primary">내 수업에 코딩 한 스푼 · 강사석</p>
+            <p className="text-xs text-muted-foreground">
+              {data?.ok ? data.session.name : "심화반 연수"}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Nametag nickname={stored.nickname} role="instructor" />
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleLogout}
+              aria-label="로그아웃"
+              className="h-9 w-9 p-0"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <section className="mx-auto max-w-6xl px-4 py-6">
+        {/* 세션 정보 & 접속자 */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="chalkboard p-6 lg:col-span-2">
+            <p className="mb-2 text-xs uppercase tracking-widest text-accent">참가자 입장 코드</p>
+            <div className="flex items-baseline gap-3">
+              <KeyRound className="h-6 w-6 text-accent" aria-hidden />
+              <span className="font-display text-4xl font-bold tracking-[0.2em] text-chalk sm:text-5xl">
+                {data?.ok ? data.session.participant_code : "····"}
+              </span>
+            </div>
+            <p className="mt-3 text-sm text-chalk/80">
+              참가자에게 이 코드를 안내하세요. 강사 코드는 별도로 보관합니다.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border-2 border-primary/20 bg-card p-5 shadow-sm">
+            <div className="mb-3 flex items-center gap-2 text-primary">
+              <Users className="h-4 w-4" aria-hidden />
+              <h2 className="font-display text-sm font-bold">
+                접속 참가자 {participants.length}명
+              </h2>
+            </div>
+            {participants.length === 0 ? (
+              <p className="text-sm text-muted-foreground">아직 접속한 참가자가 없습니다.</p>
+            ) : (
+              <ul className="flex flex-wrap gap-1.5">
+                {participants.map((p) => (
+                  <li
+                    key={p.id}
+                    className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary"
+                  >
+                    {p.nickname}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* 시간표 */}
+        <div className="mt-8">
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h1 className="font-display text-2xl font-bold text-foreground">오늘의 시간표</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                현재 열린 교시는 {currentStage}교시입니다. 스테이지 개폐는 다음 Step에서 활성화됩니다.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {STAGES.map((s) => (
+              <TimetableCard key={s.code} stage={s} status={statusFor(s.no)} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
