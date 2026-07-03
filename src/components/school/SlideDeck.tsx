@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
@@ -17,17 +17,27 @@ type Props = {
 
 /**
  * 강사 전용 강의 슬라이드 컨트롤러.
- * - 강의 시작 → 슬라이드 0번 노출 (참가자 화면 동기화)
- * - 이전/다음/종료
- * - 키보드: ←, →, Esc
+ * 낙관적 로컬 인덱스로 빠른 연속 클릭에도 스택 없이 반영.
  */
 export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: Props) {
   const queryClient = useQueryClient();
   const changeSlide = useServerFn(setCurrentSlide);
 
-  const active = currentSlideIndex !== null;
   const total = SLIDES.length;
-  const idx = active ? Math.min(currentSlideIndex!, total - 1) : 0;
+  // 서버 값과 낙관적 값 중 최신 것을 로컬 상태로 유지
+  const [localIndex, setLocalIndex] = useState<number | null>(currentSlideIndex);
+  const lastServerRef = useRef<number | null>(currentSlideIndex);
+
+  // 서버 값이 바뀌면 로컬 값을 동기화 (사용자 최신 값 우선)
+  useEffect(() => {
+    if (currentSlideIndex !== lastServerRef.current) {
+      lastServerRef.current = currentSlideIndex;
+      setLocalIndex(currentSlideIndex);
+    }
+  }, [currentSlideIndex]);
+
+  const active = localIndex !== null;
+  const idx = active ? Math.min(localIndex!, total - 1) : 0;
   const slide = SLIDES[idx];
 
   const mut = useMutation({
@@ -43,20 +53,27 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
     onError: () => toast.error("슬라이드 전송에 실패했습니다."),
   });
 
+  function push(next: number | null) {
+    setLocalIndex(next);
+    mut.mutate(next);
+  }
+
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") {
-        if (idx < total - 1) mut.mutate(idx + 1);
+        if (idx < total - 1) push(idx + 1);
       } else if (e.key === "ArrowLeft") {
-        if (idx > 0) mut.mutate(idx - 1);
+        if (idx > 0) push(idx - 1);
       } else if (e.key === "Escape") {
-        mut.mutate(null);
+        push(null);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active, idx, total, mut]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, idx, total]);
+
 
   if (!active) {
     return (
