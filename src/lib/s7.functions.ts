@@ -95,8 +95,9 @@ export const getMyPortfolio = createServerFn({ method: "POST" })
         .order("order_index", { ascending: true }),
       supabaseAdmin
         .from("s5_checklist_results")
-        .select("test_case_id, status, note")
+        .select("test_case_id, source, status, note")
         .eq("user_id", user.id),
+
       supabaseAdmin
         .from("s5_revised_prompts")
         .select("target, evidence, keep_list, add_list, constraints, confirmed_at")
