@@ -70,6 +70,14 @@ function InstructorHome() {
     refetchInterval: 15_000,
   });
 
+  const { data: s4 } = useQuery({
+    queryKey: s4Key,
+    queryFn: () => fetchS4({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 15_000,
+  });
+
+
   const { data: help } = useQuery({
     queryKey: helpKey,
     queryFn: () => fetchHelp({ data: { userId: stored!.userId } }),
