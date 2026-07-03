@@ -157,7 +157,7 @@ export const getGallery = createServerFn({ method: "POST" })
         nickname: m.nickname,
         prdProblem: (prd?.problem ?? "").slice(0, 240),
         promptRole: pr?.role ?? "",
-        promptTask: (pr?.task ?? "").slice(0, 240),
+        promptTask: ((pr?.context ?? "").trim().split(/\n+/).find((l) => l.trim() && !l.startsWith("#")) ?? "").slice(0, 240),
         promptConfirmed: !!pr?.confirmed_at,
         revisedTarget: rv?.target ?? "",
         revisedAdd: (rv?.add_list ?? "").slice(0, 240),
