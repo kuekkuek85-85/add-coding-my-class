@@ -29,6 +29,16 @@ export type S4Progress = {
   confirmed: boolean;
 };
 
+export type S5Progress = {
+  userId: string;
+  totalCases: number;
+  checkedCases: number;
+  qaGiven: boolean;
+  qaReceived: number;
+  revisedFilled: boolean;
+  confirmed: boolean;
+};
+
 export type HelpRow = {
   userId: string;
   level: "green" | "yellow" | "red";
