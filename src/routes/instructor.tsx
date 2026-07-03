@@ -18,6 +18,7 @@ import { STAGES, TimetableCard, type StageStatus } from "@/components/school/Tim
 import { StageControls } from "@/components/school/StageControls";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
 import { InstructorSlideDeck } from "@/components/school/SlideDeck";
+import { PresenterQueueAdmin } from "@/components/s6/PresenterQueueAdmin";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
