@@ -77,7 +77,7 @@ export const getMyS4State = createServerFn({ method: "POST" })
     const user = await getUser(data.userId);
     if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
 
-    const [{ data: cases }, { data: prompt }, { data: prd }] = await Promise.all([
+    const [{ data: cases }, { data: prompt }, { data: prd }, { data: s2cases }] = await Promise.all([
       supabaseAdmin
         .from("s4_test_cases")
         .select("id, title, given, when_step, then_step, order_index")
@@ -93,15 +93,30 @@ export const getMyS4State = createServerFn({ method: "POST" })
         .select("problem, users, features, nonfunctional, success_metric, out_of_scope, submitted_v2_at")
         .eq("user_id", user.id)
         .maybeSingle(),
+      supabaseAdmin
+        .from("s2_test_cases")
+        .select("id, title, given_when, expected_then, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: true }),
     ]);
 
     const completeCases = (cases ?? []).filter(isCompleteCase).length;
+    const s2Count = (s2cases ?? []).length;
+    const totalCases = completeCases + s2Count;
     const confirmed = !!prompt?.confirmed_at;
     return {
       ok: true as const,
       cases: (cases ?? []) as TestCase[],
+      s2Cases: (s2cases ?? []).map((c) => ({
+        id: c.id as string,
+        title: (c.title ?? "") as string,
+        given_when: (c.given_when ?? "") as string,
+        expected_then: (c.expected_then ?? "") as string,
+      })),
+      s2Count,
       completeCases,
-      canBuildPrompt: completeCases >= 3,
+      totalCases,
+      canBuildPrompt: totalCases >= 3,
       prompt: {
         role: prompt?.role ?? "",
         context: prompt?.context ?? "",
@@ -122,6 +137,7 @@ export const getMyS4State = createServerFn({ method: "POST" })
         : null,
     };
   });
+
 
 // -------- 테스트 케이스 CRUD --------
 
@@ -391,7 +407,7 @@ export const confirmMyS4Prompt = createServerFn({ method: "POST" })
     if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
     if (user.role !== "participant") return { ok: false as const, error: "참가자만 확정할 수 있습니다." };
 
-    const [{ data: cases }, { data: prompt }] = await Promise.all([
+    const [{ data: cases }, { data: prompt }, { data: s2cases }] = await Promise.all([
       supabaseAdmin
         .from("s4_test_cases")
         .select("title, given, when_step, then_step")
@@ -401,11 +417,16 @@ export const confirmMyS4Prompt = createServerFn({ method: "POST" })
         .select("role, context, task, nonfunctional, confirmed_at")
         .eq("user_id", user.id)
         .maybeSingle(),
+      supabaseAdmin
+        .from("s2_test_cases")
+        .select("id")
+        .eq("user_id", user.id),
     ]);
 
     const completeCount = (cases ?? []).filter(isCompleteCase).length;
-    if (completeCount < 3) {
-      return { ok: false as const, error: "완성된 테스트 케이스 3개 이상이 필요합니다." };
+    const totalCount = completeCount + (s2cases ?? []).length;
+    if (totalCount < 3) {
+      return { ok: false as const, error: "테스트 케이스가 총 3개 이상 필요합니다. (2교시 케이스 포함)" };
     }
     if (!prompt) return { ok: false as const, error: "프롬프트를 먼저 저장해 주세요." };
     if (

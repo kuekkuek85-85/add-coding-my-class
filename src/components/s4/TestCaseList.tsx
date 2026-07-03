@@ -85,7 +85,9 @@ export function TestCaseList({
   });
 
   const cases = data?.ok ? data.cases : [];
+  const s2Cases = data?.ok ? (data.s2Cases ?? []) : [];
   const completeCount = data?.ok ? data.completeCases : 0;
+  const totalCount = completeCount + s2Cases.length;
 
   return (
     <div className="rounded-2xl border-2 border-primary/20 bg-card p-5 shadow-sm">
@@ -94,21 +96,49 @@ export function TestCaseList({
           <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">S4 · 4교시</p>
           <h2 className="font-display text-xl font-bold text-foreground">테스트 케이스</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            프롬프트를 조립하기 전에 <b>주어진 / 할 때 / 그러면</b>으로 3개 이상 먼저 작성합니다.
+            2교시 케이스가 아래에 자동으로 보여집니다. <b>총 3개 이상</b>이 되도록 이번 교시에서 추가해 주세요.
           </p>
         </div>
         <div className="text-right text-xs">
-          <p className={cn("font-semibold", completeCount >= 3 ? "text-emerald-600" : "text-muted-foreground")}>
-            {completeCount} / 3 완성
+          <p className={cn("font-semibold", totalCount >= 3 ? "text-emerald-600" : "text-muted-foreground")}>
+            {totalCount} / 3 완성
+          </p>
+          <p className="text-[11px] text-muted-foreground">
+            2교시 {s2Cases.length} · 4교시 {completeCount}
           </p>
         </div>
       </div>
+
+      {/* 2교시에서 가져온 케이스 (읽기 전용) */}
+      {s2Cases.length > 0 && (
+        <div className="mb-4 rounded-xl border-2 border-primary/15 bg-primary/5 p-3">
+          <p className="mb-2 text-xs font-semibold text-primary">2교시에서 가져온 케이스 (읽기 전용)</p>
+          <ol className="flex flex-col gap-2">
+            {s2Cases.map((c, i) => (
+              <li key={c.id} className="rounded-lg border border-primary/20 bg-card p-2 text-xs">
+                <div className="mb-1 flex items-center gap-2">
+                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                    S2·{i + 1}
+                  </span>
+                  <span className="font-bold text-foreground">{c.title || "(제목 없음)"}</span>
+                </div>
+                <dl className="grid gap-0.5 pl-7">
+                  <Row label="상황" value={c.given_when} />
+                  <Row label="기대" value={c.expected_then} />
+                </dl>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
 
       {/* 리스트 */}
       <ol className="mb-4 flex flex-col gap-2">
         {cases.length === 0 && (
           <li className="rounded-xl border border-dashed border-border/60 bg-muted/30 p-4 text-center text-sm text-muted-foreground">
-            아직 테스트 케이스가 없어요. 아래에서 첫 케이스를 추가해 주세요.
+            {s2Cases.length >= 2
+              ? "2교시 케이스만으로도 2개가 있어요. 아래에서 1개만 더 추가하면 다음 단계로 갈 수 있습니다."
+              : "아직 테스트 케이스가 없어요. 아래에서 첫 케이스를 추가해 주세요."}
           </li>
         )}
         {cases.map((c, i) => {

@@ -79,13 +79,14 @@ function S4Page() {
   }
 
   const completeCases = state?.ok ? state.completeCases : 0;
+  const totalCases = state?.ok ? (state.totalCases ?? completeCases) : 0;
   const canBuildPrompt = state?.ok ? state.canBuildPrompt : false;
   const confirmed = state?.ok ? state.confirmed : false;
   const prd = state?.ok ? state.prd : null;
 
   const tabs: Array<{ id: Tab; label: string; enabled: boolean }> = [
     { id: "cases", label: "1. 테스트 케이스", enabled: true },
-    { id: "hints", label: "2. TDD 도우미", enabled: completeCases >= 1 },
+    { id: "hints", label: "2. TDD 도우미", enabled: totalCases >= 1 },
     { id: "prompt", label: "3. 첫 프롬프트", enabled: canBuildPrompt },
   ];
 
@@ -132,7 +133,7 @@ function S4Page() {
                       : "border-border/40 bg-muted text-muted-foreground opacity-60",
                 )}
               >
-                {t.id === "hints" && completeCases >= 1 && <Sparkles className="h-3 w-3" aria-hidden />}
+                {t.id === "hints" && totalCases >= 1 && <Sparkles className="h-3 w-3" aria-hidden />}
                 {t.id === "prompt" && confirmed && <CheckCircle2 className="h-3 w-3" aria-hidden />}
                 {t.label}
               </button>
@@ -141,7 +142,7 @@ function S4Page() {
         </div>
 
         {tab === "cases" && <TestCaseList userId={stored.userId} locked={confirmed} />}
-        {tab === "hints" && <TddHintPanel userId={stored.userId} enabled={completeCases >= 1} />}
+        {tab === "hints" && <TddHintPanel userId={stored.userId} enabled={totalCases >= 1} />}
         {tab === "prompt" && (
           <FirstPromptBuilder
             userId={stored.userId}
