@@ -337,3 +337,52 @@ function S3Cell({
   return <StageCell status={status} />;
 }
 
+function S4Cell({
+  completeCases,
+  promptFilled,
+  confirmed,
+  status,
+}: {
+  completeCases: number;
+  promptFilled: boolean;
+  confirmed: boolean;
+  status: "done" | "open" | "locked";
+}) {
+  if (confirmed) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground"
+        aria-label="S4 프롬프트 확정 완료"
+        title="S4 게이트 통과"
+      >
+        <Stamp className="h-3 w-3" aria-hidden />
+        확정
+      </span>
+    );
+  }
+  if (completeCases >= 3 || promptFilled) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-900"
+        aria-label={`S4 테스트 케이스 ${completeCases}개${promptFilled ? " · 프롬프트 작성" : ""}`}
+        title={`테스트 케이스 ${completeCases}개${promptFilled ? ", 프롬프트 작성" : ""}`}
+      >
+        <FileCheck2 className="h-3 w-3" aria-hidden />
+        {completeCases}건
+      </span>
+    );
+  }
+  if (completeCases > 0) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-accent/60 px-2 py-0.5 text-xs font-semibold text-primary"
+        aria-label={`S4 테스트 케이스 ${completeCases}개`}
+      >
+        {completeCases}/3
+      </span>
+    );
+  }
+  return <StageCell status={status} />;
+}
+
+
