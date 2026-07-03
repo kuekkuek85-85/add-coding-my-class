@@ -89,9 +89,47 @@ export function ParticipantGrid({
           {participants.map((p) => {
             const pr = progressMap.get(p.id);
             const s2 = s2Map.get(p.id);
+            const help = helpMap?.get(p.id);
+            const morning = morningEarnedMap?.get(p.id) ?? false;
+            const helpLevel: "green" | "yellow" | "red" = help?.level ?? "green";
+            const helpDot =
+              helpLevel === "red"
+                ? "bg-rose-500"
+                : helpLevel === "yellow"
+                  ? "bg-amber-400"
+                  : "bg-emerald-500";
+            const HelpIcon =
+              helpLevel === "red" ? CircleX : helpLevel === "yellow" ? CircleAlert : null;
             return (
               <tr key={p.id} className="border-b border-border/40 last:border-0">
-                <td className="px-3 py-2.5 font-medium text-foreground">{p.nickname}</td>
+                <td className="px-3 py-2.5 font-medium text-foreground">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn("inline-block h-2.5 w-2.5 shrink-0 rounded-full", helpDot)}
+                      aria-label={`신호등 ${helpLevel}`}
+                      title={help?.note ?? undefined}
+                    />
+                    {HelpIcon && (
+                      <HelpIcon
+                        className={cn(
+                          "h-3.5 w-3.5",
+                          helpLevel === "red" ? "text-rose-600" : "text-amber-600",
+                        )}
+                        aria-hidden
+                      />
+                    )}
+                    <span>{p.nickname}</span>
+                    {morning && (
+                      <span
+                        className="inline-flex items-center gap-0.5 rounded-full border border-primary/40 bg-accent/40 px-1.5 py-0.5 text-[10px] font-bold text-primary"
+                        title="오전 완료 도장"
+                      >
+                        <Stamp className="h-3 w-3" aria-hidden />
+                      </span>
+                    )}
+                  </div>
+                </td>
+
                 <td className="px-2 py-2 text-center">
                   <span
                     className={cn(
