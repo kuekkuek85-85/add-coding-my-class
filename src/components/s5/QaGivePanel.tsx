@@ -76,7 +76,7 @@ export function QaGivePanel({ userId }: { userId: string }) {
   if (asn.status === "need_s4") {
     return (
       <div className="rounded-2xl border-2 border-dashed border-border/70 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
-        S4에서 첫 PRD 프롬프트를 확정해야 교차 QA가 배정됩니다.
+        S4에서 PRD 프롬프트를 확정해야 교차 QA가 배정됩니다.
       </div>
     );
   }
