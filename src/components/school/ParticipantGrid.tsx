@@ -177,6 +177,8 @@ export function ParticipantGrid({
                   const showS2Gate = s.no === 2 && st !== "locked";
                   const s3 = s3Map.get(p.id);
                   const showS3 = s.no === 3 && (st !== "locked" || s3?.v1 || s3?.v2);
+                  const s4 = s4Map.get(p.id);
+                  const showS4 = s.no === 4 && (st !== "locked" || (s4?.completeCases ?? 0) > 0 || s4?.confirmed);
                   return (
                     <td key={s.code} className="px-2 py-2 text-center">
                       {showS1Count ? (
@@ -193,6 +195,13 @@ export function ParticipantGrid({
                           v2={!!s3?.v2}
                           reviewGiven={!!s3?.reviewGiven}
                           reviewReceived={s3?.reviewReceived ?? 0}
+                          status={st}
+                        />
+                      ) : showS4 ? (
+                        <S4Cell
+                          completeCases={s4?.completeCases ?? 0}
+                          promptFilled={!!s4?.promptFilled}
+                          confirmed={!!s4?.confirmed}
                           status={st}
                         />
                       ) : (
