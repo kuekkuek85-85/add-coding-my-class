@@ -117,7 +117,7 @@ function BundleDialog({ userId, targetId }: { userId: string; targetId: string }
     </DialogContent>
   );
 
-  const { nickname, prd, prompt, revised, cases } = data;
+  const { nickname, prd, prompt, revised, cases, deployedUrl } = data;
   return (
     <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
       <DialogHeader>
@@ -126,6 +126,8 @@ function BundleDialog({ userId, targetId }: { userId: string; targetId: string }
         </DialogTitle>
       </DialogHeader>
       <div className="space-y-4 text-sm">
+        <DeployedLinkBanner url={deployedUrl} />
+
         <Section title="PRD">
           <Field label="문제">{prd?.problem}</Field>
           <Field label="사용자">{prd?.users}</Field>
