@@ -135,11 +135,14 @@ function BundleDialog({ userId, targetId }: { userId: string; targetId: string }
           <Field label="비기능">{prd?.nonfunctional}</Field>
           <Field label="성공 지표">{prd?.success_metric}</Field>
         </Section>
-        <Section title="첫 PRD 프롬프트">
-          <Field label="역할">{prompt?.role}</Field>
-          <Field label="컨텍스트">{prompt?.context}</Field>
-          <Field label="할 일">{prompt?.task}</Field>
-          <Field label="비기능">{prompt?.nonfunctional}</Field>
+        <Section title="수정한 PRD 프롬프트">
+          {prompt?.context?.trim() ? (
+            <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded-lg border border-border/40 bg-muted/30 p-2 text-xs leading-relaxed text-foreground">
+{prompt.context}
+            </pre>
+          ) : (
+            <p className="text-xs text-muted-foreground">아직 작성되지 않았습니다.</p>
+          )}
         </Section>
         <Section title={`테스트 케이스 · 실행 결과 (${cases.length}건)`}>
           {cases.length === 0 ? (
