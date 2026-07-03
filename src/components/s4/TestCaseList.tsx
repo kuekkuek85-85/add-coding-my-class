@@ -173,7 +173,11 @@ export function TestCaseList({
       </ol>
 
       {/* 폼 */}
-      {!locked && (
+      {locked ? (
+        <div className="rounded-xl border-2 border-dashed border-border/60 bg-muted/30 p-3 text-xs text-muted-foreground">
+          첫 프롬프트를 확정한 뒤에는 테스트 케이스를 추가·수정할 수 없습니다.
+        </div>
+      ) : (
         <div className="rounded-xl border-2 border-primary/25 bg-accent/20 p-3">
           <p className="mb-2 text-xs font-semibold text-primary">
             {editingId ? "테스트 케이스 편집" : "새 테스트 케이스"}
