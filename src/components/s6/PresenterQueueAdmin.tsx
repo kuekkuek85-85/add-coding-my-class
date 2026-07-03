@@ -28,6 +28,7 @@ import { PresentationFullscreen } from "@/components/s6/PresentationFullscreen";
 
 export function PresenterQueueAdmin({ userId }: { userId: string }) {
   const qc = useQueryClient();
+  const [showFullscreen, setShowFullscreen] = useState(false);
   const fetchOverview = useServerFn(getSessionS6Overview);
   const fetchState = useServerFn(getPresentationState);
   const add = useServerFn(addToQueue);
