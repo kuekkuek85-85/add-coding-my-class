@@ -54,7 +54,9 @@ export type PortfolioLike = {
     checkedCount: number;
     totalCases: number;
     confirmed: boolean;
+    deployedUrl?: string | null;
   };
+
   s6: {
     title: string;
     slides: unknown[];
