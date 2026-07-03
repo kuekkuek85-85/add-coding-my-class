@@ -79,9 +79,15 @@ function InstructorHome() {
             <p className="mb-2 text-xs uppercase tracking-widest text-accent">참가자 입장 코드</p>
             <div className="flex items-baseline gap-3">
               <KeyRound className="h-6 w-6 text-accent" aria-hidden />
-              <span className="font-display text-4xl font-bold tracking-[0.2em] text-chalk sm:text-5xl">
-                {data?.ok ? data.session.participant_code : "····"}
-              </span>
+              {data?.ok ? (
+                <span className="font-display text-4xl font-bold tracking-[0.2em] text-chalk sm:text-5xl">
+                  {data.session.participant_code}
+                </span>
+              ) : (
+                <span className="font-display text-2xl font-medium text-chalk/60">
+                  불러오는 중…
+                </span>
+              )}
             </div>
             <p className="mt-3 text-sm text-chalk/80">
               참가자에게 이 코드를 안내하세요. 강사 코드는 별도로 보관합니다.
