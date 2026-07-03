@@ -70,6 +70,14 @@ export function PresentationStage({ userId }: { userId: string }) {
           </p>
         )}
       </div>
+      {current && state.currentDeck && (
+        <SlideDeckViewer
+          title={state.currentDeck.title}
+          slides={state.currentDeck.slides}
+          presenterName={current.nickname}
+        />
+      )}
+
 
       {state.queue.length > 0 && (
         <div className="rounded-2xl border-2 border-primary/15 bg-card p-4 shadow-sm">
