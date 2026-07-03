@@ -79,6 +79,12 @@ function InstructorHome() {
   const participants = (data?.ok ? data.members : []).filter((m) => m.role === "participant");
   const currentStage = data?.ok ? data.session.current_stage : 1;
 
+  const s2Progress = s2?.ok ? s2.progress : [];
+  const s2Min = s2?.ok ? s2.min : 2;
+  const s2PassedCount = s2Progress.filter((p) => p.passed).length;
+  const s2AllPassed = participants.length > 0 && s2PassedCount === participants.length;
+  const blockNext = currentStage === 2 && !s2AllPassed;
+
   function handleLogout() {
     clearStoredSession();
     navigate({ to: "/" });
