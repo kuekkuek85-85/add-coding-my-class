@@ -77,7 +77,7 @@ function SlideBody({ slide, index, total }: { slide: SlideDef; index: number; to
       </div>
 
       {/* 본문 */}
-      <div className="flex flex-1 flex-col justify-center px-24">
+      <div className="flex min-h-0 flex-1 flex-col justify-center overflow-hidden px-24 py-6">
         {slide.kicker && (
           <p className="slide-kicker mb-8 font-display font-bold text-accent">
             {slide.kicker}
