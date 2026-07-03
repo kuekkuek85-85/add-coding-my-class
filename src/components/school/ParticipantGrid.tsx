@@ -178,7 +178,7 @@ export function ParticipantGrid({
                     {morning && (
                       <span
                         className="inline-flex items-center gap-0.5 rounded-full border border-primary/40 bg-accent/40 px-1.5 py-0.5 text-[10px] font-bold text-primary"
-                        title="오전 완료 도장"
+                        title="중간 도장 완료"
                       >
                         <Stamp className="h-3 w-3" aria-hidden />
                       </span>
