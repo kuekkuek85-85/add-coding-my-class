@@ -424,7 +424,7 @@ export const confirmMyS4Prompt = createServerFn({ method: "POST" })
     if (totalCount < 3) {
       return { ok: false as const, error: "테스트 케이스가 총 3개 이상 필요합니다. (2교시 케이스 포함)" };
     }
-    if (!prompt) return { ok: false as const, error: "프롬프트를 먼저 저장해 주세요." };
+    if (!prompt) return { ok: false as const, error: "초안 PRD를 먼저 수정·저장해 주세요." };
     if (
       !isPromptComplete({
         role: prompt.role,
@@ -433,7 +433,7 @@ export const confirmMyS4Prompt = createServerFn({ method: "POST" })
         nonfunctional: prompt.nonfunctional,
       })
     ) {
-      return { ok: false as const, error: "프롬프트 5칸을 모두 채워 주세요." };
+      return { ok: false as const, error: "초안 PRD 내용을 입력해 주세요." };
     }
 
     const now = new Date().toISOString();
