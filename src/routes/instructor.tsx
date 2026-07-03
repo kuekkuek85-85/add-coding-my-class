@@ -292,6 +292,7 @@ function InstructorHome() {
             </p>
           </div>
           <ParticipantGrid
+            instructorUserId={stored.userId}
             participants={participants}
             currentStage={currentStage}
             s1Progress={s1Progress}
