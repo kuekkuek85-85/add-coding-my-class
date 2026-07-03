@@ -103,12 +103,22 @@ export function PresenterQueueAdmin({ userId }: { userId: string }) {
           <Mic className="h-4 w-4" aria-hidden />
           <h3 className="font-display text-sm font-bold">S6 발표 진행</h3>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {state?.ok && state.timerStartedAt ? (
             <LiveTimer startedAt={state.timerStartedAt} />
           ) : (
             <span className="text-xs text-muted-foreground">타이머 대기 중</span>
           )}
+          <Button
+            size="sm"
+            className="gap-1"
+            disabled={!current}
+            onClick={() => setShowFullscreen(true)}
+            title={current ? "발표 슬라이드를 큰 화면으로 띄우기" : "현재 발표자가 없습니다"}
+          >
+            <Maximize2 className="h-3.5 w-3.5" aria-hidden />
+            슬라이드 띄우기
+          </Button>
           <Button
             size="sm"
             variant="outline"
