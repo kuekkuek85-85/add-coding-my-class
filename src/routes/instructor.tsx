@@ -10,6 +10,7 @@ import { getInstructorS2Summary } from "@/lib/s2.functions";
 import { getSessionS3Overview } from "@/lib/s3.functions";
 import { getSessionS4Overview } from "@/lib/s4.functions";
 import { getSessionS5Overview } from "@/lib/s5.functions";
+import { getSessionS6Overview } from "@/lib/s6.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
