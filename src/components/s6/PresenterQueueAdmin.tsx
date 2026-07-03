@@ -11,6 +11,7 @@ import {
   X,
   CheckCircle2,
   Mic,
+  Maximize2,
 } from "lucide-react";
 
 import {
