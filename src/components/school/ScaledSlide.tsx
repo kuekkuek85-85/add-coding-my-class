@@ -120,6 +120,50 @@ function SlideBody({ slide, index, total }: { slide: SlideDef; index: number; to
               </p>
             )}
           </>
+        ) : slide.kind === "compare" && slide.compare ? (
+          <>
+            <h2 className="slide-title font-display font-bold text-chalk">
+              {slide.title}
+            </h2>
+            <div className="mt-12 grid grid-cols-2 gap-10">
+              <CompareColumn
+                label={slide.compare.left.label}
+                items={slide.compare.left.items}
+                tone="do"
+              />
+              <CompareColumn
+                label={slide.compare.right.label}
+                items={slide.compare.right.items}
+                tone="dont"
+              />
+            </div>
+          </>
+        ) : slide.kind === "stat" && slide.stats ? (
+          <>
+            <h2 className="slide-title font-display font-bold text-chalk">
+              {slide.title}
+            </h2>
+            <div className="mt-12 grid grid-cols-3 gap-8">
+              {slide.stats.map((s, i) => (
+                <div
+                  key={i}
+                  className="flex min-h-[380px] flex-col justify-between rounded-3xl border-2 border-accent/40 bg-chalk/10 p-10"
+                >
+                  <p className="slide-title font-display font-black text-accent">
+                    {s.value}
+                  </p>
+                  <div>
+                    <p className="slide-body-lg font-display font-bold text-chalk">
+                      {s.label}
+                    </p>
+                    {s.caption && (
+                      <p className="slide-caption mt-4 text-chalk/70">{s.caption}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         ) : (
           <>
             <h2 className="slide-title font-display font-bold text-chalk">
@@ -132,23 +176,35 @@ function SlideBody({ slide, index, total }: { slide: SlideDef; index: number; to
             )}
             {slide.bullets && slide.bullets.length > 0 && (
               <ul className="mt-12 flex flex-col gap-6">
-                {slide.bullets.map((b, i) => (
-                  <li key={i} className="flex items-start gap-6">
-                    <span
-                      className={cn(
-                        "mt-3 inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full font-display font-bold",
-                        slide.kind === "steps"
-                          ? "bg-accent text-primary"
-                          : "bg-chalk/15 text-accent",
-                      )}
-                      style={{ fontSize: 28 }}
-                      aria-hidden
-                    >
-                      {slide.kind === "steps" ? i + 1 : "·"}
-                    </span>
-                    <span className="slide-body-lg text-chalk">{b}</span>
-                  </li>
-                ))}
+                {slide.bullets.map((raw, i) => {
+                  const b = typeof raw === "string" ? { title: raw } : raw;
+                  return (
+                    <li key={i} className="flex items-start gap-6">
+                      <span
+                        className={cn(
+                          "mt-2 inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full font-display font-bold",
+                          slide.kind === "steps"
+                            ? "bg-accent text-primary"
+                            : "bg-chalk/15 text-accent",
+                        )}
+                        style={{ fontSize: 30 }}
+                        aria-hidden
+                      >
+                        {slide.kind === "steps" ? i + 1 : "·"}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="slide-body-lg font-display font-bold text-chalk">
+                          {b.title}
+                        </p>
+                        {b.caption && (
+                          <p className="slide-body mt-2 text-chalk/75">
+                            {b.caption}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </>
@@ -164,6 +220,63 @@ function SlideBody({ slide, index, total }: { slide: SlideDef; index: number; to
           {slide.id}
         </span>
       </div>
+    </div>
+  );
+}
+
+function CompareColumn({
+  label,
+  items,
+  tone,
+}: {
+  label: string;
+  items: string[];
+  tone: "do" | "dont";
+}) {
+  const isDo = tone === "do";
+  return (
+    <div
+      className={cn(
+        "flex min-h-[560px] flex-col rounded-3xl border-2 p-10",
+        isDo
+          ? "border-accent/50 bg-chalk/10"
+          : "border-chalk/25 bg-chalk/5",
+      )}
+    >
+      <div className="mb-6 flex items-center gap-4">
+        <span
+          className={cn(
+            "inline-flex h-12 w-12 items-center justify-center rounded-full font-display font-black",
+            isDo ? "bg-accent text-primary" : "bg-chalk/25 text-chalk",
+          )}
+          style={{ fontSize: 26 }}
+          aria-hidden
+        >
+          {isDo ? "O" : "X"}
+        </span>
+        <p
+          className={cn(
+            "slide-subtitle font-display font-bold",
+            isDo ? "text-accent" : "text-chalk/85",
+          )}
+        >
+          {label}
+        </p>
+      </div>
+      <ul className="flex flex-1 flex-col gap-5">
+        {items.map((it, i) => (
+          <li key={i} className="flex items-start gap-4">
+            <span
+              className={cn(
+                "mt-4 inline-block h-3 w-3 shrink-0 rounded-full",
+                isDo ? "bg-accent" : "bg-chalk/50",
+              )}
+              aria-hidden
+            />
+            <span className="slide-body text-chalk">{it}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
