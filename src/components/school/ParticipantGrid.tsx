@@ -1,18 +1,27 @@
-import { Stamp, CircleDot, Lock } from "lucide-react";
+import { Stamp, CircleDot, Lock, StickyNote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
 
+export type S1Progress = {
+  userId: string;
+  checked: number;
+  memoCount: number;
+};
+
 /**
  * 강사 대시보드: 참가자 × 6교시 그리드.
- * 현재는 세션 단위 current_stage 기준으로 도장/진행중/잠금을 표시한다.
- * Step 3부터 참가자별 체크포인트 결과가 반영된다.
+ * S1 셀은 체크포인트 통과 개수(N/M)를, 오전 메모 개수를 사이드에 표시한다.
  */
 export function ParticipantGrid({
   participants,
   currentStage,
+  s1Progress,
+  s1Total,
 }: {
   participants: Array<{ id: string; nickname: string }>;
   currentStage: number;
+  s1Progress?: S1Progress[];
+  s1Total?: number;
 }) {
   if (participants.length === 0) {
     return (
@@ -24,13 +33,20 @@ export function ParticipantGrid({
     );
   }
 
+  const progressMap = new Map<string, S1Progress>();
+  for (const p of s1Progress ?? []) progressMap.set(p.userId, p);
+  const total = s1Total ?? 0;
+
   return (
     <div className="overflow-x-auto rounded-2xl border-2 border-primary/15 bg-card">
-      <table className="w-full min-w-[520px] text-sm">
+      <table className="w-full min-w-[560px] text-sm">
         <thead>
           <tr className="border-b border-border/70 bg-muted/40 text-xs">
             <th className="px-3 py-2 text-left font-semibold text-muted-foreground">
               참가 교사
+            </th>
+            <th className="px-2 py-2 text-center font-semibold text-muted-foreground">
+              메모
             </th>
             {STAGES.map((s) => (
               <th
@@ -44,23 +60,75 @@ export function ParticipantGrid({
           </tr>
         </thead>
         <tbody>
-          {participants.map((p) => (
-            <tr key={p.id} className="border-b border-border/40 last:border-0">
-              <td className="px-3 py-2.5 font-medium text-foreground">{p.nickname}</td>
-              {STAGES.map((s) => {
-                const st: "done" | "open" | "locked" =
-                  s.no < currentStage ? "done" : s.no === currentStage ? "open" : "locked";
-                return (
-                  <td key={s.code} className="px-2 py-2 text-center">
-                    <StageCell status={st} />
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+          {participants.map((p) => {
+            const pr = progressMap.get(p.id);
+            return (
+              <tr key={p.id} className="border-b border-border/40 last:border-0">
+                <td className="px-3 py-2.5 font-medium text-foreground">{p.nickname}</td>
+                <td className="px-2 py-2 text-center">
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs",
+                      (pr?.memoCount ?? 0) > 0
+                        ? "bg-accent/40 text-primary"
+                        : "bg-muted text-muted-foreground",
+                    )}
+                    aria-label={`오전 메모 ${pr?.memoCount ?? 0}건`}
+                  >
+                    <StickyNote className="h-3 w-3" aria-hidden />
+                    {pr?.memoCount ?? 0}
+                  </span>
+                </td>
+                {STAGES.map((s) => {
+                  const st: "done" | "open" | "locked" =
+                    s.no < currentStage ? "done" : s.no === currentStage ? "open" : "locked";
+                  const showS1Count = s.no === 1 && total > 0 && st !== "locked";
+                  return (
+                    <td key={s.code} className="px-2 py-2 text-center">
+                      {showS1Count ? (
+                        <S1Cell checked={pr?.checked ?? 0} total={total} status={st} />
+                      ) : (
+                        <StageCell status={st} />
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
+  );
+}
+
+function S1Cell({
+  checked,
+  total,
+  status,
+}: {
+  checked: number;
+  total: number;
+  status: "done" | "open" | "locked";
+}) {
+  const complete = checked >= total && total > 0;
+  return (
+    <span
+      className={cn(
+        "inline-flex min-w-[46px] items-center justify-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold",
+        complete
+          ? "bg-primary text-primary-foreground"
+          : checked > 0
+            ? "bg-accent/50 text-primary"
+            : status === "open"
+              ? "bg-muted text-muted-foreground"
+              : "bg-muted text-muted-foreground",
+      )}
+      aria-label={`S1 체크포인트 ${checked}/${total}`}
+    >
+      {complete && <Stamp className="h-3 w-3" aria-hidden />}
+      {checked}/{total}
+    </span>
   );
 }
 
