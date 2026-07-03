@@ -91,6 +91,13 @@ function InstructorHome() {
     refetchInterval: 15_000,
   });
 
+  const { data: s6 } = useQuery({
+    queryKey: s6Key,
+    queryFn: () => fetchS6({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 10_000,
+  });
+
 
 
   const { data: help } = useQuery({
