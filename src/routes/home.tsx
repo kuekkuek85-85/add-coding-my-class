@@ -79,6 +79,7 @@ function ParticipantHome() {
   const currentSlideIndex = data?.ok ? data.session.current_slide_index : null;
   const s2Passed = s2?.ok ? s2.passed : false;
   const s4Confirmed = s4?.ok ? s4.confirmed : false;
+  const s5Confirmed = s6?.ok ? s6.s5Confirmed : false;
   const s1Checked = s1?.ok ? s1.checkedIds.length : 0;
   const s1Total = s1?.ok ? s1.checkpoints.length : 0;
   const morningEarned = s1Total > 0 && s1Checked >= s1Total && s2Passed;
