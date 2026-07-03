@@ -196,7 +196,43 @@ export const getMyS5State = createServerFn({ method: "POST" })
       confirmedAt: revised?.confirmed_at ?? null,
       qaGivenCount,
       qaReceivedCount,
+      deployedUrl: user.deployed_url ?? "",
     };
+  });
+
+// -------- 배포 URL 저장 --------
+
+export const saveMyDeployedUrl = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; url: string }) =>
+    z
+      .object({
+        userId: uuid,
+        url: z.string().trim().max(500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (user.role !== "participant")
+      return { ok: false as const, error: "참가자만 저장할 수 있습니다." };
+
+    const trimmed = data.url.trim();
+    if (trimmed.length > 0) {
+      if (!/^https?:\/\/.+/i.test(trimmed))
+        return {
+          ok: false as const,
+          error: "http:// 또는 https:// 로 시작하는 URL을 입력해 주세요.",
+        };
+    }
+
+    const { error } = await supabaseAdmin
+      .from("app_users")
+      .update({ deployed_url: trimmed.length > 0 ? trimmed : null })
+      .eq("id", user.id);
+    if (error) return { ok: false as const, error: "저장에 실패했습니다." };
+    return { ok: true as const };
   });
 
 
