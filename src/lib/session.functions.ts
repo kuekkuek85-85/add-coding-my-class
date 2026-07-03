@@ -114,7 +114,7 @@ export const getSessionSnapshot = createServerFn({ method: "POST" })
 
     const { data: session } = await supabaseAdmin
       .from("sessions")
-      .select("id, name, participant_code, instructor_code, current_stage")
+      .select("id, name, participant_code, instructor_code, current_stage, current_slide_index")
       .eq("id", user.session_id)
       .single();
 
@@ -173,4 +173,32 @@ export const setCurrentStage = createServerFn({ method: "POST" })
     }
 
     return { ok: true as const, currentStage: data.stageNo };
+  });
+
+export const setCurrentSlide = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; slideIndex: number | null }) =>
+    z
+      .object({
+        userId: z.string().uuid(),
+        slideIndex: z.number().int().min(0).max(99).nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: caller } = await supabaseAdmin
+      .from("app_users")
+      .select("id, role, session_id")
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (!caller) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (caller.role !== "instructor") {
+      return { ok: false as const, error: "강사만 강의 슬라이드를 조작할 수 있습니다." };
+    }
+    const { error } = await supabaseAdmin
+      .from("sessions")
+      .update({ current_slide_index: data.slideIndex })
+      .eq("id", caller.session_id);
+    if (error) return { ok: false as const, error: "슬라이드 변경에 실패했습니다." };
+    return { ok: true as const, slideIndex: data.slideIndex };
   });
