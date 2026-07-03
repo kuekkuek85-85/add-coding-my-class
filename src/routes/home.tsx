@@ -216,6 +216,10 @@ function ParticipantHome() {
                   } else {
                     toast("아직 열리지 않았습니다.");
                   }
+                } else if (s.no === 1) {
+                  navigate({ to: "/s1" });
+                } else if (s.no === 2) {
+                  navigate({ to: "/s2" });
                 } else if (s.no === 3) {
                   navigate({ to: "/s3" });
                 } else if (s.no === 4) {
@@ -225,6 +229,7 @@ function ParticipantHome() {
                 } else if (s.no === 6) {
                   navigate({ to: "/s6" });
                 }
+
               }}
             />
           ))}
