@@ -207,6 +207,7 @@ export const setS5ChecklistResult = createServerFn({ method: "POST" })
     (input: {
       userId: string;
       testCaseId: string;
+      source: "s2" | "s4";
       status: "pass" | "fail" | "partial";
       note: string;
     }) =>
@@ -214,6 +215,7 @@ export const setS5ChecklistResult = createServerFn({ method: "POST" })
         .object({
           userId: uuid,
           testCaseId: uuid,
+          source: z.enum(["s2", "s4"]),
           status: z.enum(["pass", "fail", "partial"]),
           note: z.string().max(1000),
         })
@@ -226,18 +228,10 @@ export const setS5ChecklistResult = createServerFn({ method: "POST" })
     if (user.role !== "participant")
       return { ok: false as const, error: "참가자만 저장할 수 있습니다." };
 
-    // 확정 후엔 잠금
-    const { data: revised } = await supabaseAdmin
-      .from("s5_revised_prompts")
-      .select("confirmed_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (revised?.confirmed_at)
-      return { ok: false as const, error: "S5 게이트 통과 후에는 수정할 수 없습니다." };
-
-    // 대상 테스트 케이스가 내 것인지 확인
+    // 대상 테스트 케이스가 내 것인지 확인 (source에 따라 테이블 분기)
+    const table = data.source === "s2" ? "s2_test_cases" : "s4_test_cases";
     const { data: tc } = await supabaseAdmin
-      .from("s4_test_cases")
+      .from(table)
       .select("user_id")
       .eq("id", data.testCaseId)
       .maybeSingle();
@@ -248,12 +242,13 @@ export const setS5ChecklistResult = createServerFn({ method: "POST" })
       {
         user_id: user.id,
         test_case_id: data.testCaseId,
+        source: data.source,
         session_id: user.session_id,
         status: data.status,
         note: data.note,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "user_id,test_case_id" },
+      { onConflict: "user_id,source,test_case_id" },
     );
     if (error) return { ok: false as const, error: "저장에 실패했습니다." };
     return { ok: true as const };
