@@ -136,6 +136,20 @@ function InstructorHome() {
     onError: () => toast.error("스테이지 변경에 실패했습니다."),
   });
 
+  const resetFn = useServerFn(resetSessionData);
+  const resetMutation = useMutation({
+    mutationFn: () => resetFn({ data: { userId: stored!.userId } }),
+    onSuccess: (res) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success("세션 데이터가 초기화되었습니다.");
+      queryClient.invalidateQueries();
+    },
+    onError: () => toast.error("초기화에 실패했습니다."),
+  });
+
   if (!ready || !stored) return <div className="min-h-screen" />;
 
   if (data && !data.ok) {
