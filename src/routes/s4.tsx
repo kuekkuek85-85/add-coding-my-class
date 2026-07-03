@@ -11,7 +11,7 @@ import { getMyS4State, confirmMyS4Prompt } from "@/lib/s4.functions";
 import { Button } from "@/components/ui/button";
 import { Nametag } from "@/components/school/Nametag";
 import { TrafficLight } from "@/components/school/TrafficLight";
-import { PrdReadOnly } from "@/components/s4/PrdReadOnly";
+
 import { TestCaseList } from "@/components/s4/TestCaseList";
 import { TddHintPanel } from "@/components/s4/TddHintPanel";
 import { FirstPromptBuilder } from "@/components/s4/FirstPromptBuilder";
@@ -82,7 +82,7 @@ function S4Page() {
   const totalCases = state?.ok ? (state.totalCases ?? completeCases) : 0;
   const canBuildPrompt = state?.ok ? state.canBuildPrompt : false;
   const confirmed = state?.ok ? state.confirmed : false;
-  const prd = state?.ok ? state.prd : null;
+  
 
   const tabs: Array<{ id: Tab; label: string; enabled: boolean }> = [
     { id: "cases", label: "1. 테스트 케이스", enabled: true },
@@ -111,9 +111,6 @@ function S4Page() {
       </header>
 
       <section className="mx-auto max-w-4xl px-4 py-5">
-        <div className="mb-4">
-          <PrdReadOnly prd={prd} />
-        </div>
 
         <div className="mb-4 flex flex-wrap gap-2">
           {tabs.map((t) => {
