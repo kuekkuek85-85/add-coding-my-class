@@ -89,7 +89,7 @@ export function FirstPromptBuilder({
   const prd = data?.ok ? data.prd : null;
   const cases = data?.ok ? data.cases : [];
   const s2Cases = data?.ok ? data.s2Cases : [];
-  const readOnly = !!data?.ok && data.confirmed;
+  
 
   const draftSeed = useMemo(() => buildDraftText(prd, cases, s2Cases), [prd, cases, s2Cases]);
 
@@ -118,7 +118,6 @@ export function FirstPromptBuilder({
   });
 
   function update(next: string) {
-    if (readOnly) return;
     const clipped = next.slice(0, MAX_LEN);
     setText(clipped);
     setStatus("saving");
@@ -127,7 +126,6 @@ export function FirstPromptBuilder({
   }
 
   function resetToDraft() {
-    if (readOnly) return;
     if (!confirm("현재 편집 내용을 초안 PRD로 되돌립니다. 계속할까요?")) return;
     update(draftSeed);
   }
@@ -174,14 +172,10 @@ export function FirstPromptBuilder({
 
         <Textarea
           value={text}
-          readOnly={readOnly}
           onChange={(e) => update(e.target.value)}
           rows={22}
           spellCheck={false}
-          className={cn(
-            "min-h-[420px] whitespace-pre-wrap font-mono text-sm leading-relaxed",
-            readOnly && "opacity-70",
-          )}
+          className="min-h-[420px] whitespace-pre-wrap font-mono text-sm leading-relaxed"
         />
 
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
@@ -192,7 +186,6 @@ export function FirstPromptBuilder({
               variant="ghost"
               size="sm"
               onClick={resetToDraft}
-              disabled={readOnly}
               className="h-7 px-2 text-[11px]"
             >
               <RotateCcw className="mr-1 h-3 w-3" aria-hidden />
