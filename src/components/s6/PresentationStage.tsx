@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Mic, MessageCircle, Send, Timer } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageCircle, Mic, Send, Timer } from "lucide-react";
 
 import {
   getPresentationState,
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { SlidePreview } from "@/components/s6/SlidePreview";
 
 export function PresentationStage({ userId }: { userId: string }) {
   const qc = useQueryClient();
