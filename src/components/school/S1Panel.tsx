@@ -223,7 +223,7 @@ export function S1Panel({
           </>
         ) : (
           <p className="text-xs text-muted-foreground">
-            오전(1~2교시)에만 새 메모를 저장할 수 있습니다. 아래는 지금까지의 메모입니다.
+            1~2교시에만 새 메모를 저장할 수 있습니다. 아래는 지금까지의 메모입니다.
           </p>
         )}
 
