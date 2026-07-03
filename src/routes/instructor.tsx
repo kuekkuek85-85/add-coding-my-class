@@ -8,6 +8,7 @@ import { getSessionSnapshot, setCurrentStage } from "@/lib/session.functions";
 import { getInstructorS1Summary } from "@/lib/s1.functions";
 import { getInstructorS2Summary } from "@/lib/s2.functions";
 import { getSessionS3Overview } from "@/lib/s3.functions";
+import { getSessionS4Overview } from "@/lib/s4.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
