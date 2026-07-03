@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Mic, MessageCircle, Send, Timer } from "lucide-react";
+import { ChevronLeft, ChevronRight, MessageCircle, Mic, Send, Timer } from "lucide-react";
 
 import {
   getPresentationState,
@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { SlidePreview } from "@/components/s6/SlidePreview";
 
 export function PresentationStage({ userId }: { userId: string }) {
   const qc = useQueryClient();
@@ -69,6 +70,14 @@ export function PresentationStage({ userId }: { userId: string }) {
           </p>
         )}
       </div>
+      {current && state.currentDeck && (
+        <SlideDeckViewer
+          title={state.currentDeck.title}
+          slides={state.currentDeck.slides}
+          presenterName={current.nickname}
+        />
+      )}
+
 
       {state.queue.length > 0 && (
         <div className="rounded-2xl border-2 border-primary/15 bg-card p-4 shadow-sm">
@@ -209,6 +218,103 @@ function ReceivedComments({
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function SlideDeckViewer({
+  title,
+  slides,
+  presenterName,
+}: {
+  title: string;
+  slides: Array<{ heading: string; body: string }>;
+  presenterName: string;
+}) {
+  const [index, setIndex] = useState(0);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ w: 640, h: 360 });
+
+  useEffect(() => {
+    setIndex(0);
+  }, [title, presenterName, slides.length]);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const w = el.clientWidth;
+      setSize({ w, h: Math.round((w * 9) / 16) });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  if (slides.length === 0) return null;
+  const total = slides.length;
+  const clamped = Math.min(Math.max(index, 0), total - 1);
+  const s = slides[clamped]!;
+  const isCover = clamped === 0;
+
+  return (
+    <div className="rounded-2xl border-2 border-primary/25 bg-card p-3 shadow-sm">
+      <div className="mb-2 flex items-center justify-between gap-2 px-1">
+        <p className="truncate font-display text-sm font-bold text-primary">
+          {title}
+        </p>
+        <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+          {clamped + 1} / {total}
+        </span>
+      </div>
+      <div ref={wrapRef} className="w-full">
+        <SlidePreview
+          heading={s.heading}
+          body={s.body}
+          page={clamped + 1}
+          total={total}
+          presenterName={presenterName}
+          width={size.w}
+          height={size.h}
+          variant={isCover ? "cover" : "default"}
+        />
+      </div>
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={clamped === 0}
+          onClick={() => setIndex((i) => Math.max(0, i - 1))}
+          aria-label="이전 슬라이드"
+        >
+          <ChevronLeft className="h-4 w-4" aria-hidden /> 이전
+        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-1">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`슬라이드 ${i + 1}`}
+              className={`h-2.5 w-2.5 rounded-full transition-all ${
+                i === clamped
+                  ? "scale-125 bg-primary"
+                  : "bg-primary/25 hover:bg-primary/50"
+              }`}
+            />
+          ))}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={clamped >= total - 1}
+          onClick={() => setIndex((i) => Math.min(total - 1, i + 1))}
+          aria-label="다음 슬라이드"
+        >
+          다음 <ChevronRight className="h-4 w-4" aria-hidden />
+        </Button>
+      </div>
     </div>
   );
 }
