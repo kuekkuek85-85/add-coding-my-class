@@ -26,35 +26,42 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
   const total = SLIDES.length;
   // 서버 값과 낙관적 값 중 최신 것을 로컬 상태로 유지
   const [localIndex, setLocalIndex] = useState<number | null>(currentSlideIndex);
-  const lastServerRef = useRef<number | null>(currentSlideIndex);
+  const localRef = useRef<number | null>(currentSlideIndex);
+  const pendingRef = useRef(0);
 
-  // 서버 값이 바뀌면 로컬 값을 동기화 (사용자 최신 값 우선)
+  // 서버 값이 바뀌면 로컬 값을 동기화 — 단, 진행 중인 mutation이 없을 때만
+  // (연속 클릭 중에 서버 응답이 낙관적 값을 덮어쓰지 않도록)
   useEffect(() => {
-    if (currentSlideIndex !== lastServerRef.current) {
-      lastServerRef.current = currentSlideIndex;
+    if (pendingRef.current > 0) return;
+    if (currentSlideIndex !== localRef.current) {
+      localRef.current = currentSlideIndex;
       setLocalIndex(currentSlideIndex);
     }
   }, [currentSlideIndex]);
 
   const active = localIndex !== null;
-  const idx = active ? Math.min(localIndex!, total - 1) : 0;
+  const idx = active ? Math.min(localIndex!, SLIDES.length - 1) : 0;
+  const total = SLIDES.length;
   const slide = SLIDES[idx];
 
   const mut = useMutation({
     mutationFn: (slideIndex: number | null) =>
       changeSlide({ data: { userId, slideIndex } }),
-    onSuccess: (res) => {
-      if (!res.ok) {
+    onMutate: () => {
+      pendingRef.current += 1;
+    },
+    onSettled: (res) => {
+      pendingRef.current = Math.max(0, pendingRef.current - 1);
+      if (res && !res.ok) {
         toast.error(res.error);
         return;
       }
-      queryClient.invalidateQueries({ queryKey: snapshotKey });
+      if (pendingRef.current === 0) {
+        queryClient.invalidateQueries({ queryKey: snapshotKey });
+      }
     },
     onError: () => toast.error("슬라이드 전송에 실패했습니다."),
   });
-
-  const localRef = useRef<number | null>(currentSlideIndex);
-  useEffect(() => { localRef.current = localIndex; }, [localIndex]);
 
   function push(next: number | null) {
     localRef.current = next;
@@ -63,7 +70,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
   }
   function stepBy(delta: number) {
     const cur = localRef.current ?? 0;
-    const next = Math.max(0, Math.min(total - 1, cur + delta));
+    const next = Math.max(0, Math.min(SLIDES.length - 1, cur + delta));
     if (next !== cur) push(next);
   }
 
@@ -77,7 +84,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active, total]);
+  }, [active]);
 
 
   if (!active) {
