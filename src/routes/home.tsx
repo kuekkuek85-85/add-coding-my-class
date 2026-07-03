@@ -12,6 +12,7 @@ import { S1Panel } from "@/components/school/S1Panel";
 import { S2Panel } from "@/components/school/S2Panel";
 import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
+import { getMyS4State } from "@/lib/s4.functions";
 import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
 import { TrafficLight } from "@/components/school/TrafficLight";
 import { MorningStamp } from "@/components/school/MorningStamp";
@@ -27,6 +28,7 @@ function ParticipantHome() {
   const fetchSnapshot = useServerFn(getSessionSnapshot);
   const fetchS1 = useServerFn(getMyS1State);
   const fetchS2 = useServerFn(getMyS2State);
+  const fetchS4 = useServerFn(getMyS4State);
 
   const { data } = useQuery({
     queryKey: ["snapshot", stored?.userId],
@@ -49,6 +51,13 @@ function ParticipantHome() {
     refetchInterval: 15_000,
   });
 
+  const { data: s4 } = useQuery({
+    queryKey: ["s4-state", stored?.userId],
+    queryFn: () => fetchS4({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 15_000,
+  });
+
   if (!ready || !stored) return <div className="min-h-screen" />;
 
   if (data && !data.ok) {
@@ -60,6 +69,7 @@ function ParticipantHome() {
   const currentStage = data?.ok ? data.session.current_stage : 1;
   const currentSlideIndex = data?.ok ? data.session.current_slide_index : null;
   const s2Passed = s2?.ok ? s2.passed : false;
+  const s4Confirmed = s4?.ok ? s4.confirmed : false;
   const s1Checked = s1?.ok ? s1.checkedIds.length : 0;
   const s1Total = s1?.ok ? s1.checkpoints.length : 0;
   const morningEarned = s1Total > 0 && s1Checked >= s1Total && s2Passed;
@@ -73,6 +83,8 @@ function ParticipantHome() {
   function statusFor(stageNo: number): StageStatus {
     // S3는 S2 미니 게이트(테스트 케이스 2건) 통과 전까지 강제로 잠금
     if (stageNo === 3 && !s2Passed) return "locked";
+    // S5는 S4 게이트(첫 프롬프트 확정) 통과 전까지 강제로 잠금
+    if (stageNo === 5 && !s4Confirmed) return "locked";
     if (stageNo < currentStage) return "done";
     if (stageNo === currentStage) return "open";
     return "locked";
@@ -141,6 +153,8 @@ function ParticipantHome() {
                 if (st === "locked") {
                   if (s.no === 3 && !s2Passed) {
                     toast(`S2 게이트 미통과 — 테스트 케이스를 2개 이상 작성해야 열립니다.`);
+                  } else if (s.no === 5 && !s4Confirmed) {
+                    toast(`S4 게이트 미통과 — 4교시 첫 프롬프트 확정 후 열립니다.`);
                   } else {
                     toast("아직 열리지 않았습니다.");
                   }
@@ -148,7 +162,9 @@ function ParticipantHome() {
                   navigate({ to: "/s3" });
                 } else if (s.no === 4) {
                   navigate({ to: "/s4" });
-                } else if (s.no > 4) {
+                } else if (s.no === 5) {
+                  navigate({ to: "/s5" });
+                } else if (s.no > 5) {
                   toast(`${s.code} · ${s.title} — 준비 중입니다.`);
                 }
               }}

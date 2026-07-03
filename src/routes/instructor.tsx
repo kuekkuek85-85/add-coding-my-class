@@ -9,6 +9,7 @@ import { getInstructorS1Summary } from "@/lib/s1.functions";
 import { getInstructorS2Summary } from "@/lib/s2.functions";
 import { getSessionS3Overview } from "@/lib/s3.functions";
 import { getSessionS4Overview } from "@/lib/s4.functions";
+import { getSessionS5Overview } from "@/lib/s5.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
@@ -33,6 +34,7 @@ function InstructorHome() {
   const fetchS2 = useServerFn(getInstructorS2Summary);
   const fetchS3 = useServerFn(getSessionS3Overview);
   const fetchS4 = useServerFn(getSessionS4Overview);
+  const fetchS5 = useServerFn(getSessionS5Overview);
   const fetchHelp = useServerFn(listSessionHelpSignals);
 
   const snapshotKey = ["snapshot", stored?.userId];
@@ -40,6 +42,7 @@ function InstructorHome() {
   const s2Key = ["instructor-s2", stored?.userId];
   const s3Key = ["instructor-s3", stored?.userId];
   const s4Key = ["instructor-s4", stored?.userId];
+  const s5Key = ["instructor-s5", stored?.userId];
   const helpKey = ["instructor-help", stored?.userId];
 
   const { data } = useQuery({
@@ -76,6 +79,14 @@ function InstructorHome() {
     enabled: !!stored?.userId,
     refetchInterval: 15_000,
   });
+
+  const { data: s5 } = useQuery({
+    queryKey: s5Key,
+    queryFn: () => fetchS5({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 15_000,
+  });
+
 
 
   const { data: help } = useQuery({
@@ -272,6 +283,7 @@ function InstructorHome() {
             s2Min={s2Min}
             s3Progress={s3?.ok ? s3.progress : []}
             s4Progress={s4?.ok ? s4.progress : []}
+            s5Progress={s5?.ok ? s5.progress : []}
             helpMap={helpMap}
             morningEarnedMap={morningEarnedMap}
           />

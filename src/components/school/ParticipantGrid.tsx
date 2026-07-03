@@ -29,6 +29,16 @@ export type S4Progress = {
   confirmed: boolean;
 };
 
+export type S5Progress = {
+  userId: string;
+  totalCases: number;
+  checkedCases: number;
+  qaGiven: boolean;
+  qaReceived: number;
+  revisedFilled: boolean;
+  confirmed: boolean;
+};
+
 export type HelpRow = {
   userId: string;
   level: "green" | "yellow" | "red";
@@ -49,6 +59,7 @@ export function ParticipantGrid({
   s2Min,
   s3Progress,
   s4Progress,
+  s5Progress,
   helpMap,
   morningEarnedMap,
 }: {
@@ -60,6 +71,7 @@ export function ParticipantGrid({
   s2Min?: number;
   s3Progress?: S3Progress[];
   s4Progress?: S4Progress[];
+  s5Progress?: S5Progress[];
   helpMap?: Map<string, HelpRow>;
   morningEarnedMap?: Map<string, boolean>;
 }) {
@@ -86,6 +98,10 @@ export function ParticipantGrid({
 
   const s4Map = new Map<string, S4Progress>();
   for (const p of s4Progress ?? []) s4Map.set(p.userId, p);
+
+  const s5Map = new Map<string, S5Progress>();
+  for (const p of s5Progress ?? []) s5Map.set(p.userId, p);
+
 
 
 
@@ -179,6 +195,10 @@ export function ParticipantGrid({
                   const showS3 = s.no === 3 && (st !== "locked" || s3?.v1 || s3?.v2);
                   const s4 = s4Map.get(p.id);
                   const showS4 = s.no === 4 && (st !== "locked" || (s4?.completeCases ?? 0) > 0 || s4?.confirmed);
+                  const s5 = s5Map.get(p.id);
+                  const showS5 =
+                    s.no === 5 &&
+                    (st !== "locked" || (s5?.checkedCases ?? 0) > 0 || s5?.confirmed || s5?.qaGiven);
                   return (
                     <td key={s.code} className="px-2 py-2 text-center">
                       {showS1Count ? (
@@ -202,6 +222,15 @@ export function ParticipantGrid({
                           completeCases={s4?.completeCases ?? 0}
                           promptFilled={!!s4?.promptFilled}
                           confirmed={!!s4?.confirmed}
+                          status={st}
+                        />
+                      ) : showS5 ? (
+                        <S5Cell
+                          totalCases={s5?.totalCases ?? 0}
+                          checkedCases={s5?.checkedCases ?? 0}
+                          qaGiven={!!s5?.qaGiven}
+                          revisedFilled={!!s5?.revisedFilled}
+                          confirmed={!!s5?.confirmed}
                           status={st}
                         />
                       ) : (
@@ -384,5 +413,60 @@ function S4Cell({
   }
   return <StageCell status={status} />;
 }
+
+function S5Cell({
+  totalCases,
+  checkedCases,
+  qaGiven,
+  revisedFilled,
+  confirmed,
+  status,
+}: {
+  totalCases: number;
+  checkedCases: number;
+  qaGiven: boolean;
+  revisedFilled: boolean;
+  confirmed: boolean;
+  status: "done" | "open" | "locked";
+}) {
+  if (confirmed) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground"
+        aria-label="S5 수정 프롬프트 확정 완료"
+        title="S5 게이트 통과"
+      >
+        <Stamp className="h-3 w-3" aria-hidden />
+        확정
+      </span>
+    );
+  }
+  const allChecked = totalCases > 0 && checkedCases >= totalCases;
+  if (allChecked || revisedFilled || qaGiven) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-900"
+        aria-label={`S5 체크 ${checkedCases}/${totalCases}${qaGiven ? " · QA 완료" : ""}${revisedFilled ? " · 수정 프롬프트 작성" : ""}`}
+        title={`체크 ${checkedCases}/${totalCases}${qaGiven ? ", QA 완료" : ""}${revisedFilled ? ", 수정 프롬프트 작성" : ""}`}
+      >
+        <FileCheck2 className="h-3 w-3" aria-hidden />
+        {checkedCases}/{totalCases || 0}
+        {qaGiven && <MessagesSquare className="ml-0.5 h-3 w-3" aria-hidden />}
+      </span>
+    );
+  }
+  if (checkedCases > 0) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-accent/60 px-2 py-0.5 text-xs font-semibold text-primary"
+        aria-label={`S5 체크 ${checkedCases}/${totalCases}`}
+      >
+        {checkedCases}/{totalCases || 0}
+      </span>
+    );
+  }
+  return <StageCell status={status} />;
+}
+
 
 

@@ -415,6 +415,167 @@ export type Database = {
         }
         Relationships: []
       }
+      s5_checklist_results: {
+        Row: {
+          note: string
+          session_id: string
+          status: string
+          test_case_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          note?: string
+          session_id: string
+          status: string
+          test_case_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          note?: string
+          session_id?: string
+          status?: string
+          test_case_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s5_checklist_results_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s5_checklist_results_test_case_id_fkey"
+            columns: ["test_case_id"]
+            isOneToOne: false
+            referencedRelation: "s4_test_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s5_checklist_results_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s5_qa_reviews: {
+        Row: {
+          good: string
+          id: string
+          issue: string
+          reviewee_id: string
+          reviewer_id: string
+          session_id: string
+          submitted_at: string
+          suggestion: string
+          updated_at: string
+        }
+        Insert: {
+          good: string
+          id?: string
+          issue?: string
+          reviewee_id: string
+          reviewer_id: string
+          session_id: string
+          submitted_at?: string
+          suggestion?: string
+          updated_at?: string
+        }
+        Update: {
+          good?: string
+          id?: string
+          issue?: string
+          reviewee_id?: string
+          reviewer_id?: string
+          session_id?: string
+          submitted_at?: string
+          suggestion?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s5_qa_reviews_reviewee_id_fkey"
+            columns: ["reviewee_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s5_qa_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s5_qa_reviews_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s5_revised_prompts: {
+        Row: {
+          add_list: string
+          confirmed_at: string | null
+          constraints: string
+          created_at: string
+          evidence: string
+          keep_list: string
+          session_id: string
+          target: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          add_list?: string
+          confirmed_at?: string | null
+          constraints?: string
+          created_at?: string
+          evidence?: string
+          keep_list?: string
+          session_id: string
+          target?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          add_list?: string
+          confirmed_at?: string | null
+          constraints?: string
+          created_at?: string
+          evidence?: string
+          keep_list?: string
+          session_id?: string
+          target?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s5_revised_prompts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s5_revised_prompts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sessions: {
         Row: {
           created_at: string
