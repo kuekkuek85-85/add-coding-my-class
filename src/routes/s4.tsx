@@ -87,7 +87,7 @@ function S4Page() {
   const tabs: Array<{ id: Tab; label: string; enabled: boolean }> = [
     { id: "cases", label: "1. 테스트 케이스", enabled: true },
     { id: "hints", label: "2. TDD 도우미", enabled: totalCases >= 1 },
-    { id: "prompt", label: "3. 첫 PRD 프롬프트", enabled: canBuildPrompt },
+    { id: "prompt", label: "3. 초안 PRD 수정하기", enabled: canBuildPrompt },
   ];
 
   return (
