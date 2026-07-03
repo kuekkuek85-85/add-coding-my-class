@@ -277,6 +277,13 @@ function InstructorHome() {
           />
         </div>
 
+        {/* S6 발표 진행 (6교시일 때만 노출) */}
+        {currentStage >= 6 && (
+          <div className="mt-6">
+            <PresenterQueueAdmin userId={stored.userId} />
+          </div>
+        )}
+
         {/* 참가자 진행 그리드 */}
         <div className="mt-8">
           <div className="mb-3">
@@ -295,6 +302,7 @@ function InstructorHome() {
             s3Progress={s3?.ok ? s3.progress : []}
             s4Progress={s4?.ok ? s4.progress : []}
             s5Progress={s5?.ok ? s5.progress : []}
+            s6Progress={s6?.ok ? s6.progress : []}
             helpMap={helpMap}
             morningEarnedMap={morningEarnedMap}
           />
