@@ -146,7 +146,9 @@ function ParticipantHome() {
                   }
                 } else if (s.no === 3) {
                   navigate({ to: "/s3" });
-                } else if (s.no > 3) {
+                } else if (s.no === 4) {
+                  navigate({ to: "/s4" });
+                } else if (s.no > 4) {
                   toast(`${s.code} · ${s.title} — 준비 중입니다.`);
                 }
               }}

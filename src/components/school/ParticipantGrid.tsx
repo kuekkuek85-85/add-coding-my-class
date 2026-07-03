@@ -22,6 +22,13 @@ export type S3Progress = {
   reviewReceived: number;
 };
 
+export type S4Progress = {
+  userId: string;
+  completeCases: number;
+  promptFilled: boolean;
+  confirmed: boolean;
+};
+
 export type HelpRow = {
   userId: string;
   level: "green" | "yellow" | "red";
@@ -41,6 +48,7 @@ export function ParticipantGrid({
   s2Progress,
   s2Min,
   s3Progress,
+  s4Progress,
   helpMap,
   morningEarnedMap,
 }: {
@@ -51,6 +59,7 @@ export function ParticipantGrid({
   s2Progress?: S2Progress[];
   s2Min?: number;
   s3Progress?: S3Progress[];
+  s4Progress?: S4Progress[];
   helpMap?: Map<string, HelpRow>;
   morningEarnedMap?: Map<string, boolean>;
 }) {
@@ -74,6 +83,10 @@ export function ParticipantGrid({
 
   const s3Map = new Map<string, S3Progress>();
   for (const p of s3Progress ?? []) s3Map.set(p.userId, p);
+
+  const s4Map = new Map<string, S4Progress>();
+  for (const p of s4Progress ?? []) s4Map.set(p.userId, p);
+
 
 
   return (
@@ -164,6 +177,8 @@ export function ParticipantGrid({
                   const showS2Gate = s.no === 2 && st !== "locked";
                   const s3 = s3Map.get(p.id);
                   const showS3 = s.no === 3 && (st !== "locked" || s3?.v1 || s3?.v2);
+                  const s4 = s4Map.get(p.id);
+                  const showS4 = s.no === 4 && (st !== "locked" || (s4?.completeCases ?? 0) > 0 || s4?.confirmed);
                   return (
                     <td key={s.code} className="px-2 py-2 text-center">
                       {showS1Count ? (
@@ -180,6 +195,13 @@ export function ParticipantGrid({
                           v2={!!s3?.v2}
                           reviewGiven={!!s3?.reviewGiven}
                           reviewReceived={s3?.reviewReceived ?? 0}
+                          status={st}
+                        />
+                      ) : showS4 ? (
+                        <S4Cell
+                          completeCases={s4?.completeCases ?? 0}
+                          promptFilled={!!s4?.promptFilled}
+                          confirmed={!!s4?.confirmed}
                           status={st}
                         />
                       ) : (
@@ -314,4 +336,53 @@ function S3Cell({
   }
   return <StageCell status={status} />;
 }
+
+function S4Cell({
+  completeCases,
+  promptFilled,
+  confirmed,
+  status,
+}: {
+  completeCases: number;
+  promptFilled: boolean;
+  confirmed: boolean;
+  status: "done" | "open" | "locked";
+}) {
+  if (confirmed) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground"
+        aria-label="S4 프롬프트 확정 완료"
+        title="S4 게이트 통과"
+      >
+        <Stamp className="h-3 w-3" aria-hidden />
+        확정
+      </span>
+    );
+  }
+  if (completeCases >= 3 || promptFilled) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-900"
+        aria-label={`S4 테스트 케이스 ${completeCases}개${promptFilled ? " · 프롬프트 작성" : ""}`}
+        title={`테스트 케이스 ${completeCases}개${promptFilled ? ", 프롬프트 작성" : ""}`}
+      >
+        <FileCheck2 className="h-3 w-3" aria-hidden />
+        {completeCases}건
+      </span>
+    );
+  }
+  if (completeCases > 0) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-accent/60 px-2 py-0.5 text-xs font-semibold text-primary"
+        aria-label={`S4 테스트 케이스 ${completeCases}개`}
+      >
+        {completeCases}/3
+      </span>
+    );
+  }
+  return <StageCell status={status} />;
+}
+
 
