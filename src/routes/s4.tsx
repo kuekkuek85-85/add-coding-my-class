@@ -149,7 +149,7 @@ function S4Page() {
             onConfirmClick={() => confirmMut.mutate()}
             confirmDisabled={!canBuildPrompt || confirmed}
             confirmBusy={confirmMut.isPending}
-            confirmLabel={confirmed ? "확정 완료" : "첫 PRD 프롬프트 확정"}
+            confirmLabel={confirmed ? "확정 완료" : "초안 PRD 수정 확정"}
           />
         )}
       </section>
