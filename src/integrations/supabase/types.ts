@@ -14,7 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      app_users: {
+        Row: {
+          created_at: string
+          id: string
+          last_seen_at: string
+          nickname: string
+          role: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_seen_at?: string
+          nickname: string
+          role: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_seen_at?: string
+          nickname?: string
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_users_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sessions: {
+        Row: {
+          created_at: string
+          current_stage: number
+          id: string
+          instructor_code: string
+          name: string
+          participant_code: string
+        }
+        Insert: {
+          created_at?: string
+          current_stage?: number
+          id?: string
+          instructor_code: string
+          name: string
+          participant_code: string
+        }
+        Update: {
+          created_at?: string
+          current_stage?: number
+          id?: string
+          instructor_code?: string
+          name?: string
+          participant_code?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
