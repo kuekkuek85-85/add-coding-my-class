@@ -339,6 +339,8 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
         nickname,
         stage: 6 as const,
         s6: {
+          deployedUrl:
+            (target as { deployed_url?: string | null }).deployed_url ?? null,
           deck: deck
             ? {
                 title: (deck.title ?? "") as string,
@@ -362,6 +364,7 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
         },
       };
     }
+
 
     return { ok: false as const, error: "지원하지 않는 스테이지입니다." };
   });
