@@ -458,6 +458,7 @@ function S6View({
   s6,
 }: {
   s6: {
+    deployedUrl?: string | null;
     deck: { title: string; slides: unknown; confirmedAt: string | null } | null;
     queue: {
       state: "waiting" | "current" | "done" | null;
@@ -468,20 +469,54 @@ function S6View({
     comments: Array<{ partnerNickname: string; good: string; question: string }>;
   };
 }) {
+  const rawSlides = Array.isArray(s6.deck?.slides)
+    ? (s6.deck!.slides as Array<{ heading?: unknown; body?: unknown }>)
+    : [];
+  const slides = rawSlides.map((s) => ({
+    heading: typeof s?.heading === "string" ? s.heading : "",
+    body: typeof s?.body === "string" ? s.body : "",
+  }));
+  const total = slides.length;
+  const hasAny = slides.some((s) => s.heading.trim() || s.body.trim());
   return (
     <div>
+      <Section title="배포 URL">
+        <DeployedUrlBanner url={s6.deployedUrl} />
+      </Section>
       <Section title={`슬라이드${s6.deck?.confirmedAt ? " (확정)" : ""}`}>
         {!s6.deck ? (
           <Empty text="아직 슬라이드가 없습니다." />
         ) : (
           <div>
             <Field label="제목" value={s6.deck.title} />
-            <pre className="max-h-64 overflow-auto whitespace-pre-wrap rounded-lg border border-border/40 bg-muted/30 p-2 text-xs">
-              {JSON.stringify(s6.deck.slides ?? {}, null, 2)}
-            </pre>
+            {hasAny ? (
+              <ol className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {slides.map((s, i) => (
+                  <li key={i} className="flex flex-col items-center gap-1">
+                    <SlidePreview
+                      heading={s.heading}
+                      body={s.body}
+                      page={i + 1}
+                      total={total}
+                      presenterName={i === 0 ? s6.deck!.title : undefined}
+                      deployedUrl={i === 0 ? s6.deployedUrl : null}
+                      width={320}
+                      height={180}
+                      variant={i === 0 ? "cover" : "default"}
+                    />
+                    <span className="text-[11px] text-muted-foreground">
+                      {i + 1} / {total} · {s.heading || "(제목 없음)"}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <Empty text="아직 채운 슬라이드가 없습니다." />
+            )}
           </div>
         )}
       </Section>
+
       <Section title="발표 큐">
         {!s6.queue ? (
           <Empty text="큐에 등록되지 않았습니다." />
