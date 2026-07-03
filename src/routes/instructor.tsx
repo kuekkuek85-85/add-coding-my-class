@@ -1,12 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { LogOut, Users, KeyRound } from "lucide-react";
 
-import { getSessionSnapshot } from "@/lib/session.functions";
+import { getSessionSnapshot, setCurrentStage } from "@/lib/session.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
+import { StageControls } from "@/components/school/StageControls";
+import { ParticipantGrid } from "@/components/school/ParticipantGrid";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/instructor")({
@@ -15,14 +18,32 @@ export const Route = createFileRoute("/instructor")({
 
 function InstructorHome() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { ready, session: stored } = useStoredSession({ requireRole: "instructor" });
   const fetchSnapshot = useServerFn(getSessionSnapshot);
+  const changeStage = useServerFn(setCurrentStage);
+
+  const snapshotKey = ["snapshot", stored?.userId];
 
   const { data } = useQuery({
-    queryKey: ["snapshot", stored?.userId],
+    queryKey: snapshotKey,
     queryFn: () => fetchSnapshot({ data: { userId: stored!.userId } }),
     enabled: !!stored?.userId,
     refetchInterval: 5_000,
+  });
+
+  const stageMutation = useMutation({
+    mutationFn: (stageNo: number) =>
+      changeStage({ data: { userId: stored!.userId, stageNo } }),
+    onSuccess: (res, stageNo) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(`${stageNo}교시가 열렸습니다.`);
+      queryClient.invalidateQueries({ queryKey: snapshotKey });
+    },
+    onError: () => toast.error("스테이지 변경에 실패했습니다."),
   });
 
   if (!ready || !stored) return <div className="min-h-screen" />;
@@ -118,16 +139,30 @@ function InstructorHome() {
           </div>
         </div>
 
-        {/* 시간표 */}
+        {/* 스테이지 개폐 컨트롤 */}
+        <div className="mt-6">
+          <StageControls
+            currentStage={currentStage}
+            maxStage={STAGES.length}
+            busy={stageMutation.isPending}
+            onChange={(next) => stageMutation.mutate(next)}
+          />
+        </div>
+
+        {/* 참가자 진행 그리드 */}
         <div className="mt-8">
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <h1 className="font-display text-2xl font-bold text-foreground">오늘의 시간표</h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                현재 열린 교시는 {currentStage}교시입니다. 스테이지 개폐는 다음 Step에서 활성화됩니다.
-              </p>
-            </div>
+          <div className="mb-3">
+            <h2 className="font-display text-xl font-bold text-foreground">참가자 진행 현황</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              14명 × 6교시 그리드. 도장은 통과한 스테이지를 나타냅니다.
+            </p>
           </div>
+          <ParticipantGrid participants={participants} currentStage={currentStage} />
+        </div>
+
+        {/* 시간표(참고) */}
+        <div className="mt-8">
+          <h2 className="mb-3 font-display text-xl font-bold text-foreground">오늘의 시간표</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {STAGES.map((s) => (
               <TimetableCard key={s.code} stage={s} status={statusFor(s.no)} />
@@ -138,3 +173,4 @@ function InstructorHome() {
     </main>
   );
 }
+

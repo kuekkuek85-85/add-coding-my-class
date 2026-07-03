@@ -23,7 +23,7 @@ function ParticipantHome() {
     queryKey: ["snapshot", stored?.userId],
     queryFn: () => fetchSnapshot({ data: { userId: stored!.userId } }),
     enabled: !!stored?.userId,
-    refetchInterval: 15_000,
+    refetchInterval: 5_000,
   });
 
   if (!ready || !stored) return <div className="min-h-screen" />;
