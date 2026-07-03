@@ -213,6 +213,10 @@ export function ParticipantGrid({
                   const showS5 =
                     s.no === 5 &&
                     (st !== "locked" || (s5?.checkedCases ?? 0) > 0 || s5?.confirmed || s5?.qaGiven);
+                  const s6 = s6Map.get(p.id);
+                  const showS6 =
+                    s.no === 6 &&
+                    (st !== "locked" || s6?.slidesConfirmed || s6?.slidesFilled || !!s6?.queueState);
                   return (
                     <td key={s.code} className="px-2 py-2 text-center">
                       {showS1Count ? (
@@ -245,6 +249,14 @@ export function ParticipantGrid({
                           qaGiven={!!s5?.qaGiven}
                           revisedFilled={!!s5?.revisedFilled}
                           confirmed={!!s5?.confirmed}
+                          status={st}
+                        />
+                      ) : showS6 ? (
+                        <S6Cell
+                          slidesConfirmed={!!s6?.slidesConfirmed}
+                          slidesFilled={!!s6?.slidesFilled}
+                          queueState={s6?.queueState ?? null}
+                          commentsReceived={s6?.commentsReceived ?? 0}
                           status={st}
                         />
                       ) : (
