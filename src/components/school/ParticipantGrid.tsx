@@ -39,6 +39,15 @@ export type S5Progress = {
   confirmed: boolean;
 };
 
+export type S6Progress = {
+  userId: string;
+  slidesConfirmed: boolean;
+  slidesFilled: boolean;
+  queueState: "waiting" | "current" | "done" | null;
+  orderIndex: number | null;
+  commentsReceived: number;
+};
+
 export type HelpRow = {
   userId: string;
   level: "green" | "yellow" | "red";
