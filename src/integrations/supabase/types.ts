@@ -157,6 +157,7 @@ export type Database = {
       sessions: {
         Row: {
           created_at: string
+          current_slide_index: number | null
           current_stage: number
           id: string
           instructor_code: string
@@ -165,6 +166,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          current_slide_index?: number | null
           current_stage?: number
           id?: string
           instructor_code: string
@@ -173,6 +175,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          current_slide_index?: number | null
           current_stage?: number
           id?: string
           instructor_code?: string
