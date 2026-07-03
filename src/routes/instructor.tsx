@@ -80,6 +80,14 @@ function InstructorHome() {
     refetchInterval: 15_000,
   });
 
+  const { data: s5 } = useQuery({
+    queryKey: s5Key,
+    queryFn: () => fetchS5({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 15_000,
+  });
+
+
 
   const { data: help } = useQuery({
     queryKey: helpKey,
