@@ -23,7 +23,7 @@ export function InstructorSlideDeck({ userId, currentSlideIndex, snapshotKey }: 
   const queryClient = useQueryClient();
   const changeSlide = useServerFn(setCurrentSlide);
 
-  const total = SLIDES.length;
+  // total은 아래 idx 계산에서 SLIDES.length로 직접 사용
   // 서버 값과 낙관적 값 중 최신 것을 로컬 상태로 유지
   const [localIndex, setLocalIndex] = useState<number | null>(currentSlideIndex);
   const localRef = useRef<number | null>(currentSlideIndex);
