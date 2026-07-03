@@ -60,12 +60,8 @@ function isCompleteCase(c: {
 }
 
 function isPromptComplete(p: PromptFields) {
-  return (
-    p.role.trim().length > 0 &&
-    p.context.trim().length > 0 &&
-    p.task.trim().length > 0 &&
-    p.nonfunctional.trim().length > 0
-  );
+  // 초안 PRD 수정 방식: 단일 텍스트(context) 하나만 필수.
+  return p.context.trim().length > 0;
 }
 
 // -------- 상태 조회 --------
