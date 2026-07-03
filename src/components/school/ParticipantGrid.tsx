@@ -226,50 +226,66 @@ export function ParticipantGrid({
                   const showS6 =
                     s.no === 6 &&
                     (st !== "locked" || s6?.slidesConfirmed || s6?.slidesFilled || !!s6?.queueState);
+                  const cellContent = showS1Count ? (
+                    <S1Cell checked={pr?.checked ?? 0} total={total} status={st} />
+                  ) : showS2Gate ? (
+                    <S2Cell
+                      cases={s2?.cases ?? 0}
+                      min={s2Threshold}
+                      passed={s2?.passed ?? false}
+                    />
+                  ) : showS3 ? (
+                    <S3Cell
+                      v1={!!s3?.v1}
+                      v2={!!s3?.v2}
+                      reviewGiven={!!s3?.reviewGiven}
+                      reviewReceived={s3?.reviewReceived ?? 0}
+                      status={st}
+                    />
+                  ) : showS4 ? (
+                    <S4Cell
+                      completeCases={s4?.completeCases ?? 0}
+                      promptFilled={!!s4?.promptFilled}
+                      confirmed={!!s4?.confirmed}
+                      status={st}
+                    />
+                  ) : showS5 ? (
+                    <S5Cell
+                      totalCases={s5?.totalCases ?? 0}
+                      checkedCases={s5?.checkedCases ?? 0}
+                      qaGiven={!!s5?.qaGiven}
+                      revisedFilled={!!s5?.revisedFilled}
+                      confirmed={!!s5?.confirmed}
+                      status={st}
+                    />
+                  ) : showS6 ? (
+                    <S6Cell
+                      slidesConfirmed={!!s6?.slidesConfirmed}
+                      slidesFilled={!!s6?.slidesFilled}
+                      queueState={s6?.queueState ?? null}
+                      commentsReceived={s6?.commentsReceived ?? 0}
+                      status={st}
+                    />
+                  ) : (
+                    <StageCell status={st} />
+                  );
+                  const clickable = s.no <= 6;
                   return (
                     <td key={s.code} className="px-2 py-2 text-center">
-                      {showS1Count ? (
-                        <S1Cell checked={pr?.checked ?? 0} total={total} status={st} />
-                      ) : showS2Gate ? (
-                        <S2Cell
-                          cases={s2?.cases ?? 0}
-                          min={s2Threshold}
-                          passed={s2?.passed ?? false}
-                        />
-                      ) : showS3 ? (
-                        <S3Cell
-                          v1={!!s3?.v1}
-                          v2={!!s3?.v2}
-                          reviewGiven={!!s3?.reviewGiven}
-                          reviewReceived={s3?.reviewReceived ?? 0}
-                          status={st}
-                        />
-                      ) : showS4 ? (
-                        <S4Cell
-                          completeCases={s4?.completeCases ?? 0}
-                          promptFilled={!!s4?.promptFilled}
-                          confirmed={!!s4?.confirmed}
-                          status={st}
-                        />
-                      ) : showS5 ? (
-                        <S5Cell
-                          totalCases={s5?.totalCases ?? 0}
-                          checkedCases={s5?.checkedCases ?? 0}
-                          qaGiven={!!s5?.qaGiven}
-                          revisedFilled={!!s5?.revisedFilled}
-                          confirmed={!!s5?.confirmed}
-                          status={st}
-                        />
-                      ) : showS6 ? (
-                        <S6Cell
-                          slidesConfirmed={!!s6?.slidesConfirmed}
-                          slidesFilled={!!s6?.slidesFilled}
-                          queueState={s6?.queueState ?? null}
-                          commentsReceived={s6?.commentsReceived ?? 0}
-                          status={st}
-                        />
+                      {clickable ? (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setDetail({ userId: p.id, nickname: p.nickname, stageNo: s.no })
+                          }
+                          className="inline-flex rounded-full transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                          aria-label={`${p.nickname}의 ${s.code} 산출물 자세히 보기`}
+                          title={`${p.nickname} · ${s.code} 자세히 보기`}
+                        >
+                          {cellContent}
+                        </button>
                       ) : (
-                        <StageCell status={st} />
+                        cellContent
                       )}
                     </td>
                   );
@@ -279,6 +295,16 @@ export function ParticipantGrid({
           })}
         </tbody>
       </table>
+      <ParticipantDetailDialog
+        open={detail !== null}
+        onOpenChange={(v) => {
+          if (!v) setDetail(null);
+        }}
+        instructorUserId={instructorUserId}
+        targetUserId={detail?.userId ?? null}
+        targetNickname={detail?.nickname ?? ""}
+        stageNo={detail?.stageNo ?? null}
+      />
     </div>
   );
 }
