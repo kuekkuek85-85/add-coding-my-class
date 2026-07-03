@@ -89,7 +89,7 @@ export function FirstPromptBuilder({
   const prd = data?.ok ? data.prd : null;
   const cases = data?.ok ? data.cases : [];
   const s2Cases = data?.ok ? data.s2Cases : [];
-  const readOnly = !!data?.ok && data.confirmed;
+  
 
   const draftSeed = useMemo(() => buildDraftText(prd, cases, s2Cases), [prd, cases, s2Cases]);
 
