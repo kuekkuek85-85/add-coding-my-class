@@ -248,11 +248,3 @@ export function QaGivePanel({ userId }: { userId: string }) {
   );
 }
 
-function PromptRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex gap-2">
-      <dt className="w-16 shrink-0 font-semibold text-muted-foreground">{label}</dt>
-      <dd className="flex-1 whitespace-pre-wrap text-foreground">{value || "-"}</dd>
-    </div>
-  );
-}
