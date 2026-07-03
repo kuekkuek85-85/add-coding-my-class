@@ -17,6 +17,7 @@ export type Database = {
       app_users: {
         Row: {
           created_at: string
+          deployed_url: string | null
           id: string
           last_seen_at: string
           nickname: string
@@ -25,6 +26,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deployed_url?: string | null
           id?: string
           last_seen_at?: string
           nickname: string
@@ -33,6 +35,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deployed_url?: string | null
           id?: string
           last_seen_at?: string
           nickname?: string
