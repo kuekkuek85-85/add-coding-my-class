@@ -499,7 +499,7 @@ function S5Cell({
     return (
       <span
         className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground"
-        aria-label="S5 수정 프롬프트 확정 완료"
+        aria-label="S5 수정 PRD 프롬프트 확정 완료"
         title="S5 게이트 통과"
       >
         <Stamp className="h-3 w-3" aria-hidden />
@@ -512,8 +512,8 @@ function S5Cell({
     return (
       <span
         className="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-900"
-        aria-label={`S5 체크 ${checkedCases}/${totalCases}${qaGiven ? " · QA 완료" : ""}${revisedFilled ? " · 수정 프롬프트 작성" : ""}`}
-        title={`체크 ${checkedCases}/${totalCases}${qaGiven ? ", QA 완료" : ""}${revisedFilled ? ", 수정 프롬프트 작성" : ""}`}
+        aria-label={`S5 체크 ${checkedCases}/${totalCases}${qaGiven ? " · QA 완료" : ""}${revisedFilled ? " · 수정 PRD 프롬프트 작성" : ""}`}
+        title={`체크 ${checkedCases}/${totalCases}${qaGiven ? ", QA 완료" : ""}${revisedFilled ? ", 수정 PRD 프롬프트 작성" : ""}`}
       >
         <FileCheck2 className="h-3 w-3" aria-hidden />
         {checkedCases}/{totalCases || 0}

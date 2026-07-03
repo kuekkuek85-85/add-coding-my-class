@@ -34,7 +34,7 @@ export function GalleryGrid({ userId }: { userId: string }) {
           </h3>
         </div>
         <p className="mt-1 text-xs text-muted-foreground">
-          동료들의 PRD·프롬프트·수정 프롬프트를 자유롭게 살펴보세요.
+          동료들의 PRD·프롬프트·수정 PRD 프롬프트를 자유롭게 살펴보세요.
         </p>
       </div>
 
@@ -74,7 +74,7 @@ export function GalleryGrid({ userId }: { userId: string }) {
                 {it.prdProblem || "-"}
               </p>
               <p className="mb-1 text-[11px] font-semibold text-muted-foreground">
-                첫 프롬프트의 할 일
+                첫 PRD 프롬프트의 할 일
               </p>
               <p className="mb-3 line-clamp-2 text-sm text-foreground/85">
                 {it.promptTask || "-"}
@@ -135,7 +135,7 @@ function BundleDialog({ userId, targetId }: { userId: string; targetId: string }
           <Field label="비기능">{prd?.nonfunctional}</Field>
           <Field label="성공 지표">{prd?.success_metric}</Field>
         </Section>
-        <Section title="첫 프롬프트">
+        <Section title="첫 PRD 프롬프트">
           <Field label="역할">{prompt?.role}</Field>
           <Field label="컨텍스트">{prompt?.context}</Field>
           <Field label="할 일">{prompt?.task}</Field>
@@ -164,7 +164,7 @@ function BundleDialog({ userId, targetId }: { userId: string; targetId: string }
             </ul>
           )}
         </Section>
-        <Section title="수정 프롬프트">
+        <Section title="수정 PRD 프롬프트">
           <Field label="대상">{revised?.target}</Field>
           <Field label="근거">{revised?.evidence}</Field>
           <Field label="유지">{revised?.keep_list}</Field>

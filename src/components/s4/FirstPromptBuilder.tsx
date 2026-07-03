@@ -148,7 +148,7 @@ export function FirstPromptBuilder({
   async function copyPrompt() {
     try {
       await navigator.clipboard.writeText(finalPrompt);
-      toast.success("프롬프트를 클립보드에 복사했습니다.");
+      toast.success("PRD 프롬프트를 클립보드에 복사했습니다.");
     } catch {
       toast.error("복사에 실패했습니다. 텍스트를 직접 선택해 복사해 주세요.");
     }
@@ -160,7 +160,7 @@ export function FirstPromptBuilder({
         <div className="mb-3 flex items-baseline justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">S4 · 4교시</p>
-            <h2 className="font-display text-xl font-bold text-foreground">첫 프롬프트 조립</h2>
+            <h2 className="font-display text-xl font-bold text-foreground">첫 PRD 프롬프트 조립</h2>
             <p className="mt-1 text-xs text-muted-foreground">
               5칸을 직접 채웁니다. AI는 이 문장을 대신 써주지 않습니다.
             </p>
@@ -200,7 +200,7 @@ export function FirstPromptBuilder({
       {/* 미리보기 */}
       <div className="rounded-2xl border-2 border-primary/20 bg-card p-5 shadow-sm">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="font-display text-sm font-bold text-primary">최종 프롬프트 미리보기</h3>
+          <h3 className="font-display text-sm font-bold text-primary">최종 PRD 프롬프트 미리보기</h3>
           <Button size="sm" variant="outline" onClick={copyPrompt}>
             <Copy className="mr-1 h-3.5 w-3.5" aria-hidden />
             복사
@@ -214,7 +214,7 @@ export function FirstPromptBuilder({
       {/* 확정 바 */}
       <div className="flex items-center justify-between rounded-2xl border-2 border-primary/30 bg-accent/30 p-4">
         <div>
-          <p className="font-display text-sm font-bold text-primary">첫 프롬프트 확정</p>
+          <p className="font-display text-sm font-bold text-primary">첫 PRD 프롬프트 확정</p>
           <p className="text-xs text-muted-foreground">
             확정하면 S4 게이트를 통과합니다. 확정 후에도 테스트 케이스는 계속 다듬을 수 있습니다.
           </p>
@@ -228,15 +228,15 @@ export function FirstPromptBuilder({
       {/* 실행 안내 (Lovable로 옮기기) */}
       <div className="rounded-2xl border-4 border-primary bg-primary/10 p-6 text-center shadow-md">
         <p className="font-display text-2xl font-bold leading-snug text-primary sm:text-3xl">
-          이 프롬프트를 복사해서 <span className="underline decoration-accent decoration-4 underline-offset-4">Lovable</span>로 구현해 보세요.
+          이 PRD 프롬프트를 복사해서 <span className="underline decoration-accent decoration-4 underline-offset-4">Lovable</span>로 구현해 보세요.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          위 <b>복사</b> 버튼을 눌러 프롬프트 전문을 가져간 뒤, Lovable 새 프로젝트 첫 입력창에 붙여넣습니다.
+          위 <b>복사</b> 버튼을 눌러 PRD 프롬프트 전문을 가져간 뒤, Lovable 새 프로젝트 첫 입력창에 붙여넣습니다.
         </p>
         <div className="mt-4 flex justify-center">
           <Button size="lg" onClick={copyPrompt} className="text-base">
             <Copy className="mr-2 h-5 w-5" aria-hidden />
-            프롬프트 전체 복사
+            PRD 프롬프트 전체 복사
           </Button>
         </div>
       </div>

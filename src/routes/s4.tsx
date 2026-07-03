@@ -53,7 +53,7 @@ function S4Page() {
     mutationFn: () => confirm({ data: { userId: stored!.userId } }),
     onSuccess: (res) => {
       if (!res.ok) return toast.error(res.error);
-      toast.success("첫 프롬프트 확정 — S4 게이트를 통과했습니다.");
+      toast.success("첫 PRD 프롬프트 확정 — S4 게이트를 통과했습니다.");
       qc.invalidateQueries({ queryKey: stateKey });
     },
   });
@@ -87,7 +87,7 @@ function S4Page() {
   const tabs: Array<{ id: Tab; label: string; enabled: boolean }> = [
     { id: "cases", label: "1. 테스트 케이스", enabled: true },
     { id: "hints", label: "2. TDD 도우미", enabled: totalCases >= 1 },
-    { id: "prompt", label: "3. 첫 프롬프트", enabled: canBuildPrompt },
+    { id: "prompt", label: "3. 첫 PRD 프롬프트", enabled: canBuildPrompt },
   ];
 
   return (
@@ -99,8 +99,8 @@ function S4Page() {
               <Link to="/home" aria-label="홈으로"><ArrowLeft className="h-4 w-4" /></Link>
             </Button>
             <div>
-              <p className="font-display text-sm font-bold text-primary">S4 · 4교시 — TDD + 첫 프롬프트</p>
-              <p className="text-xs text-muted-foreground">테스트 케이스 3개 이상 → 첫 프롬프트 조립·확정</p>
+              <p className="font-display text-sm font-bold text-primary">S4 · 4교시 — TDD + 첫 PRD 프롬프트</p>
+              <p className="text-xs text-muted-foreground">테스트 케이스 3개 이상 → 첫 PRD 프롬프트 조립·확정</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -149,7 +149,7 @@ function S4Page() {
             onConfirmClick={() => confirmMut.mutate()}
             confirmDisabled={!canBuildPrompt || confirmed}
             confirmBusy={confirmMut.isPending}
-            confirmLabel={confirmed ? "확정 완료" : "첫 프롬프트 확정"}
+            confirmLabel={confirmed ? "확정 완료" : "첫 PRD 프롬프트 확정"}
           />
         )}
       </section>

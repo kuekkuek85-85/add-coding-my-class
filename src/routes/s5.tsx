@@ -76,7 +76,7 @@ function S5Page() {
         <Lock className="mx-auto mb-3 h-8 w-8 text-muted-foreground" aria-hidden />
         <h1 className="mb-2 font-display text-xl font-bold">S4 확정이 필요합니다</h1>
         <p className="mb-4 text-sm text-muted-foreground">
-          4교시에서 첫 프롬프트를 확정한 뒤 S5를 진행할 수 있어요.
+          4교시에서 첫 PRD 프롬프트를 확정한 뒤 S5를 진행할 수 있어요.
         </p>
         <Button asChild variant="outline"><Link to="/s4">S4로 이동</Link></Button>
       </main>

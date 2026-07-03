@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 /**
- * S4(4교시 TDD + 첫 프롬프트) 서버 함수.
+ * S4(4교시 TDD + 첫 PRD 프롬프트) 서버 함수.
  *
  * 원칙:
  * - TDD 도우미와 프롬프트 조립기 모두 참가자의 문장을 대신 쓰지 않는다.

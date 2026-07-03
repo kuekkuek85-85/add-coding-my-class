@@ -9,7 +9,7 @@ import { z } from "zod";
  * - "좋은 점"은 필수(5자 이상).
  * - 게이트: (1) S4 확정된 테스트 케이스 전부에 실행 결과 기록,
  *   (2) 나에게 배정된 대상자의 QA 리뷰 제출 완료,
- *   (3) 수정 프롬프트 5칸(target/evidence/keep_list/add_list/constraints) 채움 + "확정".
+ *   (3) 수정 PRD 프롬프트 5칸(target/evidence/keep_list/add_list/constraints) 채움 + "확정".
  */
 
 const uuid = z.string().uuid();
@@ -473,7 +473,7 @@ export const getS5QaReviewsForMe = createServerFn({ method: "POST" })
     };
   });
 
-// -------- 수정 프롬프트 --------
+// -------- 수정 PRD 프롬프트 --------
 
 export const saveMyS5Revised = createServerFn({ method: "POST" })
   .inputValidator((input: { userId: string; fields: RevisedFields }) =>
@@ -563,7 +563,7 @@ export const confirmMyS5Revised = createServerFn({ method: "POST" })
         error: "배정된 대상자의 교차 QA를 먼저 제출해 주세요.",
       };
 
-    if (!revised) return { ok: false as const, error: "수정 프롬프트를 먼저 저장해 주세요." };
+    if (!revised) return { ok: false as const, error: "수정 PRD 프롬프트를 먼저 저장해 주세요." };
     if (
       !isRevisedComplete({
         target: revised.target,
@@ -573,7 +573,7 @@ export const confirmMyS5Revised = createServerFn({ method: "POST" })
         constraints: revised.constraints,
       })
     )
-      return { ok: false as const, error: "수정 프롬프트 5칸을 모두 채워 주세요." };
+      return { ok: false as const, error: "수정 PRD 프롬프트 5칸을 모두 채워 주세요." };
 
     const now = new Date().toISOString();
     const { error } = await supabaseAdmin
