@@ -72,9 +72,10 @@ export const getMyPortfolio = createServerFn({ method: "POST" })
         .order("created_at", { ascending: true }),
       supabaseAdmin
         .from("s2_test_cases")
-        .select("title, given_when, expected_then, created_at")
+        .select("id, title, given_when, expected_then, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: true }),
+
       supabaseAdmin
         .from("s3_prd_drafts")
         .select(
@@ -94,8 +95,9 @@ export const getMyPortfolio = createServerFn({ method: "POST" })
         .order("order_index", { ascending: true }),
       supabaseAdmin
         .from("s5_checklist_results")
-        .select("test_case_id, status, note")
+        .select("test_case_id, source, status, note")
         .eq("user_id", user.id),
+
       supabaseAdmin
         .from("s5_revised_prompts")
         .select("target, evidence, keep_list, add_list, constraints, confirmed_at")
@@ -143,14 +145,34 @@ export const getMyPortfolio = createServerFn({ method: "POST" })
     const s1Total = checkpointList.length;
     const s1Done = checkpointList.filter((c) => c.done).length;
 
-    const resultMap = new Map((results ?? []).map((r) => [r.test_case_id, r]));
+    const resultKey = (source: string, id: string) => `${source}:${id}`;
+    const resultMap = new Map(
+      (results ?? []).map((r) => [resultKey(r.source, r.test_case_id), r]),
+    );
     const s4CasesEnriched = (s4cases ?? []).map((c) => ({
       title: c.title,
       given: c.given,
       when_step: c.when_step,
       then_step: c.then_step,
-      result: resultMap.get(c.id) ?? null,
+      result: resultMap.get(resultKey("s4", c.id)) ?? null,
     }));
+
+    // 통합 체크리스트 항목: 2교시(S2) + 4교시(S4) 모두 포함
+    const s5ChecklistItems = [
+      ...(s2cases ?? []).map((c) => ({
+        source: "s2" as const,
+        title: c.title,
+        detail: `${c.given_when ?? ""} → ${c.expected_then ?? ""}`,
+        result: resultMap.get(resultKey("s2", c.id)) ?? null,
+      })),
+      ...(s4cases ?? []).map((c) => ({
+        source: "s4" as const,
+        title: c.title,
+        detail: `${c.given ?? ""} / ${c.when_step ?? ""} → ${c.then_step ?? ""}`,
+        result: resultMap.get(resultKey("s4", c.id)) ?? null,
+      })),
+    ];
+    const s5TotalCases = (s2cases ?? []).length + (s4cases ?? []).length;
     const s5CheckedCount = (results ?? []).length;
 
     // stamps
@@ -189,10 +211,12 @@ export const getMyPortfolio = createServerFn({ method: "POST" })
       s5: {
         revised: revised ?? null,
         checkedCount: s5CheckedCount,
-        totalCases: (s4cases ?? []).length,
+        totalCases: s5TotalCases,
+        items: s5ChecklistItems,
         confirmed: s5Confirmed,
         deployedUrl: (user as { deployed_url?: string | null }).deployed_url ?? null,
       },
+
 
       s6: {
         title: deck?.title ?? "",
