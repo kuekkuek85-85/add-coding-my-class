@@ -2,11 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Users, KeyRound } from "lucide-react";
+import { LogOut, Users, KeyRound, CircleAlert, CircleX, CircleCheck } from "lucide-react";
 
 import { getSessionSnapshot, setCurrentStage } from "@/lib/session.functions";
 import { getInstructorS1Summary } from "@/lib/s1.functions";
 import { getInstructorS2Summary } from "@/lib/s2.functions";
+import { listSessionHelpSignals } from "@/lib/help.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
@@ -14,6 +15,7 @@ import { StageControls } from "@/components/school/StageControls";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
 import { InstructorSlideDeck } from "@/components/school/SlideDeck";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/instructor")({
   component: InstructorHome,
@@ -27,10 +29,12 @@ function InstructorHome() {
   const changeStage = useServerFn(setCurrentStage);
   const fetchS1 = useServerFn(getInstructorS1Summary);
   const fetchS2 = useServerFn(getInstructorS2Summary);
+  const fetchHelp = useServerFn(listSessionHelpSignals);
 
   const snapshotKey = ["snapshot", stored?.userId];
   const s1Key = ["instructor-s1", stored?.userId];
   const s2Key = ["instructor-s2", stored?.userId];
+  const helpKey = ["instructor-help", stored?.userId];
 
   const { data } = useQuery({
     queryKey: snapshotKey,
@@ -52,6 +56,14 @@ function InstructorHome() {
     enabled: !!stored?.userId,
     refetchInterval: 5_000,
   });
+
+  const { data: help } = useQuery({
+    queryKey: helpKey,
+    queryFn: () => fetchHelp({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 5_000,
+  });
+
 
 
   const stageMutation = useMutation({
@@ -84,6 +96,24 @@ function InstructorHome() {
   const s2PassedCount = s2Progress.filter((p) => p.passed).length;
   const s2AllPassed = participants.length > 0 && s2PassedCount === participants.length;
   const blockNext = currentStage === 2 && !s2AllPassed;
+
+  const helpSignals = help?.ok ? help.signals : [];
+  const helpMap = new Map(helpSignals.map((h) => [h.userId, h]));
+  const activeHelp = helpSignals
+    .filter((h) => h.level !== "green")
+    .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))
+    .slice(0, 5);
+
+  const s1Progress = s1?.ok ? s1.progress : [];
+  const s1Total = s1?.ok ? s1.totalCheckpoints : 0;
+  const morningEarnedMap = new Map<string, boolean>();
+  for (const p of participants) {
+    const cp = s1Progress.find((x) => x.userId === p.id);
+    const sp = s2Progress.find((x) => x.userId === p.id);
+    const done = s1Total > 0 && (cp?.checked ?? 0) >= s1Total && !!sp?.passed;
+    morningEarnedMap.set(p.id, done);
+  }
+
 
   function handleLogout() {
     clearStoredSession();
@@ -166,6 +196,11 @@ function InstructorHome() {
             )}
           </div>
         </div>
+        {/* 도움 요청 스트림 */}
+        <div className="mt-4">
+          <HelpStream signals={activeHelp} total={participants.length} />
+        </div>
+
 
         {/* 스테이지 개폐 컨트롤 */}
         <div className="mt-6">
@@ -210,11 +245,14 @@ function InstructorHome() {
           <ParticipantGrid
             participants={participants}
             currentStage={currentStage}
-            s1Progress={s1?.ok ? s1.progress : []}
-            s1Total={s1?.ok ? s1.totalCheckpoints : 0}
+            s1Progress={s1Progress}
+            s1Total={s1Total}
             s2Progress={s2Progress}
             s2Min={s2Min}
+            helpMap={helpMap}
+            morningEarnedMap={morningEarnedMap}
           />
+
         </div>
 
 
@@ -231,4 +269,74 @@ function InstructorHome() {
     </main>
   );
 }
+
+type HelpRow = {
+  userId: string;
+  nickname: string;
+  level: "green" | "yellow" | "red";
+  note: string | null;
+  updatedAt: string | null;
+};
+
+function HelpStream({ signals, total }: { signals: HelpRow[]; total: number }) {
+  const empty = signals.length === 0;
+  return (
+    <div
+      className={cn(
+        "rounded-2xl border-2 p-4 shadow-sm",
+        empty
+          ? "border-emerald-500/30 bg-emerald-50/60"
+          : "border-amber-500/40 bg-amber-50/70",
+      )}
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2 font-display text-sm font-bold text-primary">
+          {empty ? (
+            <CircleCheck className="h-4 w-4 text-emerald-600" aria-hidden />
+          ) : (
+            <CircleAlert className="h-4 w-4 text-amber-600" aria-hidden />
+          )}
+          도움 요청 (신호등)
+        </div>
+        <span className="text-xs text-muted-foreground">
+          {empty ? `${total}명 모두 초록` : `최근 ${signals.length}건`}
+        </span>
+      </div>
+      {empty ? (
+        <p className="text-sm text-muted-foreground">
+          현재 노랑·빨강 신호가 없습니다.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-1.5">
+          {signals.map((s) => {
+            const isRed = s.level === "red";
+            const Icon = isRed ? CircleX : CircleAlert;
+            return (
+              <li
+                key={s.userId}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm",
+                  isRed
+                    ? "border-rose-300 bg-rose-100/70 text-rose-950"
+                    : "border-amber-300 bg-amber-100/70 text-amber-950",
+                )}
+              >
+                <Icon
+                  className={cn("h-4 w-4", isRed ? "text-rose-600" : "text-amber-600")}
+                  aria-hidden
+                />
+                <span className="font-semibold">{s.nickname}</span>
+                <span className="text-xs opacity-70">
+                  {isRed ? "막혔어요" : "잠깐 봐주세요"}
+                </span>
+                {s.note && <span className="ml-auto truncate text-xs">{s.note}</span>}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 

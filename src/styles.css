@@ -150,3 +150,12 @@
 .slide-chrome, .slide-page, .slide-footer {
   font-size: var(--slide-chrome); line-height: 1.15; white-space: nowrap;
 }
+
+/* 오전 완료 도장 애니메이션 — 회전 후 확대 착지(단발) */
+@keyframes stamp {
+  0%   { transform: scale(2.4) rotate(-18deg); opacity: 0; }
+  60%  { transform: scale(0.85) rotate(4deg);  opacity: 1; }
+  100% { transform: scale(1)    rotate(0deg);  opacity: 1; }
+}
+.animate-stamp { animation: stamp 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+

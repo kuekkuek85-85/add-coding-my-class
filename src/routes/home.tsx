@@ -10,8 +10,11 @@ import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { S1Panel } from "@/components/school/S1Panel";
 import { S2Panel } from "@/components/school/S2Panel";
+import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
 import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
+import { TrafficLight } from "@/components/school/TrafficLight";
+import { MorningStamp } from "@/components/school/MorningStamp";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/home")({
@@ -22,6 +25,7 @@ function ParticipantHome() {
   const navigate = useNavigate();
   const { ready, session: stored } = useStoredSession({ requireRole: "participant" });
   const fetchSnapshot = useServerFn(getSessionSnapshot);
+  const fetchS1 = useServerFn(getMyS1State);
   const fetchS2 = useServerFn(getMyS2State);
 
   const { data } = useQuery({
@@ -29,6 +33,13 @@ function ParticipantHome() {
     queryFn: () => fetchSnapshot({ data: { userId: stored!.userId } }),
     enabled: !!stored?.userId,
     refetchInterval: 5_000,
+  });
+
+  const { data: s1 } = useQuery({
+    queryKey: ["s1-state", stored?.userId],
+    queryFn: () => fetchS1({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 15_000,
   });
 
   const { data: s2 } = useQuery({
@@ -49,6 +60,10 @@ function ParticipantHome() {
   const currentStage = data?.ok ? data.session.current_stage : 1;
   const currentSlideIndex = data?.ok ? data.session.current_slide_index : null;
   const s2Passed = s2?.ok ? s2.passed : false;
+  const s1Checked = s1?.ok ? s1.checkedIds.length : 0;
+  const s1Total = s1?.ok ? s1.checkpoints.length : 0;
+  const morningEarned = s1Total > 0 && s1Checked >= s1Total && s2Passed;
+
 
   function handleLogout() {
     clearStoredSession();
@@ -70,7 +85,7 @@ function ParticipantHome() {
         <ParticipantSlideOverlay slideIndex={currentSlideIndex} />
       )}
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div>
             <p className="font-display text-sm font-bold text-primary">내 수업에 코딩 한 스푼</p>
             <p className="text-xs text-muted-foreground">
@@ -78,6 +93,7 @@ function ParticipantHome() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <TrafficLight userId={stored.userId} />
             <Nametag nickname={stored.nickname} role="participant" />
             <Button
               size="sm"
@@ -93,11 +109,14 @@ function ParticipantHome() {
       </header>
 
       <section className="mx-auto max-w-5xl px-4 py-6">
+        <MorningStamp earned={morningEarned} className="mb-6" />
+
         {currentStage >= 1 && (
           <div className="mb-8">
             <S1Panel userId={stored.userId} currentStage={currentStage} />
           </div>
         )}
+
 
         {currentStage >= 2 && (
           <div className="mb-8">

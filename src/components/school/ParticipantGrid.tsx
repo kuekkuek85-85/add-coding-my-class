@@ -1,4 +1,4 @@
-import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Stamp, CircleDot, Lock, StickyNote, ShieldCheck, ShieldAlert, CircleAlert, CircleX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STAGES } from "./TimetableCard";
 
@@ -14,9 +14,16 @@ export type S2Progress = {
   passed: boolean;
 };
 
+export type HelpRow = {
+  userId: string;
+  level: "green" | "yellow" | "red";
+  note: string | null;
+};
+
 /**
  * 강사 대시보드: 참가자 × 6교시 그리드.
  * S1 셀은 체크포인트 통과 개수(N/M)를, 오전 메모 개수를 사이드에 표시한다.
+ * 이름 왼쪽에 신호등 뱃지, 오른쪽에 오전 완료 도장.
  */
 export function ParticipantGrid({
   participants,
@@ -25,6 +32,8 @@ export function ParticipantGrid({
   s1Total,
   s2Progress,
   s2Min,
+  helpMap,
+  morningEarnedMap,
 }: {
   participants: Array<{ id: string; nickname: string }>;
   currentStage: number;
@@ -32,6 +41,8 @@ export function ParticipantGrid({
   s1Total?: number;
   s2Progress?: S2Progress[];
   s2Min?: number;
+  helpMap?: Map<string, HelpRow>;
+  morningEarnedMap?: Map<string, boolean>;
 }) {
   if (participants.length === 0) {
     return (
@@ -50,6 +61,7 @@ export function ParticipantGrid({
   const s2Map = new Map<string, S2Progress>();
   for (const p of s2Progress ?? []) s2Map.set(p.userId, p);
   const s2Threshold = s2Min ?? 2;
+
 
   return (
     <div className="overflow-x-auto rounded-2xl border-2 border-primary/15 bg-card">
@@ -77,9 +89,47 @@ export function ParticipantGrid({
           {participants.map((p) => {
             const pr = progressMap.get(p.id);
             const s2 = s2Map.get(p.id);
+            const help = helpMap?.get(p.id);
+            const morning = morningEarnedMap?.get(p.id) ?? false;
+            const helpLevel: "green" | "yellow" | "red" = help?.level ?? "green";
+            const helpDot =
+              helpLevel === "red"
+                ? "bg-rose-500"
+                : helpLevel === "yellow"
+                  ? "bg-amber-400"
+                  : "bg-emerald-500";
+            const HelpIcon =
+              helpLevel === "red" ? CircleX : helpLevel === "yellow" ? CircleAlert : null;
             return (
               <tr key={p.id} className="border-b border-border/40 last:border-0">
-                <td className="px-3 py-2.5 font-medium text-foreground">{p.nickname}</td>
+                <td className="px-3 py-2.5 font-medium text-foreground">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn("inline-block h-2.5 w-2.5 shrink-0 rounded-full", helpDot)}
+                      aria-label={`신호등 ${helpLevel}`}
+                      title={help?.note ?? undefined}
+                    />
+                    {HelpIcon && (
+                      <HelpIcon
+                        className={cn(
+                          "h-3.5 w-3.5",
+                          helpLevel === "red" ? "text-rose-600" : "text-amber-600",
+                        )}
+                        aria-hidden
+                      />
+                    )}
+                    <span>{p.nickname}</span>
+                    {morning && (
+                      <span
+                        className="inline-flex items-center gap-0.5 rounded-full border border-primary/40 bg-accent/40 px-1.5 py-0.5 text-[10px] font-bold text-primary"
+                        title="오전 완료 도장"
+                      >
+                        <Stamp className="h-3 w-3" aria-hidden />
+                      </span>
+                    )}
+                  </div>
+                </td>
+
                 <td className="px-2 py-2 text-center">
                   <span
                     className={cn(
