@@ -414,4 +414,59 @@ function S4Cell({
   return <StageCell status={status} />;
 }
 
+function S5Cell({
+  totalCases,
+  checkedCases,
+  qaGiven,
+  revisedFilled,
+  confirmed,
+  status,
+}: {
+  totalCases: number;
+  checkedCases: number;
+  qaGiven: boolean;
+  revisedFilled: boolean;
+  confirmed: boolean;
+  status: "done" | "open" | "locked";
+}) {
+  if (confirmed) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground"
+        aria-label="S5 수정 프롬프트 확정 완료"
+        title="S5 게이트 통과"
+      >
+        <Stamp className="h-3 w-3" aria-hidden />
+        확정
+      </span>
+    );
+  }
+  const allChecked = totalCases > 0 && checkedCases >= totalCases;
+  if (allChecked || revisedFilled || qaGiven) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-900"
+        aria-label={`S5 체크 ${checkedCases}/${totalCases}${qaGiven ? " · QA 완료" : ""}${revisedFilled ? " · 수정 프롬프트 작성" : ""}`}
+        title={`체크 ${checkedCases}/${totalCases}${qaGiven ? ", QA 완료" : ""}${revisedFilled ? ", 수정 프롬프트 작성" : ""}`}
+      >
+        <FileCheck2 className="h-3 w-3" aria-hidden />
+        {checkedCases}/{totalCases || 0}
+        {qaGiven && <MessagesSquare className="ml-0.5 h-3 w-3" aria-hidden />}
+      </span>
+    );
+  }
+  if (checkedCases > 0) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-accent/60 px-2 py-0.5 text-xs font-semibold text-primary"
+        aria-label={`S5 체크 ${checkedCases}/${totalCases}`}
+      >
+        {checkedCases}/{totalCases || 0}
+      </span>
+    );
+  }
+  return <StageCell status={status} />;
+}
+
+
 
