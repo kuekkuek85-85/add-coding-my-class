@@ -15,7 +15,7 @@ export const STAGES: Stage[] = [
   { no: 1, code: "S1", title: "기본 기능 떠올리기", goal: "체크포인트로 문제·기능·성공 기준 다듬기" },
   { no: 2, code: "S2", title: "확장 기능 떠올리기", goal: "확장 기능의 테스트 케이스 2개 먼저 작성" },
   { no: 3, code: "S3", title: "PRD 작성·검증", goal: "1차 제출 → 체인 동료 리뷰 → 2차 제출" },
-  { no: 4, code: "S4", title: "TDD + 구현", goal: "테스트 케이스 3개 이상 → PRD 프롬프트 조립" },
+  { no: 4, code: "S4", title: "TDD + 초안 PRD 수정", goal: "테스트 케이스 3개 이상 → 초안 PRD 수정·확정" },
   { no: 5, code: "S5", title: "교차 QA + 개선", goal: "실행 체크리스트 + 수정 PRD 프롬프트 초안" },
   { no: 6, code: "S6", title: "갤러리 발표", goal: "제출 순서대로 3분 발표" },
 ];
