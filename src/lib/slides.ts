@@ -614,14 +614,14 @@ const S6: SlideDef[] = [
         ],
       },
       right: {
-        right: "",
         label: "피해 주세요",
         items: [
           "슬라이드 전문을 그대로 읽기",
           "기술 자랑 위주 — 수업 맥락 없이 기능만 나열",
           "코멘트에 '별로예요'처럼 근거 없는 말 남기기",
         ],
-      } as { label: string; items: string[] },
+      },
+
     },
   },
   {
