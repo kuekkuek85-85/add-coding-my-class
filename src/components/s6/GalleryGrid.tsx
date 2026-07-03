@@ -74,7 +74,7 @@ export function GalleryGrid({ userId }: { userId: string }) {
                 {it.prdProblem || "-"}
               </p>
               <p className="mb-1 text-[11px] font-semibold text-muted-foreground">
-                첫 PRD 프롬프트의 할 일
+                수정한 PRD 프롬프트 요약
               </p>
               <p className="mb-3 line-clamp-2 text-sm text-foreground/85">
                 {it.promptTask || "-"}
