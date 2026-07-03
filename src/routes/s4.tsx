@@ -82,7 +82,7 @@ function S4Page() {
   const totalCases = state?.ok ? (state.totalCases ?? completeCases) : 0;
   const canBuildPrompt = state?.ok ? state.canBuildPrompt : false;
   const confirmed = state?.ok ? state.confirmed : false;
-  const prd = state?.ok ? state.prd : null;
+  
 
   const tabs: Array<{ id: Tab; label: string; enabled: boolean }> = [
     { id: "cases", label: "1. 테스트 케이스", enabled: true },
