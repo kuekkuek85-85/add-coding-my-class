@@ -253,14 +253,9 @@ function InstructorHome() {
             currentStage={currentStage}
             maxStage={STAGES.length}
             busy={stageMutation.isPending}
-            blockNext={false}
-            blockReason={
-              !s2AllPassed && participants.length > 0
-                ? `참고: S2 미니 게이트 ${s2PassedCount}/${participants.length}명 통과 (테스트 케이스 ${s2Min}건 이상)`
-                : undefined
-            }
             onChange={(next) => stageMutation.mutate(next)}
           />
+
 
         </div>
 
