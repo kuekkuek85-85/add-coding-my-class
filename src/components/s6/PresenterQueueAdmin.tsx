@@ -24,6 +24,7 @@ import {
   resetTimer,
 } from "@/lib/s6.functions";
 import { Button } from "@/components/ui/button";
+import { PresentationFullscreen } from "@/components/s6/PresentationFullscreen";
 
 export function PresenterQueueAdmin({ userId }: { userId: string }) {
   const qc = useQueryClient();
