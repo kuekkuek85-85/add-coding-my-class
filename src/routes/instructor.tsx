@@ -39,6 +39,7 @@ function InstructorHome() {
   const s1Key = ["instructor-s1", stored?.userId];
   const s2Key = ["instructor-s2", stored?.userId];
   const s3Key = ["instructor-s3", stored?.userId];
+  const s4Key = ["instructor-s4", stored?.userId];
   const helpKey = ["instructor-help", stored?.userId];
 
   const { data } = useQuery({
