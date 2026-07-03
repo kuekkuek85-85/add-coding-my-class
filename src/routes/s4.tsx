@@ -53,7 +53,7 @@ function S4Page() {
     mutationFn: () => confirm({ data: { userId: stored!.userId } }),
     onSuccess: (res) => {
       if (!res.ok) return toast.error(res.error);
-      toast.success("첫 PRD 프롬프트 확정 — S4 게이트를 통과했습니다.");
+      toast.success("초안 PRD 수정 확정 — S4 게이트를 통과했습니다.");
       qc.invalidateQueries({ queryKey: stateKey });
     },
   });
