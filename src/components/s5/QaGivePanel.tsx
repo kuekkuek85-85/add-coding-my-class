@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Send, UserRound } from "lucide-react";
+import { CheckCircle2, ExternalLink, Send, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -105,6 +105,36 @@ export function QaGivePanel({ userId }: { userId: string }) {
 
       {bundle?.ok && (
         <div className="rounded-2xl border-2 border-primary/15 bg-card p-4 shadow-sm">
+          <div className="mb-3 rounded-xl border-2 border-primary/25 bg-accent/15 p-3">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-primary/70">
+              대상자의 배포 앱 URL
+            </p>
+            {bundle.deployedUrl ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <a
+                  href={bundle.deployedUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="break-all text-sm font-semibold text-primary underline underline-offset-2"
+                >
+                  {bundle.deployedUrl}
+                </a>
+                <a
+                  href={bundle.deployedUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1 rounded-full border-2 border-primary/40 bg-card px-2 py-0.5 text-[11px] font-semibold text-primary hover:bg-primary/5"
+                >
+                  <ExternalLink className="h-3 w-3" aria-hidden /> 새 창에서 열기
+                </a>
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                대상자가 아직 배포 URL을 등록하지 않았습니다. 등록될 때까지 프롬프트와 케이스 기준으로만 검토해 주세요.
+              </p>
+            )}
+          </div>
+
           <h3 className="mb-2 font-display text-sm font-bold text-primary">대상자의 첫 프롬프트</h3>
           <dl className="grid gap-2 text-xs">
             <PromptRow label="역할" value={bundle.prompt.role} />

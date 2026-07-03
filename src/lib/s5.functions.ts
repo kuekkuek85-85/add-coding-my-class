@@ -34,7 +34,7 @@ async function getUser(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("app_users")
-    .select("id, role, session_id, nickname")
+    .select("id, role, session_id, nickname, deployed_url")
     .eq("id", userId)
     .maybeSingle();
   return data;
@@ -196,7 +196,43 @@ export const getMyS5State = createServerFn({ method: "POST" })
       confirmedAt: revised?.confirmed_at ?? null,
       qaGivenCount,
       qaReceivedCount,
+      deployedUrl: user.deployed_url ?? "",
     };
+  });
+
+// -------- 배포 URL 저장 --------
+
+export const saveMyDeployedUrl = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; url: string }) =>
+    z
+      .object({
+        userId: uuid,
+        url: z.string().trim().max(500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (user.role !== "participant")
+      return { ok: false as const, error: "참가자만 저장할 수 있습니다." };
+
+    const trimmed = data.url.trim();
+    if (trimmed.length > 0) {
+      if (!/^https?:\/\/.+/i.test(trimmed))
+        return {
+          ok: false as const,
+          error: "http:// 또는 https:// 로 시작하는 URL을 입력해 주세요.",
+        };
+    }
+
+    const { error } = await supabaseAdmin
+      .from("app_users")
+      .update({ deployed_url: trimmed.length > 0 ? trimmed : null })
+      .eq("id", user.id);
+    if (error) return { ok: false as const, error: "저장에 실패했습니다." };
+    return { ok: true as const };
   });
 
 
@@ -310,7 +346,7 @@ export const getRevieweeS4Bundle = createServerFn({ method: "POST" })
     if (pairs.get(user.id) !== data.revieweeId)
       return { ok: false as const, error: "배정된 리뷰 대상자가 아닙니다." };
 
-    const [{ data: prompt }, { data: cases }, { data: results }] = await Promise.all([
+    const [{ data: prompt }, { data: cases }, { data: results }, { data: reviewee }] = await Promise.all([
       supabaseAdmin
         .from("s4_prompts")
         .select("role, context, task, nonfunctional, confirmed_at")
@@ -325,6 +361,11 @@ export const getRevieweeS4Bundle = createServerFn({ method: "POST" })
         .from("s5_checklist_results")
         .select("test_case_id, status, note")
         .eq("user_id", data.revieweeId),
+      supabaseAdmin
+        .from("app_users")
+        .select("deployed_url")
+        .eq("id", data.revieweeId)
+        .maybeSingle(),
     ]);
     if (!prompt?.confirmed_at)
       return { ok: false as const, error: "대상자가 아직 S4를 확정하지 않았습니다." };
@@ -338,6 +379,7 @@ export const getRevieweeS4Bundle = createServerFn({ method: "POST" })
         task: prompt.task,
         nonfunctional: prompt.nonfunctional,
       },
+      deployedUrl: reviewee?.deployed_url ?? "",
       cases: (cases ?? []).map((c) => ({
         id: c.id,
         title: c.title,
