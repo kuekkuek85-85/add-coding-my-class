@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { LogOut, Users, KeyRound, CircleAlert, CircleX, CircleCheck, RotateCcw } from "lucide-react";
 
 import { getSessionSnapshot, setCurrentStage, resetSessionData } from "@/lib/session.functions";
+import { getInstructorS1Summary } from "@/lib/s1.functions";
 import { getInstructorS2Summary } from "@/lib/s2.functions";
 import { getSessionS3Overview } from "@/lib/s3.functions";
 import { getSessionS4Overview } from "@/lib/s4.functions";
