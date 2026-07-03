@@ -99,8 +99,8 @@ function S4Page() {
               <Link to="/home" aria-label="홈으로"><ArrowLeft className="h-4 w-4" /></Link>
             </Button>
             <div>
-              <p className="font-display text-sm font-bold text-primary">S4 · 4교시 — TDD + 첫 PRD 프롬프트</p>
-              <p className="text-xs text-muted-foreground">테스트 케이스 3개 이상 → 첫 PRD 프롬프트 조립·확정</p>
+              <p className="font-display text-sm font-bold text-primary">S4 · 4교시 — TDD + 초안 PRD 수정</p>
+              <p className="text-xs text-muted-foreground">테스트 케이스 3개 이상 → 초안 PRD 수정·확정</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
