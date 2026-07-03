@@ -75,6 +75,7 @@ export function PresentationStage({ userId }: { userId: string }) {
           title={state.currentDeck.title}
           slides={state.currentDeck.slides}
           presenterName={current.nickname}
+          deployedUrl={state.currentDeck.deployedUrl}
         />
       )}
 
