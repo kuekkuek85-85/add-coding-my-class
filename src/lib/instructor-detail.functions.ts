@@ -237,14 +237,14 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
           .maybeSingle(),
         supabaseAdmin
           .from("s5_qa_reviews")
-          .select("id, reviewee_id, works, breaks, next_step, created_at")
+          .select("id, reviewee_id, good, issue, suggestion, submitted_at")
           .eq("reviewer_id", target.id)
-          .order("created_at", { ascending: false }),
+          .order("submitted_at", { ascending: false }),
         supabaseAdmin
           .from("s5_qa_reviews")
-          .select("id, reviewer_id, works, breaks, next_step, created_at")
+          .select("id, reviewer_id, good, issue, suggestion, submitted_at")
           .eq("reviewee_id", target.id)
-          .order("created_at", { ascending: false }),
+          .order("submitted_at", { ascending: false }),
       ]);
       const titleMap = new Map<string, string>();
       for (const c of s4cases ?? []) titleMap.set(`s4:${c.id}`, (c.title ?? "") as string);
@@ -287,15 +287,15 @@ export const getParticipantStageDetail = createServerFn({ method: "POST" })
             : null,
           qaGiven: (qaGiven ?? []).map((r) => ({
             partnerNickname: nickMap.get(r.reviewee_id as string) ?? "동료",
-            works: (r.works ?? "") as string,
-            breaks: (r.breaks ?? "") as string,
-            next_step: (r.next_step ?? "") as string,
+            good: (r.good ?? "") as string,
+            issue: (r.issue ?? "") as string,
+            suggestion: (r.suggestion ?? "") as string,
           })),
           qaReceived: (qaReceived ?? []).map((r) => ({
             partnerNickname: nickMap.get(r.reviewer_id as string) ?? "동료",
-            works: (r.works ?? "") as string,
-            breaks: (r.breaks ?? "") as string,
-            next_step: (r.next_step ?? "") as string,
+            good: (r.good ?? "") as string,
+            issue: (r.issue ?? "") as string,
+            suggestion: (r.suggestion ?? "") as string,
           })),
         },
       };
