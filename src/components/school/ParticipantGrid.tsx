@@ -496,3 +496,65 @@ function S5Cell({
 
 
 
+
+function S6Cell({
+  slidesConfirmed,
+  slidesFilled,
+  queueState,
+  commentsReceived,
+  status,
+}: {
+  slidesConfirmed: boolean;
+  slidesFilled: boolean;
+  queueState: "waiting" | "current" | "done" | null;
+  commentsReceived: number;
+  status: "done" | "open" | "locked";
+}) {
+  if (queueState === "done") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground"
+        aria-label={`S6 발표 완료 · 코멘트 ${commentsReceived}건`}
+        title={`발표 완료 · 코멘트 ${commentsReceived}건`}
+      >
+        <Stamp className="h-3 w-3" aria-hidden />
+        발표
+      </span>
+    );
+  }
+  if (queueState === "current") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-300 px-2 py-0.5 text-xs font-semibold text-amber-950"
+        aria-label="지금 발표 중"
+      >
+        <Mic className="h-3 w-3" aria-hidden />
+        발표 중
+      </span>
+    );
+  }
+  if (slidesConfirmed) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-accent/60 px-2 py-0.5 text-xs font-semibold text-primary"
+        aria-label="슬라이드 확정 · 발표 대기"
+        title="슬라이드 확정 완료"
+      >
+        <Presentation className="h-3 w-3" aria-hidden />
+        슬라이드
+      </span>
+    );
+  }
+  if (slidesFilled) {
+    return (
+      <span
+        className="inline-flex items-center gap-1 rounded-full bg-amber-200 px-2 py-0.5 text-xs font-semibold text-amber-900"
+        aria-label="슬라이드 6장 채움"
+      >
+        <FileCheck2 className="h-3 w-3" aria-hidden />
+        6/6
+      </span>
+    );
+  }
+  return <StageCell status={status} />;
+}
