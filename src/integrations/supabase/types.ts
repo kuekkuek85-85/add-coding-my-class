@@ -226,6 +226,117 @@ export type Database = {
         }
         Relationships: []
       }
+      s3_grill_questions: {
+        Row: {
+          created_at: string
+          draft_snapshot: string
+          id: string
+          questions: Json
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          draft_snapshot: string
+          id?: string
+          questions: Json
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          draft_snapshot?: string
+          id?: string
+          questions?: Json
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      s3_prd_drafts: {
+        Row: {
+          created_at: string
+          features: string
+          id: string
+          nonfunctional: string
+          out_of_scope: string
+          problem: string
+          session_id: string
+          submitted_v1_at: string | null
+          submitted_v2_at: string | null
+          success_metric: string
+          updated_at: string
+          user_id: string
+          users: string
+        }
+        Insert: {
+          created_at?: string
+          features?: string
+          id?: string
+          nonfunctional?: string
+          out_of_scope?: string
+          problem?: string
+          session_id: string
+          submitted_v1_at?: string | null
+          submitted_v2_at?: string | null
+          success_metric?: string
+          updated_at?: string
+          user_id: string
+          users?: string
+        }
+        Update: {
+          created_at?: string
+          features?: string
+          id?: string
+          nonfunctional?: string
+          out_of_scope?: string
+          problem?: string
+          session_id?: string
+          submitted_v1_at?: string | null
+          submitted_v2_at?: string | null
+          success_metric?: string
+          updated_at?: string
+          user_id?: string
+          users?: string
+        }
+        Relationships: []
+      }
+      s3_reviews: {
+        Row: {
+          good: string
+          id: string
+          question: string
+          reviewee_id: string
+          reviewer_id: string
+          session_id: string
+          submitted_at: string
+          suggestion: string
+          updated_at: string
+        }
+        Insert: {
+          good: string
+          id?: string
+          question?: string
+          reviewee_id: string
+          reviewer_id: string
+          session_id: string
+          submitted_at?: string
+          suggestion?: string
+          updated_at?: string
+        }
+        Update: {
+          good?: string
+          id?: string
+          question?: string
+          reviewee_id?: string
+          reviewer_id?: string
+          session_id?: string
+          submitted_at?: string
+          suggestion?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           created_at: string

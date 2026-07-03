@@ -7,6 +7,7 @@ import { LogOut, Users, KeyRound, CircleAlert, CircleX, CircleCheck } from "luci
 import { getSessionSnapshot, setCurrentStage } from "@/lib/session.functions";
 import { getInstructorS1Summary } from "@/lib/s1.functions";
 import { getInstructorS2Summary } from "@/lib/s2.functions";
+import { getSessionS3Overview } from "@/lib/s3.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
@@ -29,11 +30,13 @@ function InstructorHome() {
   const changeStage = useServerFn(setCurrentStage);
   const fetchS1 = useServerFn(getInstructorS1Summary);
   const fetchS2 = useServerFn(getInstructorS2Summary);
+  const fetchS3 = useServerFn(getSessionS3Overview);
   const fetchHelp = useServerFn(listSessionHelpSignals);
 
   const snapshotKey = ["snapshot", stored?.userId];
   const s1Key = ["instructor-s1", stored?.userId];
   const s2Key = ["instructor-s2", stored?.userId];
+  const s3Key = ["instructor-s3", stored?.userId];
   const helpKey = ["instructor-help", stored?.userId];
 
   const { data } = useQuery({
@@ -55,6 +58,13 @@ function InstructorHome() {
     queryFn: () => fetchS2({ data: { userId: stored!.userId } }),
     enabled: !!stored?.userId,
     refetchInterval: 5_000,
+  });
+
+  const { data: s3 } = useQuery({
+    queryKey: s3Key,
+    queryFn: () => fetchS3({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 15_000,
   });
 
   const { data: help } = useQuery({
@@ -249,6 +259,7 @@ function InstructorHome() {
             s1Total={s1Total}
             s2Progress={s2Progress}
             s2Min={s2Min}
+            s3Progress={s3?.ok ? s3.progress : []}
             helpMap={helpMap}
             morningEarnedMap={morningEarnedMap}
           />
