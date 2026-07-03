@@ -206,6 +206,38 @@ function InstructorHome() {
           </div>
           <div className="flex items-center gap-2">
             <Nametag nickname={stored.nickname} role="instructor" />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-9 gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <RotateCcw className="h-4 w-4" aria-hidden />
+                  <span className="hidden sm:inline">데이터 초기화</span>
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>세션 데이터를 초기화할까요?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    참가자 계정과 모든 교시 산출물(체크포인트, 테스트 케이스, PRD,
+                    프롬프트, 리뷰, 발표, 회고 등)이 삭제됩니다. 강사 계정과 세션
+                    입장 코드는 유지됩니다. 이 작업은 되돌릴 수 없습니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => resetMutation.mutate()}
+                    disabled={resetMutation.isPending}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {resetMutation.isPending ? "초기화 중…" : "초기화"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button
               size="sm"
               variant="ghost"
