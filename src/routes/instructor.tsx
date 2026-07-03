@@ -2,11 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Users, KeyRound } from "lucide-react";
+import { LogOut, Users, KeyRound, CircleAlert, CircleX, CircleCheck } from "lucide-react";
 
 import { getSessionSnapshot, setCurrentStage } from "@/lib/session.functions";
 import { getInstructorS1Summary } from "@/lib/s1.functions";
 import { getInstructorS2Summary } from "@/lib/s2.functions";
+import { listSessionHelpSignals } from "@/lib/help.functions";
 import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
@@ -14,6 +15,7 @@ import { StageControls } from "@/components/school/StageControls";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
 import { InstructorSlideDeck } from "@/components/school/SlideDeck";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/instructor")({
   component: InstructorHome,
@@ -27,10 +29,12 @@ function InstructorHome() {
   const changeStage = useServerFn(setCurrentStage);
   const fetchS1 = useServerFn(getInstructorS1Summary);
   const fetchS2 = useServerFn(getInstructorS2Summary);
+  const fetchHelp = useServerFn(listSessionHelpSignals);
 
   const snapshotKey = ["snapshot", stored?.userId];
   const s1Key = ["instructor-s1", stored?.userId];
   const s2Key = ["instructor-s2", stored?.userId];
+  const helpKey = ["instructor-help", stored?.userId];
 
   const { data } = useQuery({
     queryKey: snapshotKey,
@@ -52,6 +56,14 @@ function InstructorHome() {
     enabled: !!stored?.userId,
     refetchInterval: 5_000,
   });
+
+  const { data: help } = useQuery({
+    queryKey: helpKey,
+    queryFn: () => fetchHelp({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+    refetchInterval: 5_000,
+  });
+
 
 
   const stageMutation = useMutation({
