@@ -30,7 +30,7 @@ export function PresentationFullscreen({
   const [size, setSize] = useState({ w: 1280, h: 720 });
   const [index, setIndex] = useState(0);
 
-  // 브라우저 전체화면 진입/이탈
+  // 브라우저 전체화면 진입 시도 (한 번만). 이탈해도 오버레이는 유지한다.
   useEffect(() => {
     const el = overlayRef.current;
     if (!el) return;
@@ -39,15 +39,12 @@ export function PresentationFullscreen({
         /* 사용자 제스처가 아니면 실패할 수 있음 — 무시하고 오버레이만 유지 */
       });
     }
-    const onFsChange = () => {
-      if (!document.fullscreenElement) onClose();
-    };
-    document.addEventListener("fullscreenchange", onFsChange);
     return () => {
-      document.removeEventListener("fullscreenchange", onFsChange);
       if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
     };
-  }, [onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const current = data?.ok ? data.current : null;
   const deck = data?.ok ? data.currentDeck : null;
