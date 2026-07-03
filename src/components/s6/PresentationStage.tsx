@@ -75,6 +75,7 @@ export function PresentationStage({ userId }: { userId: string }) {
           title={state.currentDeck.title}
           slides={state.currentDeck.slides}
           presenterName={current.nickname}
+          deployedUrl={state.currentDeck.deployedUrl}
         />
       )}
 
@@ -226,10 +227,12 @@ function SlideDeckViewer({
   title,
   slides,
   presenterName,
+  deployedUrl,
 }: {
   title: string;
   slides: Array<{ heading: string; body: string }>;
   presenterName: string;
+  deployedUrl?: string | null;
 }) {
   const [index, setIndex] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -273,6 +276,7 @@ function SlideDeckViewer({
           page={clamped + 1}
           total={total}
           presenterName={presenterName}
+          deployedUrl={isCover ? deployedUrl : null}
           width={size.w}
           height={size.h}
           variant={isCover ? "cover" : "default"}
