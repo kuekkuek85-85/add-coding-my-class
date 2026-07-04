@@ -30,7 +30,7 @@ type PromptFields = {
 
 const promptSchema = z.object({
   role: z.string().max(500),
-  context: z.string().max(2000),
+  context: z.string().max(8000),
   task: z.string().max(2000),
   nonfunctional: z.string().max(1000),
 });
