@@ -153,7 +153,7 @@ function S3Page() {
 
         {tab === "write" && (
           <>
-            <PrdForm userId={stored.userId} readOnly={v2} />
+            <PrdForm userId={stored.userId} />
             <div className="mt-4 flex items-center justify-between rounded-2xl border-2 border-primary/20 bg-card p-4">
               <p className="text-sm text-muted-foreground">
                 {v1 ? "1차 제출 완료 — Grill Me와 동료 리뷰가 열렸습니다." : "6개 섹션을 모두 채우면 1차 제출할 수 있어요."}
@@ -182,7 +182,7 @@ function S3Page() {
             <div className="rounded-2xl border-2 border-primary/20 bg-card p-5">
               <h3 className="mb-2 font-display text-lg font-bold text-primary">내가 받은 리뷰</h3>
               <p className="mb-3 text-xs text-muted-foreground">
-                리뷰를 참고해 PRD를 다듬은 뒤 2차 제출해 주세요. "작성" 탭에서 수정할 수 있습니다.
+                리뷰를 참고해 PRD를 다듬은 뒤 2차 제출해 주세요. "작성" 탭에서 언제든 수정할 수 있습니다.
               </p>
               <ReviewReceivedList userId={stored.userId} />
             </div>
@@ -191,19 +191,20 @@ function S3Page() {
               <div>
                 <p className="font-display text-sm font-bold text-primary">2차 제출</p>
                 <p className="text-xs text-muted-foreground">
-                  1차 제출 완료 + 받은 리뷰 1건 이상 있으면 S3 게이트가 통과됩니다.
+                  1차 제출이 완료되면 언제든 2차 제출할 수 있어요. 실수로 제출했더라도 수정 후 다시 제출할 수 있습니다.
                 </p>
               </div>
               <Button
-                disabled={!v1 || v2 || submitV2Mut.isPending}
+                disabled={!v1 || submitV2Mut.isPending}
                 onClick={() => submitV2Mut.mutate()}
               >
                 <CheckCircle2 className="mr-1 h-4 w-4" aria-hidden />
-                {v2 ? "2차 제출 완료" : "2차 제출"}
+                {v2 ? "2차 재제출" : "2차 제출"}
               </Button>
             </div>
           </div>
         )}
+
       </section>
     </main>
   );
