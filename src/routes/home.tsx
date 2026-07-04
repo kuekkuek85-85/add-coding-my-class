@@ -122,9 +122,7 @@ function ParticipantHome() {
     return "locked";
   }
 
-    if (stageNo === currentStage) return "open";
-    return "locked";
-  }
+
 
 
   return (
