@@ -63,21 +63,8 @@ function S6Page() {
     );
   }
 
-  const s5Confirmed = state?.ok ? state.s5Confirmed : false;
   const confirmed = state?.ok ? state.confirmed : false;
 
-  if (!s5Confirmed) {
-    return (
-      <main className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <Lock className="mx-auto mb-3 h-8 w-8 text-muted-foreground" aria-hidden />
-        <h1 className="mb-2 font-display text-xl font-bold">S5 확정이 필요합니다</h1>
-        <p className="mb-4 text-sm text-muted-foreground">
-          5교시에서 수정 PRD 프롬프트를 확정한 뒤 S6를 진행할 수 있어요.
-        </p>
-        <Button asChild variant="outline"><Link to="/s5">S5로 이동</Link></Button>
-      </main>
-    );
-  }
 
   const tabs: Array<{ id: Tab; label: string; icon: typeof LayoutGrid }> = [
     { id: "gallery", label: "1. 갤러리", icon: LayoutGrid },
