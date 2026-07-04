@@ -128,15 +128,8 @@ export const saveMyPrdDraft = createServerFn({ method: "POST" })
       return { ok: false as const, error: "참가자만 저장할 수 있습니다." };
     }
 
-    // v2 제출 완료면 잠금
-    const { data: existing } = await supabaseAdmin
-      .from("s3_prd_drafts")
-      .select("submitted_v2_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (existing?.submitted_v2_at) {
-      return { ok: false as const, error: "2차 제출 완료 — 더 이상 수정할 수 없습니다." };
-    }
+
+
 
     const { error } = await supabaseAdmin.from("s3_prd_drafts").upsert(
       {
