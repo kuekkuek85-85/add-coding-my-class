@@ -207,11 +207,10 @@ function ParticipantHome() {
                 if (st === "locked") {
                   if (s.no === 5 && !s4Confirmed) {
                     toast(`S4 게이트 미통과 — 4교시 PRD 프롬프트 확정 후 열립니다.`);
-                  } else if (s.no === 6 && !s5Confirmed) {
-                    toast(`S5 게이트 미통과 — 5교시 수정 PRD 프롬프트 확정 후 열립니다.`);
                   } else {
                     toast("아직 열리지 않았습니다.");
                   }
+
                 } else if (s.no === 1) {
                   navigate({ to: "/s1" });
                 } else if (s.no === 2) {
