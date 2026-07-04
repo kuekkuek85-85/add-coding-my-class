@@ -128,15 +128,8 @@ export const saveMyPrdDraft = createServerFn({ method: "POST" })
       return { ok: false as const, error: "참가자만 저장할 수 있습니다." };
     }
 
-    // v2 제출 완료면 잠금
-    const { data: existing } = await supabaseAdmin
-      .from("s3_prd_drafts")
-      .select("submitted_v2_at")
-      .eq("user_id", user.id)
-      .maybeSingle();
-    if (existing?.submitted_v2_at) {
-      return { ok: false as const, error: "2차 제출 완료 — 더 이상 수정할 수 없습니다." };
-    }
+
+
 
     const { error } = await supabaseAdmin.from("s3_prd_drafts").upsert(
       {
@@ -217,16 +210,8 @@ export const submitPrdV2 = createServerFn({ method: "POST" })
     });
     if (err) return { ok: false as const, error: err };
 
-    const { count } = await supabaseAdmin
-      .from("s3_reviews")
-      .select("id", { count: "exact", head: true })
-      .eq("reviewee_id", user.id);
-    if ((count ?? 0) < 1) {
-      return {
-        ok: false as const,
-        error: "동료 리뷰를 1건 이상 받은 뒤 2차 제출할 수 있습니다.",
-      };
-    }
+
+
 
     const now = new Date().toISOString();
     const { error } = await supabaseAdmin
