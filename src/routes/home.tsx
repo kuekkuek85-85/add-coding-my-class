@@ -115,8 +115,6 @@ function ParticipantHome() {
   }
 
   function statusFor(stageNo: number): StageStatus {
-    // S3는 S2 미니 게이트(테스트 케이스 2건) 통과 전까지 강제로 잠금
-    if (stageNo === 3 && !s2Passed) return "locked";
     // S5는 S4 게이트(PRD 프롬프트 확정) 통과 전까지 강제로 잠금
     if (stageNo === 5 && !s4Confirmed) return "locked";
     // S6는 S5 게이트(수정 PRD 프롬프트 확정) 통과 전까지 강제로 잠금
