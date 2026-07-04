@@ -210,16 +210,8 @@ export const submitPrdV2 = createServerFn({ method: "POST" })
     });
     if (err) return { ok: false as const, error: err };
 
-    const { count } = await supabaseAdmin
-      .from("s3_reviews")
-      .select("id", { count: "exact", head: true })
-      .eq("reviewee_id", user.id);
-    if ((count ?? 0) < 1) {
-      return {
-        ok: false as const,
-        error: "동료 리뷰를 1건 이상 받은 뒤 2차 제출할 수 있습니다.",
-      };
-    }
+
+
 
     const now = new Date().toISOString();
     const { error } = await supabaseAdmin
