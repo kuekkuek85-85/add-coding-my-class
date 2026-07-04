@@ -130,6 +130,29 @@ export function FirstPromptBuilder({
     update(draftSeed);
   }
 
+  async function handleConfirmClick() {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+    const next = (text ?? "").slice(0, MAX_LEN);
+    setStatus("saving");
+    try {
+      const res = await save({ data: { userId, fields: { role: "", context: next, task: "", nonfunctional: "" } } });
+      if (!res.ok) {
+        setStatus("error");
+        toast.error(res.error);
+        return;
+      }
+      setStatus("saved");
+      qc.invalidateQueries({ queryKey: stateKey });
+      onConfirmClick();
+    } catch {
+      setStatus("error");
+      toast.error("저장에 실패했습니다. 다시 시도해 주세요.");
+    }
+  }
+
   async function copyPrompt() {
     if (!text) return;
     try {
@@ -207,7 +230,7 @@ export function FirstPromptBuilder({
             확정하면 S4 게이트를 통과합니다. 확정 후에도 테스트 케이스는 계속 다듬을 수 있습니다.
           </p>
         </div>
-        <Button onClick={onConfirmClick} disabled={confirmDisabled || confirmBusy}>
+        <Button onClick={handleConfirmClick} disabled={confirmDisabled || confirmBusy || status === "saving"}>
           <Lock className="mr-1 h-4 w-4" aria-hidden />
           {confirmLabel}
         </Button>
