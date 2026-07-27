@@ -25,6 +25,7 @@ import { RetrospectiveWall } from "@/components/s7/RetrospectiveWall";
 import { SessionCloseControl } from "@/components/s7/SessionCloseControl";
 import { Button } from "@/components/ui/button";
 import { MessageCenter } from "@/components/messages/MessageCenter";
+import { AnnouncementTicker } from "@/components/school/AnnouncementTicker";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -204,13 +205,14 @@ function InstructorHome() {
     <SlideThemeProvider theme={slideTheme}>
     <main className="min-h-screen">
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <div>
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+          <div className="shrink-0">
             <p className="font-display text-sm font-bold text-primary">내 수업에 코딩 한 스푼 · 강사석</p>
             <p className="text-xs text-muted-foreground">
               {data?.ok ? data.session.name : "심화반 연수"}
             </p>
           </div>
+          <AnnouncementTicker userId={stored.userId} />
           <div className="flex items-center gap-2">
             <Nametag nickname={stored.nickname} role="instructor" />
             <AlertDialog>

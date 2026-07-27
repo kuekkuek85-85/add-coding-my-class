@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 import { useStoredSession, clearStoredSession } from "@/lib/local-session";
 import { MessageCenter } from "@/components/messages/MessageCenter";
+import { AnnouncementTicker } from "@/components/school/AnnouncementTicker";
 import { getMyPortfolio, getMyCompletion } from "@/lib/s7.functions";
 import { getSessionSnapshot } from "@/lib/session.functions";
 import { Button } from "@/components/ui/button";
@@ -86,8 +87,8 @@ function PortfolioPage() {
   return (
     <main className="min-h-screen pb-24">
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur print:hidden">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
-          <div className="flex items-center gap-2">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-3">
+          <div className="flex shrink-0 items-center gap-2">
             <Button asChild variant="ghost" size="sm" className="h-9 w-9 p-0">
               <Link to="/home" aria-label="홈으로">
                 <ArrowLeft className="h-4 w-4" />
@@ -102,6 +103,7 @@ function PortfolioPage() {
               </p>
             </div>
           </div>
+          <AnnouncementTicker userId={stored.userId} />
           <Nametag nickname={stored.nickname} role="participant" />
         </div>
       </header>

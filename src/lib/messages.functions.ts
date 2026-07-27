@@ -153,6 +153,23 @@ export const listInstructorInbox = createServerFn({ method: "POST" })
     };
   });
 
+/** 헤더 티커용: 세션의 최근 전체 공지(broadcast) 목록 */
+export const listSessionBroadcasts = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string }) => z.object({ userId: uuid }).parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다.", messages: [] };
+    const { data: rows } = await supabaseAdmin
+      .from("messages")
+      .select("id, body, created_at")
+      .eq("session_id", user.session_id)
+      .eq("kind", "broadcast")
+      .order("created_at", { ascending: false })
+      .limit(30);
+    return { ok: true as const, messages: rows ?? [] };
+  });
+
 /** 안읽음 마킹 */
 export const markMessagesRead = createServerFn({ method: "POST" })
   .inputValidator(
