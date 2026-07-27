@@ -406,6 +406,7 @@ function InstructorHome() {
       </section>
       <MessageCenter session={stored} />
       <MissionToastListener session={stored} />
+      <DjWidget session={stored} />
     </main>
     </SlideThemeProvider>
   );
