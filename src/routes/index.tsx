@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { GraduationCap, ChevronLeft } from "lucide-react";
 
-import { enterSession, getOccupiedSeats } from "@/lib/session.functions";
+import { enterSession, getOccupiedSeats, checkExistingUser } from "@/lib/session.functions";
 import { readStoredSession, writeStoredSession } from "@/lib/local-session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
