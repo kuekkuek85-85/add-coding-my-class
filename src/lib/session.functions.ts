@@ -13,6 +13,20 @@ const codeSchema = z
   .max(20)
   .transform((s) => s.toUpperCase());
 
+const avatarSchema = z
+  .object({
+    hair: z.string().max(20),
+    hairColor: z.string().max(20),
+    top: z.string().max(20),
+    topColor: z.string().max(20),
+    skin: z.string().max(20),
+    accessory: z.string().max(20),
+  })
+  .nullable()
+  .optional();
+
+const seatIdSchema = z.string().trim().min(1).max(40).nullable().optional();
+
 export const enterSession = createServerFn({ method: "POST" })
   .inputValidator((input: { code: string; nickname: string }) =>
     z.object({ code: codeSchema, nickname: nicknameSchema }).parse(input),
