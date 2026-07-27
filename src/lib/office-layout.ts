@@ -50,8 +50,8 @@ const tTopSeats: Seat[] = (() => {
 /** T자 세로 좌측 4석 */
 const tLeftSeats: Seat[] = (() => {
   const x = 480;
-  const positions = [510, 590, 690, 770];
-  const desk = { x: 520, y: 470, w: 46, h: 340 };
+  const positions = [500, 625, 750, 875];
+  const desk = { x: 520, y: 470, w: 46, h: 445 };
   return positions.map((y, i) => ({
     id: `tl${i + 1}`,
     x,
@@ -65,8 +65,8 @@ const tLeftSeats: Seat[] = (() => {
 /** T자 세로 우측 4석 */
 const tRightSeats: Seat[] = (() => {
   const x = 720;
-  const positions = [510, 590, 690, 770];
-  const desk = { x: 634, y: 470, w: 46, h: 340 };
+  const positions = [500, 625, 750, 875];
+  const desk = { x: 634, y: 470, w: 46, h: 445 };
   return positions.map((y, i) => ({
     id: `tr${i + 1}`,
     x,
@@ -88,16 +88,16 @@ export const PARTICIPANT_SEATS: Seat[] = [
 export const INSTRUCTOR_SEAT: Seat = {
   id: "instructor-desk",
   x: 600,
-  y: 830,
-  desk: { x: 470, y: 855, w: 260, h: 34 },
+  y: 960,
+  desk: { x: 470, y: 985, w: 260, h: 34 },
   facing: "up",
   label: "강사석",
 };
 
 /** 앞쪽 모니터 위치 (장식용) */
-export const FRONT_MONITOR = { x: 470, y: 875, w: 260, h: 18 };
+export const FRONT_MONITOR = { x: 470, y: 1005, w: 260, h: 18 };
 
-export const OFFICE_VIEWBOX = { w: 1200, h: 920 };
+export const OFFICE_VIEWBOX = { w: 1200, h: 1040 };
 
 export function findSeat(id: string | null | undefined): Seat | null {
   if (!id) return null;
