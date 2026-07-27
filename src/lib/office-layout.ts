@@ -19,9 +19,9 @@ export type Seat = {
 /** 뒤쪽 긴 책상 8석 (한 줄) */
 const backSeats: Seat[] = (() => {
   const y = 190;
-  const startX = 220;
-  const gap = 105;
-  const desk = { x: 200, y: 130, w: 800, h: 46 };
+  const startX = 110;
+  const gap = 140;
+  const desk = { x: 80, y: 130, w: 1040, h: 46 };
   return Array.from({ length: 8 }, (_, i) => ({
     id: `b${i + 1}`,
     x: startX + i * gap,
@@ -34,9 +34,9 @@ const backSeats: Seat[] = (() => {
 
 /** T자 상단 가로 4석 */
 const tTopSeats: Seat[] = (() => {
-  const y = 380;
-  const positions = [430, 520, 680, 770];
-  const desk = { x: 400, y: 420, w: 400, h: 46 };
+  const y = 320;
+  const positions = [370, 500, 700, 830];
+  const desk = { x: 330, y: 360, w: 540, h: 46 };
   return positions.map((x, i) => ({
     id: `tt${i + 1}`,
     x,
