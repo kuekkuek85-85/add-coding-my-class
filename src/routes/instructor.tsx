@@ -17,6 +17,8 @@ import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { StageControls } from "@/components/school/StageControls";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
+import { OfficeView } from "@/components/office/OfficeView";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { InstructorSlideDeck } from "@/components/school/SlideDeck";
 import { PresenterQueueAdmin } from "@/components/s6/PresenterQueueAdmin";
 import { RetrospectiveWall } from "@/components/s7/RetrospectiveWall";
