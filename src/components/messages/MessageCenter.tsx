@@ -588,7 +588,7 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
                       <CategoryIcon category={m.category} />
                       {CATEGORY_LABEL[m.category] ?? "일반"}
                     </div>
-                    <div className="whitespace-pre-wrap break-words">{m.body}</div>
+                    <MessageBody text={m.body} />
                     <div className="mt-1 text-right text-[10px] opacity-70">{formatTime(m.created_at)}</div>
                   </div>
                 </div>
