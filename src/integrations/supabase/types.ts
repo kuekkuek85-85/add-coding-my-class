@@ -124,6 +124,48 @@ export type Database = {
         }
         Relationships: []
       }
+      dj_queue: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number
+          played_at: string | null
+          requester_id: string
+          requester_nickname: string
+          requester_role: string
+          session_id: string
+          title: string
+          video_id: string
+          youtube_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          played_at?: string | null
+          requester_id: string
+          requester_nickname: string
+          requester_role: string
+          session_id: string
+          title?: string
+          video_id: string
+          youtube_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number
+          played_at?: string | null
+          requester_id?: string
+          requester_nickname?: string
+          requester_role?: string
+          session_id?: string
+          title?: string
+          video_id?: string
+          youtube_url?: string
+        }
+        Relationships: []
+      }
       help_mission_comments: {
         Row: {
           author_id: string

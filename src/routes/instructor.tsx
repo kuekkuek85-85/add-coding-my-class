@@ -29,6 +29,7 @@ import { AnnouncementTicker } from "@/components/school/AnnouncementTicker";
 import { MissionEntryButton } from "@/components/missions/MissionEntryButton";
 import { MissionToastListener } from "@/components/missions/MissionToastListener";
 import { InstructorMissionsPanel } from "@/components/missions/InstructorMissionsPanel";
+import { DjWidget } from "@/components/dj/DjWidget";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -405,6 +406,7 @@ function InstructorHome() {
       </section>
       <MessageCenter session={stored} />
       <MissionToastListener session={stored} />
+      <DjWidget session={stored} />
     </main>
     </SlideThemeProvider>
   );
