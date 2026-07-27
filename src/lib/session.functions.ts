@@ -187,7 +187,7 @@ export const getSessionSnapshot = createServerFn({ method: "POST" })
 
     const { data: members } = await supabaseAdmin
       .from("app_users")
-      .select("id, nickname, role, last_seen_at")
+      .select("id, nickname, role, last_seen_at, seat_id, avatar")
       .eq("session_id", user.session_id)
       .order("created_at", { ascending: true });
 
@@ -201,6 +201,32 @@ export const getSessionSnapshot = createServerFn({ method: "POST" })
       user: { id: user.id, nickname: user.nickname, role: user.role as "participant" | "instructor" },
       session: session!,
       members: members ?? [],
+    };
+  });
+
+export const getOccupiedSeats = createServerFn({ method: "POST" })
+  .inputValidator((input: { code: string }) =>
+    z.object({ code: codeSchema }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: sess } = await supabaseAdmin
+      .from("sessions")
+      .select("id")
+      .or(`participant_code.eq.${data.code},instructor_code.eq.${data.code}`)
+      .maybeSingle();
+    if (!sess) return { ok: false as const, error: "코드 없음" };
+    const { data: rows } = await supabaseAdmin
+      .from("app_users")
+      .select("seat_id, nickname")
+      .eq("session_id", sess.id)
+      .not("seat_id", "is", null);
+    return {
+      ok: true as const,
+      seats: (rows ?? []).map((r) => ({
+        seatId: r.seat_id as string,
+        nickname: (r.nickname ?? "") as string,
+      })),
     };
   });
 
