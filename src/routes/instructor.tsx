@@ -36,6 +36,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { SlideThemeProvider, themeFromSession } from "@/lib/slide-theme";
 
 export const Route = createFileRoute("/instructor")({
   component: InstructorHome,
