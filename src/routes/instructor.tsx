@@ -17,6 +17,8 @@ import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { StageControls } from "@/components/school/StageControls";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
+import { OfficeView } from "@/components/office/OfficeView";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { InstructorSlideDeck } from "@/components/school/SlideDeck";
 import { PresenterQueueAdmin } from "@/components/s6/PresenterQueueAdmin";
 import { RetrospectiveWall } from "@/components/s7/RetrospectiveWall";
@@ -332,28 +334,42 @@ function InstructorHome() {
 
         {/* 참가자 진행 그리드 */}
         <div className="mt-8">
-          <div className="mb-3">
-            <h2 className="font-display text-xl font-bold text-foreground">참가자 진행 현황</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              14명 × 6교시 그리드. 도장은 통과한 스테이지를 나타냅니다.
-            </p>
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="font-display text-xl font-bold text-foreground">참가자 진행 현황</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                리스트 또는 2D 사무실 뷰로 실시간 진행률을 확인합니다.
+              </p>
+            </div>
           </div>
-          <ParticipantGrid
-            instructorUserId={stored.userId}
-            participants={participants}
-            currentStage={currentStage}
-            s1Progress={s1Progress}
-            s1Total={s1Total}
-            s2Progress={s2Progress}
-            s2Min={s2Min}
-            s3Progress={s3?.ok ? s3.progress : []}
-            s4Progress={s4?.ok ? s4.progress : []}
-            s5Progress={s5?.ok ? s5.progress : []}
-            s6Progress={s6?.ok ? s6.progress : []}
-            helpMap={helpMap}
-            morningEarnedMap={morningEarnedMap}
-          />
+          <Tabs defaultValue="office" className="w-full">
+            <TabsList>
+              <TabsTrigger value="office">2D 사무실</TabsTrigger>
+              <TabsTrigger value="list">리스트</TabsTrigger>
+            </TabsList>
+            <TabsContent value="office" className="mt-4">
+              <OfficeView instructorUserId={stored.userId} />
+            </TabsContent>
+            <TabsContent value="list" className="mt-4">
+              <ParticipantGrid
+                instructorUserId={stored.userId}
+                participants={participants}
+                currentStage={currentStage}
+                s1Progress={s1Progress}
+                s1Total={s1Total}
+                s2Progress={s2Progress}
+                s2Min={s2Min}
+                s3Progress={s3?.ok ? s3.progress : []}
+                s4Progress={s4?.ok ? s4.progress : []}
+                s5Progress={s5?.ok ? s5.progress : []}
+                s6Progress={s6?.ok ? s6.progress : []}
+                helpMap={helpMap}
+                morningEarnedMap={morningEarnedMap}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
+
 
         {/* S6 발표 진행 (6교시일 때만 노출) */}
         {currentStage >= 6 && (

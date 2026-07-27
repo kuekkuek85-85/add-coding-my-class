@@ -13,9 +13,43 @@ const codeSchema = z
   .max(20)
   .transform((s) => s.toUpperCase());
 
+const avatarSchema = z
+  .object({
+    hair: z.string().max(20),
+    hairColor: z.string().max(20),
+    top: z.string().max(20),
+    topColor: z.string().max(20),
+    skin: z.string().max(20),
+    accessory: z.string().max(20),
+  })
+  .nullable()
+  .optional();
+
+const seatIdSchema = z.string().trim().min(1).max(40).nullable().optional();
+
 export const enterSession = createServerFn({ method: "POST" })
-  .inputValidator((input: { code: string; nickname: string }) =>
-    z.object({ code: codeSchema, nickname: nicknameSchema }).parse(input),
+  .inputValidator(
+    (input: {
+      code: string;
+      nickname: string;
+      avatar?: {
+        hair: string;
+        hairColor: string;
+        top: string;
+        topColor: string;
+        skin: string;
+        accessory: string;
+      } | null;
+      seatId?: string | null;
+    }) =>
+      z
+        .object({
+          code: codeSchema,
+          nickname: nicknameSchema,
+          avatar: avatarSchema,
+          seatId: seatIdSchema,
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -46,6 +80,26 @@ export const enterSession = createServerFn({ method: "POST" })
       return { ok: false as const, error: "입장 코드를 확인해 주세요." };
     }
 
+    // Instructors always get the fixed instructor desk
+    const desiredSeat =
+      role === "instructor" ? "instructor-desk" : (data.seatId ?? null);
+
+    // Seat conflict check (only for participants selecting a seat)
+    if (role === "participant" && desiredSeat) {
+      const { data: seatHolder } = await supabaseAdmin
+        .from("app_users")
+        .select("id, nickname")
+        .eq("session_id", sessionRow.id)
+        .eq("seat_id", desiredSeat)
+        .maybeSingle();
+      if (seatHolder && seatHolder.nickname !== data.nickname) {
+        return {
+          ok: false as const,
+          error: `이 자리는 ${seatHolder.nickname}님이 이미 앉아 있어요. 다른 자리를 선택해 주세요.`,
+        };
+      }
+    }
+
     // If nickname already exists in this session with same role, re-use (same user re-entering)
     const { data: existing } = await supabaseAdmin
       .from("app_users")
@@ -61,10 +115,20 @@ export const enterSession = createServerFn({ method: "POST" })
           error: "이 닉네임은 다른 역할로 이미 사용 중입니다. 다른 닉네임을 사용해 주세요.",
         };
       }
-      await supabaseAdmin
-        .from("app_users")
-        .update({ last_seen_at: new Date().toISOString() })
-        .eq("id", existing.id);
+      const updatePayload: {
+        last_seen_at: string;
+        avatar?: typeof data.avatar;
+        seat_id?: string;
+        is_seated?: boolean;
+      } = {
+        last_seen_at: new Date().toISOString(),
+      };
+      if (data.avatar) updatePayload.avatar = data.avatar;
+      if (desiredSeat) {
+        updatePayload.seat_id = desiredSeat;
+        updatePayload.is_seated = true;
+      }
+      await supabaseAdmin.from("app_users").update(updatePayload).eq("id", existing.id);
       return {
         ok: true as const,
         userId: existing.id,
@@ -81,6 +145,9 @@ export const enterSession = createServerFn({ method: "POST" })
         session_id: sessionRow.id,
         nickname: data.nickname,
         role,
+        avatar: data.avatar ?? null,
+        seat_id: desiredSeat,
+        is_seated: !!desiredSeat,
       })
       .select("id")
       .single();
@@ -120,7 +187,7 @@ export const getSessionSnapshot = createServerFn({ method: "POST" })
 
     const { data: members } = await supabaseAdmin
       .from("app_users")
-      .select("id, nickname, role, last_seen_at")
+      .select("id, nickname, role, last_seen_at, seat_id, avatar")
       .eq("session_id", user.session_id)
       .order("created_at", { ascending: true });
 
@@ -134,6 +201,32 @@ export const getSessionSnapshot = createServerFn({ method: "POST" })
       user: { id: user.id, nickname: user.nickname, role: user.role as "participant" | "instructor" },
       session: session!,
       members: members ?? [],
+    };
+  });
+
+export const getOccupiedSeats = createServerFn({ method: "POST" })
+  .inputValidator((input: { code: string }) =>
+    z.object({ code: codeSchema }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: sess } = await supabaseAdmin
+      .from("sessions")
+      .select("id")
+      .or(`participant_code.eq.${data.code},instructor_code.eq.${data.code}`)
+      .maybeSingle();
+    if (!sess) return { ok: false as const, error: "코드 없음" };
+    const { data: rows } = await supabaseAdmin
+      .from("app_users")
+      .select("seat_id, nickname")
+      .eq("session_id", sess.id)
+      .not("seat_id", "is", null);
+    return {
+      ok: true as const,
+      seats: (rows ?? []).map((r) => ({
+        seatId: r.seat_id as string,
+        nickname: (r.nickname ?? "") as string,
+      })),
     };
   });
 

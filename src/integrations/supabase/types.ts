@@ -16,30 +16,39 @@ export type Database = {
     Tables: {
       app_users: {
         Row: {
+          avatar: Json | null
           created_at: string
           deployed_url: string | null
           id: string
+          is_seated: boolean
           last_seen_at: string
           nickname: string
           role: string
+          seat_id: string | null
           session_id: string
         }
         Insert: {
+          avatar?: Json | null
           created_at?: string
           deployed_url?: string | null
           id?: string
+          is_seated?: boolean
           last_seen_at?: string
           nickname: string
           role: string
+          seat_id?: string | null
           session_id: string
         }
         Update: {
+          avatar?: Json | null
           created_at?: string
           deployed_url?: string | null
           id?: string
+          is_seated?: boolean
           last_seen_at?: string
           nickname?: string
           role?: string
+          seat_id?: string | null
           session_id?: string
         }
         Relationships: [
