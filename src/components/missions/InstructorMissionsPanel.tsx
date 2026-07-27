@@ -20,7 +20,9 @@ export function InstructorMissionsPanel({ session }: { session: StoredSession })
   });
   const [selected, setSelected] = useState<string | null>(null);
 
-  const ok = data && "ok" in data && data.ok ? data : null;
+  const ok = data && "ok" in data && data.ok === true && "counts" in data
+    ? (data as { counts: { open: number; inProgress: number; resolved: number; cancelled: number }; recent: Array<{ id: string; title: string; status: string; updatedAt: string; requesterNickname: string }> })
+    : null;
 
   return (
     <div className="rounded-2xl border-2 border-primary/20 bg-card p-4 shadow-sm">
