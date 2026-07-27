@@ -2,6 +2,8 @@ import { Printer, Stamp } from "lucide-react";
 import { STAGES } from "@/components/school/TimetableCard";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AvatarSvg } from "@/components/avatar/AvatarSvg";
+import type { Avatar } from "@/lib/avatar-presets";
 import type { StampSet } from "./CompletionStamp";
 
 export function CertificateCard({
@@ -10,12 +12,14 @@ export function CertificateCard({
   stamps,
   completedAt,
   allDone,
+  avatar,
 }: {
   nickname: string;
   sessionName: string;
   stamps: StampSet;
   completedAt: string | null;
   allDone: boolean;
+  avatar?: Avatar | null;
 }) {
   return (
     <div className="print:m-0">
@@ -54,6 +58,11 @@ export function CertificateCard({
           </h2>
         </div>
         <div className="my-4 border-y-2 border-primary/25 py-4 text-center">
+          {avatar ? (
+            <div className="mx-auto mb-2 flex h-24 w-24 items-center justify-center rounded-full border-4 border-primary/40 bg-card shadow-sm">
+              <AvatarSvg avatar={avatar} size={80} />
+            </div>
+          ) : null}
           <p className="text-xs text-muted-foreground">이 명찰의 주인</p>
           <p className="mt-1 font-display text-3xl font-bold text-foreground">
             {nickname}
@@ -62,6 +71,7 @@ export function CertificateCard({
             연수명 · <b className="text-foreground">{sessionName}</b>
           </p>
         </div>
+
         <div className="mb-4 grid grid-cols-6 gap-2">
           {STAGES.map((s) => {
             const done = stamps[`s${s.no}` as keyof StampSet];

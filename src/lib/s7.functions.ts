@@ -19,11 +19,12 @@ async function getUser(userId: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("app_users")
-    .select("id, role, session_id, nickname, deployed_url")
+    .select("id, role, session_id, nickname, deployed_url, avatar")
     .eq("id", userId)
     .maybeSingle();
   return data;
 }
+
 
 
 // ---------- 참가자: 포트폴리오 (내 산출물 모아보기) ----------
@@ -406,12 +407,14 @@ export const getMyCompletion = createServerFn({ method: "POST" })
         closedAt: session?.closed_at ?? null,
       },
       nickname: user.nickname,
+      avatar: (user as { avatar?: unknown }).avatar ?? null,
       stamps,
       stampCount,
       retroSubmitted,
       allDone,
       completedAt: allDone ? (queueRow?.finished_at ?? retro?.submitted_at ?? null) : null,
     };
+
   });
 
 // ---------- 강사: 회고 모음 ----------
