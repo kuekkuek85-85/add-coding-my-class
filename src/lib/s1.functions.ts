@@ -238,7 +238,7 @@ export const getInstructorS1Summary = createServerFn({ method: "POST" })
     const userIds = (members ?? []).map((m) => m.id);
     const customByUser = new Map<string, number>();
     for (const row of customCheckpoints ?? []) {
-      if (!userIds.includes(row.user_id)) continue;
+      if (!row.user_id || !userIds.includes(row.user_id)) continue;
       customByUser.set(row.user_id, (customByUser.get(row.user_id) ?? 0) + 1);
     }
 
