@@ -97,7 +97,7 @@ export const INSTRUCTOR_SEAT: Seat = {
 /** 앞쪽 모니터 위치 (장식용) */
 export const FRONT_MONITOR = { x: 470, y: 1005, w: 260, h: 18 };
 
-export const OFFICE_VIEWBOX = { w: 1200, h: 920 };
+export const OFFICE_VIEWBOX = { w: 1200, h: 1040 };
 
 export function findSeat(id: string | null | undefined): Seat | null {
   if (!id) return null;
