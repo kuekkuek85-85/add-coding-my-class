@@ -6,6 +6,8 @@ import { toast } from "sonner";
 
 import { getMyHelpSignal, setMyHelpSignal } from "@/lib/help.functions";
 import { cn } from "@/lib/utils";
+import { MissionComposer } from "@/components/missions/MissionComposer";
+import type { StoredSession } from "@/lib/local-session";
 
 type Level = "green" | "yellow" | "red";
 
@@ -45,7 +47,7 @@ const OPTIONS: Array<{
  * - 낙관적 업데이트 후 서버 upsert
  * - 강사석은 5초 간격으로 반영
  */
-export function TrafficLight({ userId }: { userId: string }) {
+export function TrafficLight({ userId, session }: { userId: string; session?: StoredSession }) {
   const fetchFn = useServerFn(getMyHelpSignal);
   const saveFn = useServerFn(setMyHelpSignal);
 
@@ -56,6 +58,7 @@ export function TrafficLight({ userId }: { userId: string }) {
   });
 
   const [local, setLocal] = useState<Level | null>(null);
+  const [missionOpen, setMissionOpen] = useState(false);
   useEffect(() => {
     if (data?.ok && local === null) setLocal(data.level);
   }, [data, local]);
@@ -71,8 +74,13 @@ export function TrafficLight({ userId }: { userId: string }) {
   });
 
   function choose(next: Level) {
+    const wasGreen = current === "green";
     setLocal(next);
     mut.mutate(next);
+    // 노랑/빨강으로 넘어갈 때 미션 등록 유도 (건너뛰기 가능)
+    if (session && next !== "green" && wasGreen) {
+      setMissionOpen(true);
+    }
   }
 
   return (
@@ -81,6 +89,7 @@ export function TrafficLight({ userId }: { userId: string }) {
       role="radiogroup"
       aria-label="도움 요청 신호등"
     >
+
       {OPTIONS.map((opt) => {
         const active = current === opt.level;
         const Icon = opt.icon;

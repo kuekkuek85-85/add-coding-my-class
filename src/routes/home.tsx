@@ -144,8 +144,10 @@ function ParticipantHome() {
           </div>
           <AnnouncementTicker userId={stored.userId} />
           <div className="flex items-center gap-2">
-            <TrafficLight userId={stored.userId} />
+            <TrafficLight userId={stored.userId} session={stored} />
+            <MissionEntryButton session={stored} />
             <Nametag nickname={stored.nickname} role="participant" />
+
             <Button
               size="sm"
               variant="ghost"
@@ -237,6 +239,7 @@ function ParticipantHome() {
       </section>
 
       <MessageCenter session={stored} />
+      <MissionToastListener session={stored} />
     </main>
   );
 }
