@@ -11,6 +11,7 @@ import { getSessionS4Overview } from "@/lib/s4.functions";
 import { getSessionS5Overview } from "@/lib/s5.functions";
 import { getSessionS6Overview } from "@/lib/s6.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
+import { getSessionRetrospectives } from "@/lib/s7.functions";
 import {
   PARTICIPANT_SEATS,
   INSTRUCTOR_SEAT,
