@@ -20,6 +20,8 @@ import { CompletionStamp, type StampSet } from "@/components/s7/CompletionStamp"
 import { Button } from "@/components/ui/button";
 import { MessageCenter } from "@/components/messages/MessageCenter";
 import { AnnouncementTicker } from "@/components/school/AnnouncementTicker";
+import { MissionEntryButton } from "@/components/missions/MissionEntryButton";
+import { MissionToastListener } from "@/components/missions/MissionToastListener";
 
 export const Route = createFileRoute("/home")({
   component: ParticipantHome,
@@ -142,8 +144,10 @@ function ParticipantHome() {
           </div>
           <AnnouncementTicker userId={stored.userId} />
           <div className="flex items-center gap-2">
-            <TrafficLight userId={stored.userId} />
+            <TrafficLight userId={stored.userId} session={stored} />
+            <MissionEntryButton session={stored} />
             <Nametag nickname={stored.nickname} role="participant" />
+
             <Button
               size="sm"
               variant="ghost"
@@ -235,6 +239,7 @@ function ParticipantHome() {
       </section>
 
       <MessageCenter session={stored} />
+      <MissionToastListener session={stored} />
     </main>
   );
 }

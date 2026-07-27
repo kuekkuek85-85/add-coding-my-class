@@ -16,6 +16,7 @@ import { Route as S3RouteImport } from './routes/s3'
 import { Route as S2RouteImport } from './routes/s2'
 import { Route as S1RouteImport } from './routes/s1'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
@@ -55,6 +56,11 @@ const PortfolioRoute = PortfolioRouteImport.update({
   path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MissionsRoute = MissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstructorRoute = InstructorRouteImport.update({
   id: '/instructor',
   path: '/instructor',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/missions': typeof MissionsRoute
   '/portfolio': typeof PortfolioRoute
   '/s1': typeof S1Route
   '/s2': typeof S2Route
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/missions': typeof MissionsRoute
   '/portfolio': typeof PortfolioRoute
   '/s1': typeof S1Route
   '/s2': typeof S2Route
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
+  '/missions': typeof MissionsRoute
   '/portfolio': typeof PortfolioRoute
   '/s1': typeof S1Route
   '/s2': typeof S2Route
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/'
     | '/home'
     | '/instructor'
+    | '/missions'
     | '/portfolio'
     | '/s1'
     | '/s2'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/'
     | '/home'
     | '/instructor'
+    | '/missions'
     | '/portfolio'
     | '/s1'
     | '/s2'
@@ -138,6 +149,7 @@ export interface FileRouteTypes {
     | '/'
     | '/home'
     | '/instructor'
+    | '/missions'
     | '/portfolio'
     | '/s1'
     | '/s2'
@@ -151,6 +163,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HomeRoute: typeof HomeRoute
   InstructorRoute: typeof InstructorRoute
+  MissionsRoute: typeof MissionsRoute
   PortfolioRoute: typeof PortfolioRoute
   S1Route: typeof S1Route
   S2Route: typeof S2Route
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/missions': {
+      id: '/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof MissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/instructor': {
       id: '/instructor'
       path: '/instructor'
@@ -239,6 +259,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HomeRoute: HomeRoute,
   InstructorRoute: InstructorRoute,
+  MissionsRoute: MissionsRoute,
   PortfolioRoute: PortfolioRoute,
   S1Route: S1Route,
   S2Route: S2Route,

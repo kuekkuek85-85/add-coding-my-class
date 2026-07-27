@@ -1,58 +1,93 @@
+# 도움 미션 게시판 (Help Missions)
 
-## 목표
-참가자가 강사에게 개인 메시지(건의/오류 제보)를 보내고, 강사는 개별 답장 또는 전체 공지(식사·발표 안내 등)를 발송한다. 새 메시지는 화면 우측 하단에 토스트형 팝업으로 실시간 노출된다.
+막힌 학생의 상황을 AI가 미션 카드로 구조화 → 게시판에 공개 → 여러 동료가 참여 신청/해결 제출 → 의뢰자가 확인. 강사도 대시보드에서 모니터링.
 
-## UX
+## 사용자 흐름
 
-### 참가자 화면
-- 우측 하단 고정 플로팅 버튼(💬 아이콘 + 안읽은 수 배지).
-- 클릭 시 대화창 패널 열림 — 강사와의 1:1 스레드 + 전체 공지 히스토리 표시.
-- 입력창 하단, "강사에게 보내기" 버튼. 카테고리 선택(건의 / 오류 제보 / 질문 / 기타) 태그 하나.
-- 새 메시지 도착 시 우측 하단 팝업 토스트 4~5초 노출(공지는 강조 색상).
+**의뢰자 (막힌 학생 · 노랑/빨강 신호등에서)**
+1. 신호등을 노랑/빨강으로 바꾸면 "동료에게 도움 미션으로 올리기" 모달이 자동 뜸 (건너뛰기 가능)
+2. 상황을 자유롭게 서술 + 이미지 첨부(스크린샷) + 링크 붙여넣기
+3. "AI로 정리" 클릭 → 제목 / 요약 / 재현 단계 / 필요 역량 태그가 자동 채워짐
+4. 학생이 카드를 편집·확정 → 게시판 공개
+5. 헬퍼가 "해결 제출"할 때마다 알림 토스트 → 확인 후 "채택" 또는 "아직" 표시. 채택하면 미션 종료.
 
-### 강사 화면
-- 강사 대시보드 상단 탭 또는 플로팅 버튼으로 "메시지함" 진입.
-- 좌측: 참가자별 스레드 리스트(안읽음 배지, 최신 메시지 미리보기, 카테고리 아이콘).
-- 우측: 선택된 스레드 대화창 + 답장 입력.
-- 상단 별도 "전체 공지 보내기" 버튼 → 모달에서 공지 유형(식사/발표/일반) 선택 후 발송.
-- 새 참가자 메시지 도착 시 우측 하단 팝업 토스트.
+**헬퍼 (도와줄 친구)**
+1. `/missions` 게시판에서 대기중/진행중 미션 카드 열람
+2. "참여 신청" → 진행중 헬퍼 목록에 본인 등록
+3. 미션 상세에서 의뢰자와 대화 가능(간단 코멘트 스레드)
+4. 해결책이 준비되면 "해결 제출"(텍스트 + 링크/이미지) → 의뢰자에게 알림
+5. 여러 명이 동시에 참여·제출 가능
 
-## 데이터 모델 (신규 마이그레이션)
+**교사**
+- 대시보드에 "도움 미션" 섹션: 진행중 / 해결됨 / 미해결 카운트 + 최근 5건 미리보기
+- 교사도 미션 등록 가능 (학생이 교사에게만 물어본 케이스를 학생 동의 후 게시판으로 승격)
+- 미션 카드 클릭 시 상세 팝업
 
-`messages` 테이블
-- `id`, `session_id`, `sender_id`(app_users.id), `sender_role`('participant'|'instructor')
-- `recipient_id`(nullable — null이면 전체 공지)
-- `kind`('direct' | 'broadcast')
-- `category`('suggestion'|'bug'|'question'|'meal'|'presentation'|'general')
-- `body` text
-- `created_at`
+## UI 배치
 
-`message_reads` 테이블
-- `message_id`, `user_id`, `read_at` — 안읽음 계산용
+- 신호등 컴포넌트: 노랑/빨강 선택 시 미션 등록 모달 자동 오픈 옵션
+- 홈 화면: "도움 미션 게시판 열기" 진입 카드 + 신규 대기중 미션 배지
+- `/missions` 신규 라우트: 대기중 · 진행중 · 해결됨 탭 + 카드 목록 + 상세 다이얼로그
+- 강사 대시보드: 도움 요청(신호등) 아래 "도움 미션" 섹션
+- 우측 하단 토스트: 새 미션 게시 / 참여 신청 / 해결 제출 / 채택 이벤트
 
-RLS: 프로젝트 정책대로 클라이언트 직접접근 차단 + `deny_all`, 접근은 모두 서버 함수 경유.
+## 데이터 모델 (마이그레이션)
 
-## 서버 함수 (`src/lib/messages.functions.ts`)
-- `sendMessage({ recipientId?, kind, category, body })` — 참가자는 강사에게만 direct, 강사는 direct/broadcast 모두 가능(권한 체크).
-- `listMyThread()` — 참가자: 본인↔강사 direct + 세션 broadcast 시간순.
-- `listInstructorInbox()` — 강사: 세션의 모든 스레드(참가자별 그룹) + broadcast.
-- `listThreadWith(userId)` — 강사가 특정 참가자와의 스레드 조회.
-- `markRead(messageIds[])`.
-- `getUnreadCount()`.
+- `help_missions`
+  - session_id, requester_id, requester_role
+  - title, summary, repro_steps, tags (jsonb 배열)
+  - raw_description (원문), attachments (jsonb: [{type:'image'|'link', url, caption}])
+  - status ('open' | 'in_progress' | 'resolved' | 'cancelled')
+  - resolved_helper_id (nullable, 채택된 헬퍼)
+  - created_at, updated_at, resolved_at
+- `help_mission_helpers`
+  - mission_id, helper_id
+  - state ('joined' | 'submitted' | 'accepted')
+  - submission_text, submission_attachments (jsonb)
+  - joined_at, submitted_at
+  - unique(mission_id, helper_id)
+- `help_mission_comments` (간단 대화)
+  - id, mission_id, author_id, author_role, body, created_at
 
-## 실시간
-`ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;` 후 클라이언트에서 `useEffect` 안에 채널 구독. 본인 관련(수신자 = 자신 or broadcast or 강사이면 세션 내 전체) 필터링 후 sonner 토스트 + 카운터 무효화.
+전부 `deny_all` RLS + 서버 함수 경유(프로젝트 관례).
+
+## 서버 함수 (`src/lib/missions.functions.ts`)
+
+- `structureMissionDraft({ rawText, attachments })` — Lovable AI Gateway (`google/gemini-3.6-flash`) 호출, JSON으로 `{title, summary, reproSteps, tags[]}` 반환
+- `createMission({ title, summary, reproSteps, tags, rawDescription, attachments })`
+- `listMissions({ status? })` — 세션 스코프, 상태별 필터
+- `getMission({ missionId })` — 상세 + 헬퍼 목록 + 코멘트
+- `joinMission({ missionId })` — 헬퍼 참여
+- `submitSolution({ missionId, text, attachments })` — 해결 제출, 의뢰자에게 알림 큐
+- `acceptSolution({ missionId, helperId })` — 채택 → 미션 resolved
+- `cancelMission({ missionId })` — 의뢰자만
+- `addMissionComment({ missionId, body })`
+- `getInstructorMissionsOverview({ userId })` — 강사용 카운트/최근 목록
+- 이미지 첨부는 기존 `uploadMessageImage` 재사용
 
 ## 컴포넌트
-- `src/components/messages/MessageFab.tsx` — 참가자용 플로팅 버튼 + 시트.
-- `src/components/messages/ParticipantChatPanel.tsx`.
-- `src/components/messages/InstructorInbox.tsx` — 강사 대시보드에 탭으로 삽입.
-- `src/components/messages/BroadcastComposer.tsx` — 공지 발송 모달.
-- `src/components/messages/MessageToastListener.tsx` — 루트에서 realtime 구독, sonner로 우측 하단 팝업(공지는 강조 스타일).
 
-## 배치
-- 참가자 라우트 공통 레이아웃(홈, 각 스테이지, 갤러리, 포트폴리오)에서 `MessageFab` + `MessageToastListener` 렌더.
-- 강사 대시보드에도 `MessageToastListener` + 인박스 진입 UI 추가.
+- `src/components/missions/MissionComposer.tsx` — 원문 입력 + AI 정리 + 편집·확정
+- `src/components/missions/MissionCard.tsx` — 리스트 카드 (상태 뱃지, 태그, 헬퍼 수)
+- `src/components/missions/MissionDetailDialog.tsx` — 상세: 카드 본문·첨부·헬퍼 목록·제출물·코멘트·의뢰자 액션(채택)
+- `src/components/missions/MissionBoard.tsx` — 탭 게시판 (`/missions` 라우트에서 사용)
+- `src/components/missions/MissionToastListener.tsx` — 5초 폴링 + 토스트
+- `src/components/missions/InstructorMissionsPanel.tsx` — 강사 대시보드 섹션
+- `TrafficLight` 훅 확장: 노랑/빨강 전환 시 `MissionComposer` 모달 오픈 (건너뛰기 옵션)
+
+## 라우트
+
+- `src/routes/missions.tsx` — 참가자·강사 공용 게시판
+- 홈/각 스테이지 헤더에 "🎯 도움 미션" 진입 링크
+- `MissionToastListener`를 참가자 공용 레이아웃 + 강사 대시보드에 마운트
+
+## 알림 규칙
+
+- 헬퍼 참여 → 의뢰자에게 토스트
+- 해결 제출 → 의뢰자에게 토스트 (강조)
+- 채택 → 해당 헬퍼에게 토스트 + "고마워요" 배지
+- 새 미션 등록 → 세션 전체(의뢰자 제외)에게 대기중 배지 카운트 갱신
 
 ## 범위 외
-- 파일 첨부, 이모지 리액션, 참가자간 DM, 검색 필터 — 이번 범위 아님.
+
+- 미션 검색/필터, 헬퍼 랭킹, 포인트/보상, 미션 재오픈 흐름은 이번 범위 아님 (필요 시 후속).
