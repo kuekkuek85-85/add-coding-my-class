@@ -231,6 +231,8 @@ function ParticipantHome() {
         </div>
       </section>
 
+      <MessageCenter session={stored} />
     </main>
   );
 }
+
