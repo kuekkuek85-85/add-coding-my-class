@@ -24,6 +24,7 @@ import { PresenterQueueAdmin } from "@/components/s6/PresenterQueueAdmin";
 import { RetrospectiveWall } from "@/components/s7/RetrospectiveWall";
 import { SessionCloseControl } from "@/components/s7/SessionCloseControl";
 import { Button } from "@/components/ui/button";
+import { MessageCenter } from "@/components/messages/MessageCenter";
 import {
   AlertDialog,
   AlertDialogAction,
