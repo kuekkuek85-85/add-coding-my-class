@@ -337,6 +337,11 @@ function SeatedAvatarNode({
   const barW = 84;
   const barH = 10;
   const cellW = barW / 6;
+  // 시드 기반 지연·속도 (좌석마다 다르게 흔들리도록)
+  let seed = 0;
+  for (let i = 0; i < seat.id.length; i++) seed = (seed * 31 + seat.id.charCodeAt(i)) >>> 0;
+  const delay = ((seed % 1000) / 1000) * 2.4; // 0 ~ 2.4s
+  const duration = 3 + ((seed >> 3) % 200) / 100; // 3.0 ~ 5.0s
   return (
     <g
       transform={`translate(${seat.x}, ${seat.y})`}
@@ -385,11 +390,17 @@ function SeatedAvatarNode({
         </g>
       )}
 
-      {/* Avatar with ring */}
-      <circle cx="0" cy="0" r="26" fill="#ffffff" stroke={ring} strokeWidth="4" />
-      <g transform="translate(-24, -24)">
-        <AvatarSvg avatar={avatar} size={48} />
+      {/* Avatar with ring — 살랑 애니메이션 */}
+      <g
+        className="avatar-bob"
+        style={{ animationDelay: `-${delay}s`, animationDuration: `${duration}s` }}
+      >
+        <circle cx="0" cy="0" r="26" fill="#ffffff" stroke={ring} strokeWidth="4" />
+        <g transform="translate(-24, -24)">
+          <AvatarSvg avatar={avatar} size={48} />
+        </g>
       </g>
+
 
       {/* Status badge (top-right) */}
       {helpLevel === "red" && (
