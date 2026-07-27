@@ -374,7 +374,6 @@ function InstructorHome() {
                 participants={participants}
                 currentStage={currentStage}
                 s1Progress={s1Progress}
-                s1Total={s1Total}
                 s2Progress={s2Progress}
                 s2Min={s2Min}
                 s3Progress={s3?.ok ? s3.progress : []}
