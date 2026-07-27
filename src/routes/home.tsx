@@ -20,6 +20,8 @@ import { CompletionStamp, type StampSet } from "@/components/s7/CompletionStamp"
 import { Button } from "@/components/ui/button";
 import { MessageCenter } from "@/components/messages/MessageCenter";
 import { AnnouncementTicker } from "@/components/school/AnnouncementTicker";
+import { MissionEntryButton } from "@/components/missions/MissionEntryButton";
+import { MissionToastListener } from "@/components/missions/MissionToastListener";
 
 export const Route = createFileRoute("/home")({
   component: ParticipantHome,
