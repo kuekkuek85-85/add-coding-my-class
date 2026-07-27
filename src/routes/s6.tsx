@@ -14,6 +14,7 @@ import { GalleryGrid } from "@/components/s6/GalleryGrid";
 import { SlideDraftEditor } from "@/components/s6/SlideDraftEditor";
 import { PresentationStage } from "@/components/s6/PresentationStage";
 import { cn } from "@/lib/utils";
+import { SlideThemeProvider, themeFromSession } from "@/lib/slide-theme";
 
 export const Route = createFileRoute("/s6")({
   component: S6Page,
@@ -64,6 +65,7 @@ function S6Page() {
   }
 
   const confirmed = state?.ok ? state.confirmed : false;
+  const slideTheme = themeFromSession(snap?.ok ? snap.session : null);
 
 
   const tabs: Array<{ id: Tab; label: string; icon: typeof LayoutGrid }> = [
@@ -73,6 +75,7 @@ function S6Page() {
   ];
 
   return (
+    <SlideThemeProvider theme={slideTheme}>
     <main className="min-h-screen pb-24">
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -128,5 +131,7 @@ function S6Page() {
         {tab === "stage" && <PresentationStage userId={stored.userId} />}
       </section>
     </main>
+    </SlideThemeProvider>
   );
 }
+

@@ -36,6 +36,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { SlideThemeProvider, themeFromSession } from "@/lib/slide-theme";
 
 export const Route = createFileRoute("/instructor")({
   component: InstructorHome,
@@ -196,7 +197,10 @@ function InstructorHome() {
     return "locked";
   }
 
+  const slideTheme = themeFromSession(data?.ok ? data.session : null);
+
   return (
+    <SlideThemeProvider theme={slideTheme}>
     <main className="min-h-screen">
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
@@ -387,8 +391,10 @@ function InstructorHome() {
         )}
       </section>
     </main>
+    </SlideThemeProvider>
   );
 }
+
 
 type HelpRow = {
   userId: string;
