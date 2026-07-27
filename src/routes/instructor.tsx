@@ -324,6 +324,12 @@ function InstructorHome() {
           <HelpStream signals={activeHelp} total={participants.length} />
         </div>
 
+        {/* 도움 미션 요약 */}
+        <div className="mt-6">
+          <InstructorMissionsPanel session={stored} />
+        </div>
+
+
         {/* 스테이지 개폐 컨트롤 */}
         <div className="mt-6">
           <StageControls
@@ -398,6 +404,7 @@ function InstructorHome() {
         )}
       </section>
       <MessageCenter session={stored} />
+      <MissionToastListener session={stored} />
     </main>
     </SlideThemeProvider>
   );
