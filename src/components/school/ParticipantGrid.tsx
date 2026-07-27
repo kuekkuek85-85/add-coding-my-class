@@ -7,6 +7,7 @@ import { ParticipantDetailDialog } from "./ParticipantDetailDialog";
 export type S1Progress = {
   userId: string;
   checked: number;
+  total?: number;
   memoCount: number;
 };
 
