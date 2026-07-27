@@ -226,7 +226,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
               currentStage={currentStage}
               helpLevel={"green"}
               isInstructor
-              isPresenting={false}
+              status={null}
             />
           )}
 
