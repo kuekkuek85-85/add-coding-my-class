@@ -182,12 +182,12 @@ function InstructorHome() {
     .slice(0, 5);
 
   const s1Progress = s1?.ok ? s1.progress : [];
-  const s1Total = s1?.ok ? s1.totalCheckpoints : 0;
   const morningEarnedMap = new Map<string, boolean>();
   for (const p of participants) {
     const cp = s1Progress.find((x) => x.userId === p.id);
     const sp = s2Progress.find((x) => x.userId === p.id);
-    const done = s1Total > 0 && (cp?.checked ?? 0) >= s1Total && !!sp?.passed;
+    const total = cp?.total ?? 0;
+    const done = total > 0 && (cp?.checked ?? 0) >= total && !!sp?.passed;
     morningEarnedMap.set(p.id, done);
   }
 
