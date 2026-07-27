@@ -9,18 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as S6RouteImport } from './routes/s6'
 import { Route as S5RouteImport } from './routes/s5'
 import { Route as S4RouteImport } from './routes/s4'
 import { Route as S3RouteImport } from './routes/s3'
 import { Route as S2RouteImport } from './routes/s2'
 import { Route as S1RouteImport } from './routes/s1'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const S6Route = S6RouteImport.update({
   id: '/s6',
   path: '/s6',
@@ -49,6 +56,11 @@ const S2Route = S2RouteImport.update({
 const S1Route = S1RouteImport.update({
   id: '/s1',
   path: '/s1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioRoute = PortfolioRouteImport.update({
@@ -83,12 +95,14 @@ export interface FileRoutesByFullPath {
   '/instructor': typeof InstructorRoute
   '/missions': typeof MissionsRoute
   '/portfolio': typeof PortfolioRoute
+  '/privacy': typeof PrivacyRoute
   '/s1': typeof S1Route
   '/s2': typeof S2Route
   '/s3': typeof S3Route
   '/s4': typeof S4Route
   '/s5': typeof S5Route
   '/s6': typeof S6Route
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -96,12 +110,14 @@ export interface FileRoutesByTo {
   '/instructor': typeof InstructorRoute
   '/missions': typeof MissionsRoute
   '/portfolio': typeof PortfolioRoute
+  '/privacy': typeof PrivacyRoute
   '/s1': typeof S1Route
   '/s2': typeof S2Route
   '/s3': typeof S3Route
   '/s4': typeof S4Route
   '/s5': typeof S5Route
   '/s6': typeof S6Route
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -110,12 +126,14 @@ export interface FileRoutesById {
   '/instructor': typeof InstructorRoute
   '/missions': typeof MissionsRoute
   '/portfolio': typeof PortfolioRoute
+  '/privacy': typeof PrivacyRoute
   '/s1': typeof S1Route
   '/s2': typeof S2Route
   '/s3': typeof S3Route
   '/s4': typeof S4Route
   '/s5': typeof S5Route
   '/s6': typeof S6Route
+  '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -125,12 +143,14 @@ export interface FileRouteTypes {
     | '/instructor'
     | '/missions'
     | '/portfolio'
+    | '/privacy'
     | '/s1'
     | '/s2'
     | '/s3'
     | '/s4'
     | '/s5'
     | '/s6'
+    | '/terms'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -138,12 +158,14 @@ export interface FileRouteTypes {
     | '/instructor'
     | '/missions'
     | '/portfolio'
+    | '/privacy'
     | '/s1'
     | '/s2'
     | '/s3'
     | '/s4'
     | '/s5'
     | '/s6'
+    | '/terms'
   id:
     | '__root__'
     | '/'
@@ -151,12 +173,14 @@ export interface FileRouteTypes {
     | '/instructor'
     | '/missions'
     | '/portfolio'
+    | '/privacy'
     | '/s1'
     | '/s2'
     | '/s3'
     | '/s4'
     | '/s5'
     | '/s6'
+    | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -165,16 +189,25 @@ export interface RootRouteChildren {
   InstructorRoute: typeof InstructorRoute
   MissionsRoute: typeof MissionsRoute
   PortfolioRoute: typeof PortfolioRoute
+  PrivacyRoute: typeof PrivacyRoute
   S1Route: typeof S1Route
   S2Route: typeof S2Route
   S3Route: typeof S3Route
   S4Route: typeof S4Route
   S5Route: typeof S5Route
   S6Route: typeof S6Route
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/s6': {
       id: '/s6'
       path: '/s6'
@@ -215,6 +248,13 @@ declare module '@tanstack/react-router' {
       path: '/s1'
       fullPath: '/s1'
       preLoaderRoute: typeof S1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio': {
@@ -261,12 +301,14 @@ const rootRouteChildren: RootRouteChildren = {
   InstructorRoute: InstructorRoute,
   MissionsRoute: MissionsRoute,
   PortfolioRoute: PortfolioRoute,
+  PrivacyRoute: PrivacyRoute,
   S1Route: S1Route,
   S2Route: S2Route,
   S3Route: S3Route,
   S4Route: S4Route,
   S5Route: S5Route,
   S6Route: S6Route,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
