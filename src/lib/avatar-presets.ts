@@ -11,7 +11,20 @@ export type Avatar = {
   accessory: string;
 };
 
-export const HAIR_STYLES = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
+export const HAIR_STYLES = [
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "h7",
+  "h8",
+  "h9",
+  "h10",
+  "h11",
+  "h12",
+] as const;
 export const TOP_STYLES = ["t1", "t2", "t3", "t4", "t5"] as const;
 export const ACCESSORIES = ["none", "glasses", "hat", "headset"] as const;
 
