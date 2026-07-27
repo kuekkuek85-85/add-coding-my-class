@@ -75,6 +75,7 @@ function S6Page() {
   ];
 
   return (
+    <SlideThemeProvider theme={slideTheme}>
     <main className="min-h-screen pb-24">
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
