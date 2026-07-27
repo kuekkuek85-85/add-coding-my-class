@@ -50,12 +50,13 @@ export const sendMessage = createServerFn({ method: "POST" })
       z
         .object({
           userId: uuid,
-          body: z.string().trim().min(1).max(1000),
+          body: z.string().trim().min(1).max(4000),
           category: categorySchema.optional().default("general"),
           kind: z.enum(["direct", "broadcast"]).optional().default("direct"),
           recipientId: uuid.nullable().optional(),
         })
         .parse(input),
+
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -214,3 +215,49 @@ export const getUnreadMessageIds = createServerFn({ method: "POST" })
     const unread = candidates.filter((id) => !readSet.has(id));
     return { ok: true as const, unread };
   });
+
+/** 이미지 업로드 — base64 dataURL 을 받아 스토리지에 저장하고 1년 짜리 signed URL 을 돌려줍니다. */
+export const uploadMessageImage = createServerFn({ method: "POST" })
+  .inputValidator(
+    (input: { userId: string; dataUrl: string; filename?: string }) =>
+      z
+        .object({
+          userId: uuid,
+          // 최대 ~4MB (base64 오버헤드 포함)
+          dataUrl: z
+            .string()
+            .regex(/^data:image\/(png|jpe?g|gif|webp);base64,/i, "지원하지 않는 이미지 형식입니다.")
+            .max(6_000_000, "이미지가 너무 큽니다 (최대 4MB)."),
+          filename: z.string().max(120).optional(),
+        })
+        .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+
+    const match = /^data:(image\/[a-zA-Z+]+);base64,(.+)$/.exec(data.dataUrl);
+    if (!match) return { ok: false as const, error: "이미지 파싱에 실패했습니다." };
+    const contentType = match[1];
+    const ext = contentType.split("/")[1].replace("jpeg", "jpg");
+    const bytes = Buffer.from(match[2], "base64");
+    if (bytes.byteLength > 4 * 1024 * 1024) {
+      return { ok: false as const, error: "이미지가 너무 큽니다 (최대 4MB)." };
+    }
+    const path = `${user.session_id}/${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+    const { error: upErr } = await supabaseAdmin.storage
+      .from("message-images")
+      .upload(path, bytes, { contentType, upsert: false });
+    if (upErr) return { ok: false as const, error: `업로드 실패: ${upErr.message}` };
+
+    // 1년 signed URL (연수 일정 기준 충분)
+    const { data: signed, error: signErr } = await supabaseAdmin.storage
+      .from("message-images")
+      .createSignedUrl(path, 60 * 60 * 24 * 365);
+    if (signErr || !signed) return { ok: false as const, error: "URL 발급 실패" };
+
+    return { ok: true as const, url: signed.signedUrl, path };
+  });
+

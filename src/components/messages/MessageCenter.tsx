@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MessageCircle, Send, Megaphone, X, Bug, Lightbulb, HelpCircle, Utensils, Presentation as PresentationIcon, MessageSquare } from "lucide-react";
+import { MessageCircle, Send, Megaphone, X, Bug, Lightbulb, HelpCircle, Utensils, Presentation as PresentationIcon, MessageSquare, ImagePlus, Loader2 } from "lucide-react";
 
 import {
   sendMessage,
@@ -10,6 +10,7 @@ import {
   listInstructorInbox,
   markMessagesRead,
   getUnreadMessageIds,
+  uploadMessageImage,
 } from "@/lib/messages.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +18,134 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { StoredSession } from "@/lib/local-session";
+
+/** 본문 렌더러 — `![alt](url)` 는 이미지로, http(s) URL 은 하이퍼링크로 자동 변환. */
+function MessageBody({ text }: { text: string }) {
+  // 1) 이미지 마크다운 우선 분리
+  const IMG = /!\[[^\]]*\]\((https?:\/\/[^\s)]+)\)/g;
+  const URL_RE = /(https?:\/\/[^\s<]+)/g;
+  const parts: Array<{ type: "text" | "image"; value: string }> = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = IMG.exec(text)) !== null) {
+    if (m.index > last) parts.push({ type: "text", value: text.slice(last, m.index) });
+    parts.push({ type: "image", value: m[1] });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push({ type: "text", value: text.slice(last) });
+
+  return (
+    <div className="space-y-1">
+      {parts.map((p, i) => {
+        if (p.type === "image") {
+          return (
+            <a key={i} href={p.value} target="_blank" rel="noreferrer" className="block">
+              <img
+                src={p.value}
+                alt="첨부 이미지"
+                className="max-h-64 max-w-full rounded-lg border object-contain"
+                loading="lazy"
+              />
+            </a>
+          );
+        }
+        // 텍스트 안의 URL 하이퍼링크
+        const nodes: React.ReactNode[] = [];
+        let lastIdx = 0;
+        let mm: RegExpExecArray | null;
+        const re = new RegExp(URL_RE.source, "g");
+        while ((mm = re.exec(p.value)) !== null) {
+          if (mm.index > lastIdx) nodes.push(p.value.slice(lastIdx, mm.index));
+          const url = mm[0].replace(/[.,;!?)]+$/, "");
+          const trail = mm[0].slice(url.length);
+          nodes.push(
+            <a
+              key={`${i}-${mm.index}`}
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2 break-all"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {url}
+            </a>,
+          );
+          if (trail) nodes.push(trail);
+          lastIdx = mm.index + mm[0].length;
+        }
+        if (lastIdx < p.value.length) nodes.push(p.value.slice(lastIdx));
+        return (
+          <div key={i} className="whitespace-pre-wrap break-words">
+            {nodes.length ? nodes : p.value}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** 이미지 첨부 버튼 — 클릭 시 파일 선택 → base64 로 읽어 콜백에 넘김. */
+function ImageAttachButton({
+  session,
+  onAttached,
+}: {
+  session: StoredSession;
+  onAttached: (url: string) => void;
+}) {
+  const upload = useServerFn(uploadMessageImage);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+
+  const pick = () => inputRef.current?.click();
+  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("이미지 파일만 첨부할 수 있어요.");
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error("이미지는 최대 4MB 까지 첨부할 수 있어요.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result as string);
+        r.onerror = () => reject(new Error("파일을 읽지 못했어요."));
+        r.readAsDataURL(file);
+      });
+      const res = await upload({ data: { userId: session.userId, dataUrl, filename: file.name } });
+      if (!("ok" in res) || !res.ok) throw new Error((res as { error?: string }).error ?? "업로드 실패");
+      onAttached(res.url);
+      toast.success("이미지를 첨부했어요.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "업로드 실패");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <input ref={inputRef} type="file" accept="image/*" hidden onChange={onFile} />
+      <Button
+        type="button"
+        onClick={pick}
+        disabled={busy}
+        size="sm"
+        variant="outline"
+        className="h-10 w-10 shrink-0 p-0"
+        aria-label="이미지 첨부"
+      >
+        {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+      </Button>
+    </>
+  );
+}
+
 
 type MessageRow = {
   id: string;
@@ -239,7 +368,7 @@ function ParticipantPanel({ session, onClose }: { session: StoredSession; onClos
                 ) : !mine ? (
                   <div className="mb-1 text-xs font-semibold opacity-70">강사</div>
                 ) : null}
-                <div className="whitespace-pre-wrap break-words">{m.body}</div>
+                <MessageBody text={m.body} />
                 <div className="mt-1 flex items-center gap-1 text-[10px] opacity-70">
                   {!isBroadcast && !mine ? null : (
                     <span className="inline-flex items-center gap-0.5">
@@ -283,6 +412,10 @@ function ParticipantPanel({ session, onClose }: { session: StoredSession; onClos
             }}
             className="min-h-[56px] flex-1 resize-none"
           />
+          <ImageAttachButton
+            session={session}
+            onAttached={(url) => setBody((b) => (b.trim() ? `${b}\n![img](${url})` : `![img](${url})`))}
+          />
           <Button
             onClick={() => sendMut.mutate()}
             disabled={sendMut.isPending || !body.trim()}
@@ -292,6 +425,7 @@ function ParticipantPanel({ session, onClose }: { session: StoredSession; onClos
             <Send className="h-4 w-4" />
           </Button>
         </div>
+
       </div>
     </PanelShell>
   );
@@ -459,7 +593,7 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
                       <CategoryIcon category={m.category} />
                       {CATEGORY_LABEL[m.category] ?? "일반"}
                     </div>
-                    <div className="whitespace-pre-wrap break-words">{m.body}</div>
+                    <MessageBody text={m.body} />
                     <div className="mt-1 text-right text-[10px] opacity-70">{formatTime(m.created_at)}</div>
                   </div>
                 </div>
@@ -501,6 +635,10 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
                 }}
                 className="min-h-[56px] flex-1 resize-none"
               />
+              <ImageAttachButton
+                session={session}
+                onAttached={(url) => setBody((b) => (b.trim() ? `${b}\n![img](${url})` : `![img](${url})`))}
+              />
               <Button
                 onClick={() => sendMut.mutate()}
                 disabled={sendMut.isPending || !body.trim()}
@@ -509,6 +647,7 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
               >
                 {selected === "broadcast" ? <Megaphone className="h-4 w-4" /> : <Send className="h-4 w-4" />}
               </Button>
+
             </div>
           </div>
         </div>
