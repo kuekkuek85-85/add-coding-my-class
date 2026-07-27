@@ -220,8 +220,13 @@ export const getInstructorS1Summary = createServerFn({ method: "POST" })
       return { ok: false as const, error: "강사만 조회할 수 있습니다." };
     }
 
-    const [{ data: checkpoints }, { data: members }] = await Promise.all([
-      supabaseAdmin.from("checkpoints").select("id").eq("stage_no", 1),
+    const [{ data: seedCheckpoints }, { data: customCheckpoints }, { data: members }] = await Promise.all([
+      supabaseAdmin.from("checkpoints").select("id").eq("stage_no", 1).is("user_id", null),
+      supabaseAdmin
+        .from("checkpoints")
+        .select("id, user_id")
+        .eq("stage_no", 1)
+        .eq("is_custom", true),
       supabaseAdmin
         .from("app_users")
         .select("id, nickname")
@@ -229,8 +234,13 @@ export const getInstructorS1Summary = createServerFn({ method: "POST" })
         .eq("role", "participant"),
     ]);
 
-    const total = checkpoints?.length ?? 0;
+    const seedTotal = seedCheckpoints?.length ?? 0;
     const userIds = (members ?? []).map((m) => m.id);
+    const customByUser = new Map<string, number>();
+    for (const row of customCheckpoints ?? []) {
+      if (!userIds.includes(row.user_id)) continue;
+      customByUser.set(row.user_id, (customByUser.get(row.user_id) ?? 0) + 1);
+    }
 
     const [{ data: progress }, { data: memos }] = await Promise.all([
       userIds.length
@@ -258,10 +268,11 @@ export const getInstructorS1Summary = createServerFn({ method: "POST" })
 
     return {
       ok: true as const,
-      totalCheckpoints: total,
+      totalCheckpoints: seedTotal,
       progress: (members ?? []).map((m) => ({
         userId: m.id,
         checked: checkedByUser.get(m.id) ?? 0,
+        total: seedTotal + (customByUser.get(m.id) ?? 0),
         memoCount: memoByUser.get(m.id) ?? 0,
       })),
     };
