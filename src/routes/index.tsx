@@ -82,12 +82,24 @@ function LoginPage() {
     }
   }
 
-  function onJoinContinue(e: React.FormEvent) {
+  async function onJoinContinue(e: React.FormEvent) {
     e.preventDefault();
     if (!code.trim() || !nickname.trim()) return;
-    // Instructor codes shortcut past seat picking (fixed at instructor desk)
     const looksInstructor = code.trim().toUpperCase().startsWith("TEACHER");
     setIsInstructor(looksInstructor);
+    // 재입장 감지: 이미 등록된 닉네임이면 아바타·자리 단계 건너뛰기
+    setLoading(true);
+    try {
+      const chk = await checkExisting({ data: { code, nickname } });
+      if (chk.ok && chk.exists) {
+        await submitFinal(null);
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
     setStep("avatar");
   }
 
