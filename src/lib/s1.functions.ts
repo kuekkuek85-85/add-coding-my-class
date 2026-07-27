@@ -85,6 +85,77 @@ export const toggleCheckpoint = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+export const addCustomCheckpoint = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; label: string; hint: string }) =>
+    z.object({
+      userId: uuid,
+      label: z.string().trim().min(1, "질문을 입력하세요").max(100, "100자 이내로 작성해 주세요"),
+      hint: z.string().trim().max(200, "200자 이내로 작성해 주세요").optional(),
+    }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (user.role !== "participant") {
+      return { ok: false as const, error: "참가자만 추가할 수 있습니다." };
+    }
+
+    // 이미 추가한 커스텀 체크포인트가 있으면 덮어쓴다.
+    const { data: existing } = await supabaseAdmin
+      .from("checkpoints")
+      .select("id")
+      .eq("stage_no", 1)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const seq = 1000; // 시드 체크포인트 뒤에 배치
+    if (existing) {
+      const { error } = await supabaseAdmin
+        .from("checkpoints")
+        .update({ label: data.label, hint: data.hint || null, seq })
+        .eq("id", existing.id)
+        .eq("user_id", user.id);
+      if (error) return { ok: false as const, error: "저장에 실패했습니다." };
+      return { ok: true as const, id: existing.id };
+    }
+
+    const { data: inserted, error } = await supabaseAdmin
+      .from("checkpoints")
+      .insert({
+        stage_no: 1,
+        seq,
+        label: data.label,
+        hint: data.hint || null,
+        user_id: user.id,
+        is_custom: true,
+      })
+      .select("id")
+      .single();
+
+    if (error || !inserted) return { ok: false as const, error: "추가에 실패했습니다." };
+    return { ok: true as const, id: inserted.id };
+  });
+
+export const deleteCustomCheckpoint = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; checkpointId: string }) =>
+    z.object({ userId: uuid, checkpointId: uuid }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+
+    const { error } = await supabaseAdmin
+      .from("checkpoints")
+      .delete()
+      .eq("id", data.checkpointId)
+      .eq("user_id", user.id)
+      .eq("is_custom", true);
+    if (error) return { ok: false as const, error: "삭제에 실패했습니다." };
+    return { ok: true as const };
+  });
+
 export const addMemo = createServerFn({ method: "POST" })
   .inputValidator((input: { userId: string; stageNo: number; text: string }) =>
     z
