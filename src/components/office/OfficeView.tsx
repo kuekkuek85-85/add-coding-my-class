@@ -124,6 +124,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const s5Map = new Map((s5?.ok ? s5.progress : []).map((p) => [p.userId, p]));
   const s6Map = new Map((s6?.ok ? s6.progress : []).map((p) => [p.userId, p]));
   const helpMap = new Map((help?.ok ? help.signals : []).map((h) => [h.userId, h]));
+  const retroMap = new Map((retro?.ok ? retro.entries : []).map((r) => [r.userId, r]));
 
   function stageDoneFlags(userId: string): boolean[] {
     const s1p = s1Map.get(userId);
