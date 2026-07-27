@@ -115,7 +115,12 @@ export const enterSession = createServerFn({ method: "POST" })
           error: "이 닉네임은 다른 역할로 이미 사용 중입니다. 다른 닉네임을 사용해 주세요.",
         };
       }
-      const updatePayload: Record<string, unknown> = {
+      const updatePayload: {
+        last_seen_at: string;
+        avatar?: typeof data.avatar;
+        seat_id?: string;
+        is_seated?: boolean;
+      } = {
         last_seen_at: new Date().toISOString(),
       };
       if (data.avatar) updatePayload.avatar = data.avatar;
