@@ -24,6 +24,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const enter = useServerFn(enterSession);
   const fetchSeats = useServerFn(getOccupiedSeats);
+  const checkExisting = useServerFn(checkExistingUser);
 
   const [step, setStep] = useState<Step>("join");
   const [code, setCode] = useState("");
