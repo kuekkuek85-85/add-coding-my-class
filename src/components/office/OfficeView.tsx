@@ -235,6 +235,17 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
             const seat = findSeat(p.seat_id)!;
             const flags = stageDoneFlags(p.id);
             const h = helpMap.get(p.id);
+            const r = retroMap.get(p.id);
+            const s6Done = flags[5];
+            const retroDone = !!r?.submittedAt;
+            const status: "presenting" | "graduated" | "retro" | null =
+              currentPresenter === p.id
+                ? "presenting"
+                : retroDone
+                  ? "graduated"
+                  : s6Done
+                    ? "retro"
+                    : null;
             return (
               <SeatedAvatarNode
                 key={p.id}
@@ -244,7 +255,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
                 flags={flags}
                 currentStage={currentStage}
                 helpLevel={h?.level ?? "green"}
-                isPresenting={currentPresenter === p.id}
+                status={status}
                 onClick={() =>
                   setDetail({ userId: p.id, nickname: p.nickname, stageNo: currentStage })
                 }
