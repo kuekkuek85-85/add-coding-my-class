@@ -25,6 +25,7 @@ import { RetrospectiveWall } from "@/components/s7/RetrospectiveWall";
 import { SessionCloseControl } from "@/components/s7/SessionCloseControl";
 import { Button } from "@/components/ui/button";
 import { MessageCenter } from "@/components/messages/MessageCenter";
+import { AnnouncementTicker } from "@/components/school/AnnouncementTicker";
 import {
   AlertDialog,
   AlertDialogAction,
