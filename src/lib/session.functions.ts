@@ -382,6 +382,7 @@ export const resetSessionData = createServerFn({ method: "POST" })
       "s6_presentation_queue",
       "s6_slide_decks",
       "s7_retrospectives",
+      "dj_queue",
     ] as const;
 
     for (const t of sessionScoped) {

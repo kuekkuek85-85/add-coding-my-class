@@ -22,6 +22,7 @@ import { MessageCenter } from "@/components/messages/MessageCenter";
 import { AnnouncementTicker } from "@/components/school/AnnouncementTicker";
 import { MissionEntryButton } from "@/components/missions/MissionEntryButton";
 import { MissionToastListener } from "@/components/missions/MissionToastListener";
+import { DjWidget } from "@/components/dj/DjWidget";
 
 export const Route = createFileRoute("/home")({
   component: ParticipantHome,
@@ -240,6 +241,7 @@ function ParticipantHome() {
 
       <MessageCenter session={stored} />
       <MissionToastListener session={stored} />
+      <DjWidget session={stored} />
     </main>
   );
 }
