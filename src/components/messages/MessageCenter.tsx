@@ -170,7 +170,7 @@ function ParticipantPanel({ session, onClose }: { session: StoredSession; onClos
     refetchInterval: 5_000,
   });
 
-  const messages: MessageRow[] = data?.ok ? data.messages : [];
+  const messages: MessageRow[] = data?.ok ? (data.messages as MessageRow[]) : [];
 
   // 열릴 때, 그리고 새 메시지 도착 시 자동 read
   useEffect(() => {
@@ -311,7 +311,7 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
   });
 
   const members: Member[] = data?.ok ? data.members : [];
-  const messages: MessageRow[] = data?.ok ? data.messages : [];
+  const messages: MessageRow[] = data?.ok ? (data.messages as MessageRow[]) : [];
 
   const [selected, setSelected] = useState<string | "broadcast">("broadcast");
   const [body, setBody] = useState("");
