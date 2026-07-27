@@ -2,15 +2,18 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Lightbulb, StickyNote, Trash2 } from "lucide-react";
+import { CheckCircle2, Circle, Lightbulb, Plus, Sparkles, StickyNote, Trash2, X } from "lucide-react";
 
 import {
+  addCustomCheckpoint,
   addMemo,
+  deleteCustomCheckpoint,
   deleteMemo,
   getMyS1State,
   toggleCheckpoint,
 } from "@/lib/s1.functions";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
