@@ -159,75 +159,74 @@ export function S1Panel({
             const isCustom = !!cp.is_custom;
             return (
               <li key={cp.id}>
-                <button
-                  type="button"
-                  onClick={() => toggleMut.mutate({ checkpointId: cp.id, on: !on })}
-                  className={cn(
-                    "group relative flex w-full items-start gap-3 rounded-xl border-2 p-3 text-left transition-all",
-                    on
-                      ? "border-primary/70 bg-primary/5"
-                      : "border-border/70 bg-background hover:border-primary/40",
-                    isCustom && "border-accent/60 bg-accent/10",
-                  )}
-                  aria-pressed={on}
-                >
-                  <span
+                <div className="flex items-start gap-1">
+                  <button
+                    type="button"
+                    onClick={() => toggleMut.mutate({ checkpointId: cp.id, on: !on })}
                     className={cn(
-                      "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
-                      on ? "text-primary" : "text-muted-foreground",
+                      "group flex flex-1 items-start gap-3 rounded-xl border-2 p-3 text-left transition-all",
+                      on
+                        ? "border-primary/70 bg-primary/5"
+                        : "border-border/70 bg-background hover:border-primary/40",
+                      isCustom && "border-accent/60 bg-accent/10",
                     )}
-                    aria-hidden
+                    aria-pressed={on}
                   >
-                    {on ? (
-                      <CheckCircle2 className="h-6 w-6" />
-                    ) : (
-                      <Circle className="h-6 w-6" />
-                    )}
-                  </span>
-                  <span className="min-w-0 flex-1">
                     <span
                       className={cn(
-                        "flex items-center gap-2 font-display text-sm font-bold",
-                        on ? "text-primary" : "text-foreground",
+                        "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
+                        on ? "text-primary" : "text-muted-foreground",
                       )}
+                      aria-hidden
                     >
-                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                        {cp.seq}
-                      </span>
-                      {cp.label}
-                      {isCustom && (
-                        <span className="rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-accent-foreground">
-                          내 질문
-                        </span>
+                      {on ? (
+                        <CheckCircle2 className="h-6 w-6" />
+                      ) : (
+                        <Circle className="h-6 w-6" />
                       )}
-                      {on && !isCustom && (
-                        <span className="ml-auto text-[10px] font-semibold text-primary">
-                          초록불
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={cn(
+                          "flex items-center gap-2 font-display text-sm font-bold",
+                          on ? "text-primary" : "text-foreground",
+                        )}
+                      >
+                        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                          {cp.seq}
+                        </span>
+                        {cp.label}
+                        {isCustom && (
+                          <span className="rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-accent-foreground">
+                            내 질문
+                          </span>
+                        )}
+                        {on && !isCustom && (
+                          <span className="ml-auto text-[10px] font-semibold text-primary">
+                            초록불
+                          </span>
+                        )}
+                      </span>
+                      {cp.hint && (
+                        <span className="mt-1 flex items-start gap-1 text-xs text-muted-foreground">
+                          <Lightbulb className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+                          {cp.hint}
                         </span>
                       )}
                     </span>
-                    {cp.hint && (
-                      <span className="mt-1 flex items-start gap-1 text-xs text-muted-foreground">
-                        <Lightbulb className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
-                        {cp.hint}
-                      </span>
-                    )}
-                  </span>
+                  </button>
                   {isCustom && (
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        deleteCustomMut.mutate(cp.id);
-                      }}
+                      onClick={() => deleteCustomMut.mutate(cp.id)}
                       disabled={deleteCustomMut.isPending}
-                      className="ml-2 shrink-0 rounded-full p-1 text-muted-foreground opacity-60 transition-opacity hover:bg-destructive/10 hover:text-destructive hover:opacity-100"
+                      className="ml-1 shrink-0 self-center rounded-full p-2 text-muted-foreground opacity-60 transition-opacity hover:bg-destructive/10 hover:text-destructive hover:opacity-100"
                       aria-label="질문 삭제"
                     >
                       <X className="h-4 w-4" aria-hidden />
                     </button>
                   )}
-                </button>
+                </div>
               </li>
             );
           })}
