@@ -102,27 +102,41 @@ export type Database = {
           created_at: string
           hint: string | null
           id: string
+          is_custom: boolean
           label: string
           seq: number
           stage_no: number
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           hint?: string | null
           id?: string
+          is_custom?: boolean
           label: string
           seq: number
           stage_no: number
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           hint?: string | null
           id?: string
+          is_custom?: boolean
           label?: string
           seq?: number
           stage_no?: number
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "checkpoints_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       dj_queue: {
         Row: {
