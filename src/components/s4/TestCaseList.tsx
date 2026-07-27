@@ -117,7 +117,7 @@ export function TestCaseList({
             {s2Cases.map((c, i) => (
               <li key={c.id} className="rounded-lg border border-primary/20 bg-card p-2 text-xs">
                 <div className="mb-1 flex items-center gap-2">
-                  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary">
+                  <span className="inline-flex h-5 shrink-0 items-center justify-center rounded-full bg-primary/20 px-2 text-[10px] font-bold leading-none text-primary whitespace-nowrap">
                     S2·{i + 1}
                   </span>
                   <span className="font-bold text-foreground">{c.title || "(제목 없음)"}</span>
