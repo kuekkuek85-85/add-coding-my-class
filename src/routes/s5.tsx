@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Lock, MessageSquare, ClipboardList } from "lucide-react";
 
 import { useStoredSession, clearStoredSession } from "@/lib/local-session";
+import { MessageCenter } from "@/components/messages/MessageCenter";
 import { getSessionSnapshot } from "@/lib/session.functions";
 import { getMyS5State } from "@/lib/s5.functions";
 import { Button } from "@/components/ui/button";
@@ -155,6 +156,7 @@ function S5Page() {
           </div>
         )}
       </section>
+    <MessageCenter session={stored} />
     </main>
   );
 }

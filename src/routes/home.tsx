@@ -18,6 +18,7 @@ import { TrafficLight } from "@/components/school/TrafficLight";
 import { MorningStamp } from "@/components/school/MorningStamp";
 import { CompletionStamp, type StampSet } from "@/components/s7/CompletionStamp";
 import { Button } from "@/components/ui/button";
+import { MessageCenter } from "@/components/messages/MessageCenter";
 
 export const Route = createFileRoute("/home")({
   component: ParticipantHome,
@@ -231,6 +232,8 @@ function ParticipantHome() {
         </div>
       </section>
 
+      <MessageCenter session={stored} />
     </main>
   );
 }
+

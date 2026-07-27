@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, CheckCircle2, Lock, Sparkles } from "lucide-react";
 
 import { useStoredSession, clearStoredSession } from "@/lib/local-session";
+import { MessageCenter } from "@/components/messages/MessageCenter";
 import { getSessionSnapshot } from "@/lib/session.functions";
 import { getMyS4State, confirmMyS4Prompt } from "@/lib/s4.functions";
 import { Button } from "@/components/ui/button";
@@ -150,6 +151,7 @@ function S4Page() {
           />
         )}
       </section>
+    <MessageCenter session={stored} />
     </main>
   );
 }

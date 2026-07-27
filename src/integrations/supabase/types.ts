@@ -166,6 +166,68 @@ export type Database = {
           },
         ]
       }
+      message_reads: {
+        Row: {
+          message_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          message_id: string
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          message_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reads_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          id: string
+          kind: string
+          recipient_id: string | null
+          sender_id: string
+          sender_role: string
+          session_id: string
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string
+          id?: string
+          kind: string
+          recipient_id?: string | null
+          sender_id: string
+          sender_role: string
+          session_id: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          recipient_id?: string | null
+          sender_id?: string
+          sender_role?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       morning_memos: {
         Row: {
           created_at: string
