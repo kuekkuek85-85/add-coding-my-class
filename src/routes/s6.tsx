@@ -65,6 +65,7 @@ function S6Page() {
   }
 
   const confirmed = state?.ok ? state.confirmed : false;
+  const slideTheme = themeFromSession(snap?.ok ? snap.session : null);
 
 
   const tabs: Array<{ id: Tab; label: string; icon: typeof LayoutGrid }> = [
