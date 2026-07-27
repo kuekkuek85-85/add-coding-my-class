@@ -124,6 +124,133 @@ export type Database = {
         }
         Relationships: []
       }
+      help_mission_comments: {
+        Row: {
+          author_id: string
+          author_role: string
+          body: string
+          created_at: string
+          id: string
+          mission_id: string
+        }
+        Insert: {
+          author_id: string
+          author_role: string
+          body: string
+          created_at?: string
+          id?: string
+          mission_id: string
+        }
+        Update: {
+          author_id?: string
+          author_role?: string
+          body?: string
+          created_at?: string
+          id?: string
+          mission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "help_mission_comments_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "help_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      help_mission_helpers: {
+        Row: {
+          helper_id: string
+          joined_at: string
+          mission_id: string
+          state: string
+          submission_attachments: Json
+          submission_text: string
+          submitted_at: string | null
+        }
+        Insert: {
+          helper_id: string
+          joined_at?: string
+          mission_id: string
+          state?: string
+          submission_attachments?: Json
+          submission_text?: string
+          submitted_at?: string | null
+        }
+        Update: {
+          helper_id?: string
+          joined_at?: string
+          mission_id?: string
+          state?: string
+          submission_attachments?: Json
+          submission_text?: string
+          submitted_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "help_mission_helpers_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "help_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      help_missions: {
+        Row: {
+          attachments: Json
+          created_at: string
+          id: string
+          raw_description: string
+          repro_steps: string
+          requester_id: string
+          requester_role: string
+          resolved_at: string | null
+          resolved_helper_id: string | null
+          session_id: string
+          status: string
+          summary: string
+          tags: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          attachments?: Json
+          created_at?: string
+          id?: string
+          raw_description?: string
+          repro_steps?: string
+          requester_id: string
+          requester_role: string
+          resolved_at?: string | null
+          resolved_helper_id?: string | null
+          session_id: string
+          status?: string
+          summary?: string
+          tags?: Json
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          attachments?: Json
+          created_at?: string
+          id?: string
+          raw_description?: string
+          repro_steps?: string
+          requester_id?: string
+          requester_role?: string
+          resolved_at?: string | null
+          resolved_helper_id?: string | null
+          session_id?: string
+          status?: string
+          summary?: string
+          tags?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       help_signals: {
         Row: {
           id: string
