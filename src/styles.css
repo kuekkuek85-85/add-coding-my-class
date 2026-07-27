@@ -195,6 +195,13 @@
   .avatar-bob { animation: none; }
 }
 
+/* 공지 티커 페이드-인 */
+@keyframes ticker-fade {
+  0%   { opacity: 0; transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.ticker-fade { animation: ticker-fade 400ms ease-out; }
+
 
 /* ─────────────────────────────────────────────────────────────
  * 7기 슬라이드 테마 — 보노보노 "밤티" (kitsch)
