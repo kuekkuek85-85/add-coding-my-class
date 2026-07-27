@@ -19,12 +19,14 @@ type CompletionOk = {
   ok: true;
   session: { name: string; closedAt: string | null };
   nickname: string;
+  avatar: import("@/lib/avatar-presets").Avatar | null;
   stamps: StampSet;
   stampCount: number;
   retroSubmitted: boolean;
   allDone: boolean;
   completedAt: string | null;
 };
+
 
 export const Route = createFileRoute("/portfolio")({
   component: PortfolioPage,
