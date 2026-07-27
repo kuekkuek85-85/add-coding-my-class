@@ -28,8 +28,28 @@ const avatarSchema = z
 const seatIdSchema = z.string().trim().min(1).max(40).nullable().optional();
 
 export const enterSession = createServerFn({ method: "POST" })
-  .inputValidator((input: { code: string; nickname: string }) =>
-    z.object({ code: codeSchema, nickname: nicknameSchema }).parse(input),
+  .inputValidator(
+    (input: {
+      code: string;
+      nickname: string;
+      avatar?: {
+        hair: string;
+        hairColor: string;
+        top: string;
+        topColor: string;
+        skin: string;
+        accessory: string;
+      } | null;
+      seatId?: string | null;
+    }) =>
+      z
+        .object({
+          code: codeSchema,
+          nickname: nicknameSchema,
+          avatar: avatarSchema,
+          seatId: seatIdSchema,
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -60,6 +80,26 @@ export const enterSession = createServerFn({ method: "POST" })
       return { ok: false as const, error: "입장 코드를 확인해 주세요." };
     }
 
+    // Instructors always get the fixed instructor desk
+    const desiredSeat =
+      role === "instructor" ? "instructor-desk" : (data.seatId ?? null);
+
+    // Seat conflict check (only for participants selecting a seat)
+    if (role === "participant" && desiredSeat) {
+      const { data: seatHolder } = await supabaseAdmin
+        .from("app_users")
+        .select("id, nickname")
+        .eq("session_id", sessionRow.id)
+        .eq("seat_id", desiredSeat)
+        .maybeSingle();
+      if (seatHolder && seatHolder.nickname !== data.nickname) {
+        return {
+          ok: false as const,
+          error: `이 자리는 ${seatHolder.nickname}님이 이미 앉아 있어요. 다른 자리를 선택해 주세요.`,
+        };
+      }
+    }
+
     // If nickname already exists in this session with same role, re-use (same user re-entering)
     const { data: existing } = await supabaseAdmin
       .from("app_users")
@@ -75,10 +115,15 @@ export const enterSession = createServerFn({ method: "POST" })
           error: "이 닉네임은 다른 역할로 이미 사용 중입니다. 다른 닉네임을 사용해 주세요.",
         };
       }
-      await supabaseAdmin
-        .from("app_users")
-        .update({ last_seen_at: new Date().toISOString() })
-        .eq("id", existing.id);
+      const updatePayload: Record<string, unknown> = {
+        last_seen_at: new Date().toISOString(),
+      };
+      if (data.avatar) updatePayload.avatar = data.avatar;
+      if (desiredSeat) {
+        updatePayload.seat_id = desiredSeat;
+        updatePayload.is_seated = true;
+      }
+      await supabaseAdmin.from("app_users").update(updatePayload).eq("id", existing.id);
       return {
         ok: true as const,
         userId: existing.id,
@@ -95,6 +140,9 @@ export const enterSession = createServerFn({ method: "POST" })
         session_id: sessionRow.id,
         nickname: data.nickname,
         role,
+        avatar: data.avatar ?? null,
+        seat_id: desiredSeat,
+        is_seated: !!desiredSeat,
       })
       .select("id")
       .single();
