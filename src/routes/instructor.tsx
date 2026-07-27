@@ -391,8 +391,10 @@ function InstructorHome() {
         )}
       </section>
     </main>
+    </SlideThemeProvider>
   );
 }
+
 
 type HelpRow = {
   userId: string;
