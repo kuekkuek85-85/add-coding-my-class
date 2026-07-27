@@ -26,6 +26,9 @@ import { SessionCloseControl } from "@/components/s7/SessionCloseControl";
 import { Button } from "@/components/ui/button";
 import { MessageCenter } from "@/components/messages/MessageCenter";
 import { AnnouncementTicker } from "@/components/school/AnnouncementTicker";
+import { MissionEntryButton } from "@/components/missions/MissionEntryButton";
+import { MissionToastListener } from "@/components/missions/MissionToastListener";
+import { InstructorMissionsPanel } from "@/components/missions/InstructorMissionsPanel";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -214,6 +217,7 @@ function InstructorHome() {
           </div>
           <AnnouncementTicker userId={stored.userId} />
           <div className="flex items-center gap-2">
+            <MissionEntryButton session={stored} />
             <Nametag nickname={stored.nickname} role="instructor" />
             <AlertDialog>
               <AlertDialogTrigger asChild>
