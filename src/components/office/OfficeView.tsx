@@ -364,17 +364,14 @@ function SeatedAvatarNode({
       )}
 
       {/* Avatar with ring */}
-      <g transform="translate(-28, -28)">
-        {/* React SVG within outer SVG needs foreignObject-free path; embed via nested svg */}
-        <svg x="0" y="0" width="56" height="56" viewBox="0 0 64 64" overflow="visible">
-          <circle cx="32" cy="32" r="30" fill="none" stroke={ring} strokeWidth="4" />
-        </svg>
-        <AvatarSvgInline avatar={avatar} />
+      <circle cx="0" cy="0" r="26" fill="#ffffff" stroke={ring} strokeWidth="4" />
+      <g transform="translate(-24, -24)">
+        <AvatarSvg avatar={avatar} size={48} />
       </g>
 
       {/* Status badge (top-right) */}
       {helpLevel === "red" && (
-        <g transform="translate(24, -30)">
+        <g transform="translate(24, -22)">
           <circle r="10" fill="#e11d48">
             <animate attributeName="r" values="10;12;10" dur="1.2s" repeatCount="indefinite" />
           </circle>
@@ -384,7 +381,7 @@ function SeatedAvatarNode({
         </g>
       )}
       {helpLevel === "yellow" && (
-        <g transform="translate(24, -30)">
+        <g transform="translate(24, -22)">
           <circle r="9" fill="#f59e0b" />
           <text y="4" textAnchor="middle" fontSize="12" fill="#fff" fontWeight="800">
             ?
@@ -392,10 +389,10 @@ function SeatedAvatarNode({
         </g>
       )}
       {isPresenting && (
-        <g transform="translate(-30, -30)">
+        <g transform="translate(-26, -22)">
           <circle r="10" fill="#e11d48" />
-          <text y="4" textAnchor="middle" fontSize="11" fill="#fff" fontWeight="800">
-            🎤
+          <text y="4" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="800">
+            LIVE
           </text>
         </g>
       )}
@@ -403,11 +400,4 @@ function SeatedAvatarNode({
   );
 }
 
-// Inline avatar rendered as SVG group so it composites in the parent SVG.
-function AvatarSvgInline({ avatar }: { avatar: Avatar }) {
-  return (
-    <svg x="0" y="0" width="56" height="56" viewBox="0 0 64 64" overflow="visible">
-      <AvatarSvg avatar={avatar} size={56} />
-    </svg>
-  );
-}
+
