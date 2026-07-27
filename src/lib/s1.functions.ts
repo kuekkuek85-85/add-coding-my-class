@@ -29,8 +29,9 @@ export const getMyS1State = createServerFn({ method: "POST" })
     const [{ data: checkpoints }, { data: progress }, { data: memos }] = await Promise.all([
       supabaseAdmin
         .from("checkpoints")
-        .select("id, seq, label, hint")
+        .select("id, seq, label, hint, is_custom")
         .eq("stage_no", 1)
+        .or(`user_id.is.null, user_id.eq.${user.id}`)
         .order("seq", { ascending: true }),
       supabaseAdmin
         .from("checkpoint_progress")
@@ -81,6 +82,77 @@ export const toggleCheckpoint = createServerFn({ method: "POST" })
       if (error) return { ok: false as const, error: "저장에 실패했습니다." };
     }
 
+    return { ok: true as const };
+  });
+
+export const addCustomCheckpoint = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; label: string; hint: string }) =>
+    z.object({
+      userId: uuid,
+      label: z.string().trim().min(1, "질문을 입력하세요").max(100, "100자 이내로 작성해 주세요"),
+      hint: z.string().trim().max(200, "200자 이내로 작성해 주세요").optional(),
+    }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (user.role !== "participant") {
+      return { ok: false as const, error: "참가자만 추가할 수 있습니다." };
+    }
+
+    // 이미 추가한 커스텀 체크포인트가 있으면 덮어쓴다.
+    const { data: existing } = await supabaseAdmin
+      .from("checkpoints")
+      .select("id")
+      .eq("stage_no", 1)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const seq = 1000; // 시드 체크포인트 뒤에 배치
+    if (existing) {
+      const { error } = await supabaseAdmin
+        .from("checkpoints")
+        .update({ label: data.label, hint: data.hint || null, seq })
+        .eq("id", existing.id)
+        .eq("user_id", user.id);
+      if (error) return { ok: false as const, error: "저장에 실패했습니다." };
+      return { ok: true as const, id: existing.id };
+    }
+
+    const { data: inserted, error } = await supabaseAdmin
+      .from("checkpoints")
+      .insert({
+        stage_no: 1,
+        seq,
+        label: data.label,
+        hint: data.hint || null,
+        user_id: user.id,
+        is_custom: true,
+      })
+      .select("id")
+      .single();
+
+    if (error || !inserted) return { ok: false as const, error: "추가에 실패했습니다." };
+    return { ok: true as const, id: inserted.id };
+  });
+
+export const deleteCustomCheckpoint = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; checkpointId: string }) =>
+    z.object({ userId: uuid, checkpointId: uuid }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+
+    const { error } = await supabaseAdmin
+      .from("checkpoints")
+      .delete()
+      .eq("id", data.checkpointId)
+      .eq("user_id", user.id)
+      .eq("is_custom", true);
+    if (error) return { ok: false as const, error: "삭제에 실패했습니다." };
     return { ok: true as const };
   });
 
@@ -148,8 +220,13 @@ export const getInstructorS1Summary = createServerFn({ method: "POST" })
       return { ok: false as const, error: "강사만 조회할 수 있습니다." };
     }
 
-    const [{ data: checkpoints }, { data: members }] = await Promise.all([
-      supabaseAdmin.from("checkpoints").select("id").eq("stage_no", 1),
+    const [{ data: seedCheckpoints }, { data: customCheckpoints }, { data: members }] = await Promise.all([
+      supabaseAdmin.from("checkpoints").select("id").eq("stage_no", 1).is("user_id", null),
+      supabaseAdmin
+        .from("checkpoints")
+        .select("id, user_id")
+        .eq("stage_no", 1)
+        .eq("is_custom", true),
       supabaseAdmin
         .from("app_users")
         .select("id, nickname")
@@ -157,8 +234,13 @@ export const getInstructorS1Summary = createServerFn({ method: "POST" })
         .eq("role", "participant"),
     ]);
 
-    const total = checkpoints?.length ?? 0;
+    const seedTotal = seedCheckpoints?.length ?? 0;
     const userIds = (members ?? []).map((m) => m.id);
+    const customByUser = new Map<string, number>();
+    for (const row of customCheckpoints ?? []) {
+      if (!row.user_id || !userIds.includes(row.user_id)) continue;
+      customByUser.set(row.user_id, (customByUser.get(row.user_id) ?? 0) + 1);
+    }
 
     const [{ data: progress }, { data: memos }] = await Promise.all([
       userIds.length
@@ -186,10 +268,11 @@ export const getInstructorS1Summary = createServerFn({ method: "POST" })
 
     return {
       ok: true as const,
-      totalCheckpoints: total,
+      totalCheckpoints: seedTotal,
       progress: (members ?? []).map((m) => ({
         userId: m.id,
         checked: checkedByUser.get(m.id) ?? 0,
+        total: seedTotal + (customByUser.get(m.id) ?? 0),
         memoCount: memoByUser.get(m.id) ?? 0,
       })),
     };

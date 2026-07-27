@@ -116,7 +116,6 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const instructor = members.find((m) => m.role === "instructor");
   const currentStage = snap?.ok ? snap.session.current_stage : 1;
 
-  const s1Total = s1?.ok ? s1.totalCheckpoints : 0;
   const s1Map = new Map((s1?.ok ? s1.progress : []).map((p) => [p.userId, p]));
   const s2Map = new Map((s2?.ok ? s2.progress : []).map((p) => [p.userId, p]));
   const s3Map = new Map((s3?.ok ? s3.progress : []).map((p) => [p.userId, p]));
@@ -133,6 +132,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
     const s4p = s4Map.get(userId);
     const s5p = s5Map.get(userId);
     const s6p = s6Map.get(userId);
+    const s1Total = s1p?.total ?? 0;
     return [
       !!(s1Total > 0 && (s1p?.checked ?? 0) >= s1Total),
       !!(s2p?.passed || (s2p?.cases ?? 0) > 0),

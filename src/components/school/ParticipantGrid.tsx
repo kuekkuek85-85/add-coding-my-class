@@ -7,6 +7,7 @@ import { ParticipantDetailDialog } from "./ParticipantDetailDialog";
 export type S1Progress = {
   userId: string;
   checked: number;
+  total?: number;
   memoCount: number;
 };
 
@@ -232,7 +233,7 @@ export function ParticipantGrid({
                     s.no === 6 &&
                     (st !== "locked" || s6?.slidesConfirmed || s6?.slidesFilled || !!s6?.queueState);
                   const cellContent = showS1Count ? (
-                    <S1Cell checked={pr?.checked ?? 0} total={total} status={st} />
+                    <S1Cell checked={pr?.checked ?? 0} total={pr?.total ?? total} status={st} />
                   ) : showS2Gate ? (
                     <S2Cell
                       cases={s2?.cases ?? 0}

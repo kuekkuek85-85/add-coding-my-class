@@ -2,15 +2,18 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { CheckCircle2, Circle, Lightbulb, StickyNote, Trash2 } from "lucide-react";
+import { CheckCircle2, Circle, Lightbulb, Plus, Sparkles, StickyNote, Trash2, X } from "lucide-react";
 
 import {
+  addCustomCheckpoint,
   addMemo,
+  deleteCustomCheckpoint,
   deleteMemo,
   getMyS1State,
   toggleCheckpoint,
 } from "@/lib/s1.functions";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +29,8 @@ export function S1Panel({
   const queryClient = useQueryClient();
   const fetchState = useServerFn(getMyS1State);
   const toggleFn = useServerFn(toggleCheckpoint);
+  const addCustomFn = useServerFn(addCustomCheckpoint);
+  const deleteCustomFn = useServerFn(deleteCustomCheckpoint);
   const addFn = useServerFn(addMemo);
   const delFn = useServerFn(deleteMemo);
 
@@ -84,6 +89,45 @@ export function S1Panel({
     onSuccess: () => queryClient.invalidateQueries({ queryKey: stateKey }),
   });
 
+  const [customLabel, setCustomLabel] = useState("");
+  const [customHint, setCustomHint] = useState("");
+
+  const addCustomMut = useMutation({
+    mutationFn: () =>
+      addCustomFn({
+        data: {
+          userId,
+          label: customLabel.trim(),
+          hint: customHint.trim(),
+        },
+      }),
+    onSuccess: (res) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      setCustomLabel("");
+      setCustomHint("");
+      toast.success("나만의 AI 비판적 사용 질문이 추가되었습니다.");
+      queryClient.invalidateQueries({ queryKey: stateKey });
+    },
+    onError: () => toast.error("추가에 실패했습니다."),
+  });
+
+  const deleteCustomMut = useMutation({
+    mutationFn: (checkpointId: string) =>
+      deleteCustomFn({ data: { userId, checkpointId } }),
+    onSuccess: (res) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success("질문이 삭제되었습니다.");
+      queryClient.invalidateQueries({ queryKey: stateKey });
+    },
+    onError: () => toast.error("삭제에 실패했습니다."),
+  });
+
   if (!data || !data.ok) return null;
 
   const total = data.checkpoints.length;
@@ -112,61 +156,118 @@ export function S1Panel({
         <ul className="flex flex-col gap-2">
           {data.checkpoints.map((cp) => {
             const on = checkedSet.has(cp.id);
+            const isCustom = !!cp.is_custom;
             return (
               <li key={cp.id}>
-                <button
-                  type="button"
-                  onClick={() => toggleMut.mutate({ checkpointId: cp.id, on: !on })}
-                  className={cn(
-                    "group flex w-full items-start gap-3 rounded-xl border-2 p-3 text-left transition-all",
-                    on
-                      ? "border-primary/70 bg-primary/5"
-                      : "border-border/70 bg-background hover:border-primary/40",
-                  )}
-                  aria-pressed={on}
-                >
-                  <span
+                <div className="flex items-start gap-1">
+                  <button
+                    type="button"
+                    onClick={() => toggleMut.mutate({ checkpointId: cp.id, on: !on })}
                     className={cn(
-                      "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
-                      on ? "text-primary" : "text-muted-foreground",
+                      "group flex flex-1 items-start gap-3 rounded-xl border-2 p-3 text-left transition-all",
+                      on
+                        ? "border-primary/70 bg-primary/5"
+                        : "border-border/70 bg-background hover:border-primary/40",
+                      isCustom && "border-accent/60 bg-accent/10",
                     )}
-                    aria-hidden
+                    aria-pressed={on}
                   >
-                    {on ? (
-                      <CheckCircle2 className="h-6 w-6" />
-                    ) : (
-                      <Circle className="h-6 w-6" />
-                    )}
-                  </span>
-                  <span className="min-w-0 flex-1">
                     <span
                       className={cn(
-                        "flex items-center gap-2 font-display text-sm font-bold",
-                        on ? "text-primary" : "text-foreground",
+                        "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full",
+                        on ? "text-primary" : "text-muted-foreground",
                       )}
+                      aria-hidden
                     >
-                      <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                        {cp.seq}
+                      {on ? (
+                        <CheckCircle2 className="h-6 w-6" />
+                      ) : (
+                        <Circle className="h-6 w-6" />
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={cn(
+                          "flex items-center gap-2 font-display text-sm font-bold",
+                          on ? "text-primary" : "text-foreground",
+                        )}
+                      >
+                        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                          {cp.seq}
+                        </span>
+                        {cp.label}
+                        {isCustom && (
+                          <span className="rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-accent-foreground">
+                            내 질문
+                          </span>
+                        )}
+                        {on && !isCustom && (
+                          <span className="ml-auto text-[10px] font-semibold text-primary">
+                            초록불
+                          </span>
+                        )}
                       </span>
-                      {cp.label}
-                      {on && (
-                        <span className="ml-auto text-[10px] font-semibold text-primary">
-                          초록불
+                      {cp.hint && (
+                        <span className="mt-1 flex items-start gap-1 text-xs text-muted-foreground">
+                          <Lightbulb className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
+                          {cp.hint}
                         </span>
                       )}
                     </span>
-                    {cp.hint && (
-                      <span className="mt-1 flex items-start gap-1 text-xs text-muted-foreground">
-                        <Lightbulb className="mt-0.5 h-3 w-3 shrink-0" aria-hidden />
-                        {cp.hint}
-                      </span>
-                    )}
-                  </span>
-                </button>
+                  </button>
+                  {isCustom && (
+                    <button
+                      type="button"
+                      onClick={() => deleteCustomMut.mutate(cp.id)}
+                      disabled={deleteCustomMut.isPending}
+                      className="ml-1 shrink-0 self-center rounded-full p-2 text-muted-foreground opacity-60 transition-opacity hover:bg-destructive/10 hover:text-destructive hover:opacity-100"
+                      aria-label="질문 삭제"
+                    >
+                      <X className="h-4 w-4" aria-hidden />
+                    </button>
+                  )}
+                </div>
               </li>
             );
           })}
         </ul>
+
+        {/* AI 비판적 사용 질문 추가 */}
+        {!data.checkpoints.some((cp) => cp.is_custom) && (
+          <div className="mt-4 rounded-xl border-2 border-dashed border-accent/50 bg-accent/10 p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" aria-hidden />
+              <h3 className="font-display text-sm font-bold text-foreground">
+                내 AI 비판적 사용 질문 1개 추가
+              </h3>
+            </div>
+            <p className="mb-2 text-xs text-muted-foreground">
+              AI를 쓸 때 스스로 한 번 더 물어볼 질문을 하나 정해 보세요. 사람마다 다를 수
+              있어요.
+            </p>
+            <Input
+              value={customLabel}
+              onChange={(e) => setCustomLabel(e.target.value.slice(0, 100))}
+              placeholder="예: AI가 추천한 기능이 우리 반 학생에게 꼭 필요한가?"
+              className="mb-2 bg-background/80"
+            />
+            <Textarea
+              value={customHint}
+              onChange={(e) => setCustomHint(e.target.value.slice(0, 200))}
+              placeholder="왜 그 질문이 중요한지 짧게 적어도 됩니다. (선택)"
+              rows={2}
+              className="mb-2 min-h-[48px] bg-background/80 text-xs"
+            />
+            <Button
+              size="sm"
+              onClick={() => addCustomMut.mutate()}
+              disabled={!customLabel.trim() || addCustomMut.isPending}
+            >
+              <Plus className="mr-1 h-3.5 w-3.5" aria-hidden />
+              추가
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* 오전 메모 위젯 */}
