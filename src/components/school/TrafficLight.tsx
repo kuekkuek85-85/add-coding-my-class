@@ -84,6 +84,7 @@ export function TrafficLight({ userId, session }: { userId: string; session?: St
   }
 
   return (
+    <>
     <div
       className="flex items-center gap-1.5 rounded-full border-2 border-primary/15 bg-card/70 p-1 shadow-sm"
       role="radiogroup"
@@ -117,5 +118,9 @@ export function TrafficLight({ userId, session }: { userId: string; session?: St
         );
       })}
     </div>
+    {session && (
+      <MissionComposer session={session} open={missionOpen} onOpenChange={setMissionOpen} />
+    )}
+    </>
   );
 }
