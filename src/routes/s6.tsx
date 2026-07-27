@@ -131,5 +131,7 @@ function S6Page() {
         {tab === "stage" && <PresentationStage userId={stored.userId} />}
       </section>
     </main>
+    </SlideThemeProvider>
   );
 }
+
