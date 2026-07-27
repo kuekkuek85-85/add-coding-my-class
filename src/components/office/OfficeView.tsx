@@ -150,21 +150,43 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
           role="img"
           aria-label="2D 사무실 대시보드"
         >
+          <defs>
+            <filter id="deskShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.25" />
+            </filter>
+          </defs>
           <OfficeBackdrop />
-          {/* Desks (draw once per group) */}
+          {/* Desks and chairs (draw once per group) */}
           {[...PARTICIPANT_SEATS, INSTRUCTOR_SEAT].map((s) =>
             s.desk ? (
-              <rect
-                key={s.id + "-desk"}
-                x={s.desk.x}
-                y={s.desk.y}
-                width={s.desk.w}
-                height={s.desk.h}
-                rx="6"
-                fill="#5b3a1e"
-                stroke="#3f2712"
-                strokeWidth="2"
-              />
+              <g key={s.id + "-deskgroup"}>
+                {/* Desk top */}
+                <rect
+                  x={s.desk.x}
+                  y={s.desk.y}
+                  width={s.desk.w}
+                  height={s.desk.h}
+                  rx="6"
+                  fill="#6d4c32"
+                  stroke="#3f2712"
+                  strokeWidth="3"
+                  filter="url(#deskShadow)"
+                />
+                {/* Desk surface highlight */}
+                <rect
+                  x={s.desk.x + 4}
+                  y={s.desk.y + 4}
+                  width={s.desk.w - 8}
+                  height={s.desk.h - 8}
+                  rx="4"
+                  fill="none"
+                  stroke="#8b5e3c"
+                  strokeWidth="2"
+                  opacity="0.6"
+                />
+                {/* Chair */}
+                <Chair seat={s} />
+              </g>
             ) : null,
           )}
           {/* Front monitor */}
@@ -399,5 +421,58 @@ function SeatedAvatarNode({
     </g>
   );
 }
+
+function Chair({
+  seat,
+}: {
+  seat: { id: string; x: number; y: number; facing: "up" | "down" | "left" | "right" };
+}) {
+  const distance = 40;
+  let cx = seat.x;
+  let cy = seat.y;
+  let w = 22;
+  let h = 16;
+  switch (seat.facing) {
+    case "up":
+      cy = seat.y + distance;
+      break;
+    case "down":
+      cy = seat.y - distance;
+      break;
+    case "left":
+      cx = seat.x + distance;
+      w = 16;
+      h = 22;
+      break;
+    case "right":
+      cx = seat.x - distance;
+      w = 16;
+      h = 22;
+      break;
+  }
+  return (
+    <g>
+      <rect
+        x={cx - w / 2}
+        y={cy - h / 2}
+        width={w}
+        height={h}
+        rx="5"
+        fill="#334155"
+        stroke="#1e293b"
+        strokeWidth="2"
+      />
+      <rect
+        x={cx - w / 2 + 3}
+        y={cy - h / 2 + 3}
+        width={w - 6}
+        height={h - 6}
+        rx="3"
+        fill="#475569"
+      />
+    </g>
+  );
+}
+
 
 
