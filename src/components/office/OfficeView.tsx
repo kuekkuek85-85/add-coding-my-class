@@ -310,7 +310,13 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
             <AlertTriangle className="h-3.5 w-3.5 text-rose-500" /> 도움 요청
           </span>
           <span className="flex items-center gap-1">
-            <Mic className="h-3.5 w-3.5 text-rose-500" /> 발표 중
+            <Mic className="h-3.5 w-3.5 text-rose-500" /> 발표
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" /> 회고 작성 중
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-3 w-3 rounded-sm bg-[#2F6B4F]" /> 수료 완료
           </span>
         </div>
       </div>
