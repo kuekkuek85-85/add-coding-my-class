@@ -103,6 +103,11 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
     queryFn: () => fetchHelp({ data: { userId: instructorUserId } }),
     ...common,
   });
+  const { data: retro } = useQuery({
+    queryKey: ["office-retro", instructorUserId],
+    queryFn: () => fetchRetro({ data: { userId: instructorUserId } }),
+    ...common,
+  });
 
   const [detail, setDetail] = useState<{ userId: string; nickname: string; stageNo: number } | null>(null);
 
