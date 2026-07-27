@@ -407,12 +407,14 @@ export const getMyCompletion = createServerFn({ method: "POST" })
         closedAt: session?.closed_at ?? null,
       },
       nickname: user.nickname,
+      avatar: (user as { avatar?: unknown }).avatar ?? null,
       stamps,
       stampCount,
       retroSubmitted,
       allDone,
       completedAt: allDone ? (queueRow?.finished_at ?? retro?.submitted_at ?? null) : null,
     };
+
   });
 
 // ---------- 강사: 회고 모음 ----------
