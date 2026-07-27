@@ -336,7 +336,7 @@ function SeatedAvatarNode({
   flags,
   currentStage,
   helpLevel,
-  isPresenting,
+  status,
   isInstructor,
   onClick,
 }: {
@@ -346,7 +346,7 @@ function SeatedAvatarNode({
   flags: boolean[];
   currentStage: number;
   helpLevel: "green" | "yellow" | "red";
-  isPresenting: boolean;
+  status: "presenting" | "retro" | "graduated" | null;
   isInstructor?: boolean;
   onClick?: () => void;
 }) {
