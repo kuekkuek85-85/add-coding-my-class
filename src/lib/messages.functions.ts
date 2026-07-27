@@ -50,12 +50,13 @@ export const sendMessage = createServerFn({ method: "POST" })
       z
         .object({
           userId: uuid,
-          body: z.string().trim().min(1).max(1000),
+          body: z.string().trim().min(1).max(4000),
           category: categorySchema.optional().default("general"),
           kind: z.enum(["direct", "broadcast"]).optional().default("direct"),
           recipientId: uuid.nullable().optional(),
         })
         .parse(input),
+
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
