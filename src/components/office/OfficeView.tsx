@@ -59,6 +59,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const fetchS5 = useServerFn(getSessionS5Overview);
   const fetchS6 = useServerFn(getSessionS6Overview);
   const fetchHelp = useServerFn(listSessionHelpSignals);
+  const fetchRetro = useServerFn(getSessionRetrospectives);
 
   const enabled = !!instructorUserId;
   const common = { enabled, refetchInterval: 5_000 } as const;
