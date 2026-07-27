@@ -14,6 +14,7 @@ import { GalleryGrid } from "@/components/s6/GalleryGrid";
 import { SlideDraftEditor } from "@/components/s6/SlideDraftEditor";
 import { PresentationStage } from "@/components/s6/PresentationStage";
 import { cn } from "@/lib/utils";
+import { SlideThemeProvider, themeFromSession } from "@/lib/slide-theme";
 
 export const Route = createFileRoute("/s6")({
   component: S6Page,
