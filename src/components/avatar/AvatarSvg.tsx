@@ -94,6 +94,60 @@ function Hair({ style, color }: { style: string; color: string }) {
           <rect x="40" y="20" width="6" height="4" fill={color} />
         </>
       );
+    case "h7": // long straight
+      return (
+        <>
+          <rect x="19" y="12" width="26" height="7" fill={color} />
+          <rect x="15" y="16" width="4" height="22" fill={color} />
+          <rect x="45" y="16" width="4" height="22" fill={color} />
+        </>
+      );
+    case "h8": // twin tails
+      return (
+        <>
+          <rect x="19" y="12" width="26" height="7" fill={color} />
+          <rect x="14" y="18" width="6" height="12" fill={color} />
+          <rect x="44" y="18" width="6" height="12" fill={color} />
+        </>
+      );
+    case "h9": // braid
+      return (
+        <>
+          <rect x="19" y="12" width="26" height="7" fill={color} />
+          <rect x="42" y="18" width="8" height="12" fill={color} />
+          <rect x="40" y="28" width="6" height="4" fill={color} />
+          <rect x="38" y="32" width="4" height="4" fill={color} />
+        </>
+      );
+    case "h10": // bun
+      return (
+        <>
+          <rect x="20" y="13" width="24" height="6" fill={color} />
+          <rect x="25" y="6" width="14" height="7" fill={color} />
+          <rect x="19" y="18" width="3" height="8" fill={color} />
+          <rect x="42" y="18" width="3" height="8" fill={color} />
+        </>
+      );
+    case "h11": // long wavy
+      return (
+        <>
+          <rect x="18" y="11" width="28" height="8" fill={color} />
+          <rect x="14" y="16" width="4" height="18" fill={color} />
+          <rect x="46" y="16" width="4" height="18" fill={color} />
+          <rect x="13" y="24" width="3" height="6" fill={color} />
+          <rect x="48" y="24" width="3" height="6" fill={color} />
+        </>
+      );
+    case "h12": // pixie headband
+      return (
+        <>
+          <rect x="19" y="14" width="26" height="6" fill={color} />
+          <rect x="19" y="12" width="26" height="2" fill="#FF6B57" />
+          <rect x="24" y="10" width="16" height="2" fill="#FF6B57" />
+          <rect x="19" y="19" width="4" height="6" fill={color} />
+          <rect x="41" y="19" width="4" height="6" fill={color} />
+        </>
+      );
     default:
       return null;
   }
