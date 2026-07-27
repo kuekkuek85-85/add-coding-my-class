@@ -11,6 +11,7 @@ import { getSessionS4Overview } from "@/lib/s4.functions";
 import { getSessionS5Overview } from "@/lib/s5.functions";
 import { getSessionS6Overview } from "@/lib/s6.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
+import { getSessionRetrospectives } from "@/lib/s7.functions";
 import {
   PARTICIPANT_SEATS,
   INSTRUCTOR_SEAT,
@@ -58,6 +59,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const fetchS5 = useServerFn(getSessionS5Overview);
   const fetchS6 = useServerFn(getSessionS6Overview);
   const fetchHelp = useServerFn(listSessionHelpSignals);
+  const fetchRetro = useServerFn(getSessionRetrospectives);
 
   const enabled = !!instructorUserId;
   const common = { enabled, refetchInterval: 5_000 } as const;
@@ -101,6 +103,11 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
     queryFn: () => fetchHelp({ data: { userId: instructorUserId } }),
     ...common,
   });
+  const { data: retro } = useQuery({
+    queryKey: ["office-retro", instructorUserId],
+    queryFn: () => fetchRetro({ data: { userId: instructorUserId } }),
+    ...common,
+  });
 
   const [detail, setDetail] = useState<{ userId: string; nickname: string; stageNo: number } | null>(null);
 
@@ -117,6 +124,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const s5Map = new Map((s5?.ok ? s5.progress : []).map((p) => [p.userId, p]));
   const s6Map = new Map((s6?.ok ? s6.progress : []).map((p) => [p.userId, p]));
   const helpMap = new Map((help?.ok ? help.signals : []).map((h) => [h.userId, h]));
+  const retroMap = new Map((retro?.ok ? retro.entries : []).map((r) => [r.userId, r]));
 
   function stageDoneFlags(userId: string): boolean[] {
     const s1p = s1Map.get(userId);
@@ -218,7 +226,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
               currentStage={currentStage}
               helpLevel={"green"}
               isInstructor
-              isPresenting={false}
+              status={null}
             />
           )}
 
@@ -227,6 +235,17 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
             const seat = findSeat(p.seat_id)!;
             const flags = stageDoneFlags(p.id);
             const h = helpMap.get(p.id);
+            const r = retroMap.get(p.id);
+            const s6Done = flags[5];
+            const retroDone = !!r?.submittedAt;
+            const status: "presenting" | "graduated" | "retro" | null =
+              currentPresenter === p.id
+                ? "presenting"
+                : retroDone
+                  ? "graduated"
+                  : s6Done
+                    ? "retro"
+                    : null;
             return (
               <SeatedAvatarNode
                 key={p.id}
@@ -236,7 +255,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
                 flags={flags}
                 currentStage={currentStage}
                 helpLevel={h?.level ?? "green"}
-                isPresenting={currentPresenter === p.id}
+                status={status}
                 onClick={() =>
                   setDetail({ userId: p.id, nickname: p.nickname, stageNo: currentStage })
                 }
@@ -291,7 +310,13 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
             <AlertTriangle className="h-3.5 w-3.5 text-rose-500" /> 도움 요청
           </span>
           <span className="flex items-center gap-1">
-            <Mic className="h-3.5 w-3.5 text-rose-500" /> 발표 중
+            <Mic className="h-3.5 w-3.5 text-rose-500" /> 발표
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" /> 회고 작성 중
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-3 w-3 rounded-sm bg-[#2F6B4F]" /> 수료 완료
           </span>
         </div>
       </div>
@@ -317,7 +342,7 @@ function SeatedAvatarNode({
   flags,
   currentStage,
   helpLevel,
-  isPresenting,
+  status,
   isInstructor,
   onClick,
 }: {
@@ -327,7 +352,7 @@ function SeatedAvatarNode({
   flags: boolean[];
   currentStage: number;
   helpLevel: "green" | "yellow" | "red";
-  isPresenting: boolean;
+  status: "presenting" | "retro" | "graduated" | null;
   isInstructor?: boolean;
   onClick?: () => void;
 }) {
@@ -421,11 +446,27 @@ function SeatedAvatarNode({
           </text>
         </g>
       )}
-      {isPresenting && (
+      {status === "presenting" && (
         <g transform="translate(-26, -22)">
-          <circle r="10" fill="#e11d48" />
+          <rect x="-20" y="-10" width="40" height="20" rx="10" fill="#e11d48" />
           <text y="4" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="800">
-            LIVE
+            발표
+          </text>
+        </g>
+      )}
+      {status === "retro" && (
+        <g transform="translate(-26, -22)">
+          <rect x="-20" y="-10" width="40" height="20" rx="10" fill="#f59e0b" />
+          <text y="4" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="800">
+            회고
+          </text>
+        </g>
+      )}
+      {status === "graduated" && (
+        <g transform="translate(-26, -22)">
+          <rect x="-20" y="-10" width="40" height="20" rx="10" fill="#2F6B4F" />
+          <text y="4" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="800">
+            수료
           </text>
         </g>
       )}
