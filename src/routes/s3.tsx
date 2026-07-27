@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ArrowLeft, CheckCircle2, Lock, Send, Sparkles } from "lucide-react";
 
 import { useStoredSession, clearStoredSession } from "@/lib/local-session";
+import { MessageCenter } from "@/components/messages/MessageCenter";
 import { getSessionSnapshot } from "@/lib/session.functions";
 import {
   getMyPrdDraft,
@@ -206,6 +207,7 @@ function S3Page() {
         )}
 
       </section>
+    <MessageCenter session={stored} />
     </main>
   );
 }

@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Lock } from "lucide-react";
 
 import { useStoredSession, clearStoredSession } from "@/lib/local-session";
+import { MessageCenter } from "@/components/messages/MessageCenter";
 import { getSessionSnapshot } from "@/lib/session.functions";
 import { Button } from "@/components/ui/button";
 import { Nametag } from "@/components/school/Nametag";
@@ -69,6 +70,7 @@ function S2Page() {
       <section className="mx-auto max-w-4xl px-4 py-5">
         <S2Panel userId={stored.userId} />
       </section>
+    <MessageCenter session={stored} />
     </main>
   );
 }
