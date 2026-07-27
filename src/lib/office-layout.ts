@@ -19,9 +19,9 @@ export type Seat = {
 /** 뒤쪽 긴 책상 8석 (한 줄) */
 const backSeats: Seat[] = (() => {
   const y = 190;
-  const startX = 220;
-  const gap = 105;
-  const desk = { x: 200, y: 130, w: 800, h: 46 };
+  const startX = 110;
+  const gap = 140;
+  const desk = { x: 80, y: 130, w: 1040, h: 46 };
   return Array.from({ length: 8 }, (_, i) => ({
     id: `b${i + 1}`,
     x: startX + i * gap,
@@ -34,9 +34,9 @@ const backSeats: Seat[] = (() => {
 
 /** T자 상단 가로 4석 */
 const tTopSeats: Seat[] = (() => {
-  const y = 380;
-  const positions = [430, 520, 680, 770];
-  const desk = { x: 400, y: 420, w: 400, h: 46 };
+  const y = 320;
+  const positions = [370, 500, 700, 830];
+  const desk = { x: 330, y: 360, w: 540, h: 46 };
   return positions.map((x, i) => ({
     id: `tt${i + 1}`,
     x,
@@ -50,8 +50,8 @@ const tTopSeats: Seat[] = (() => {
 /** T자 세로 좌측 4석 */
 const tLeftSeats: Seat[] = (() => {
   const x = 480;
-  const positions = [500, 625, 750, 875];
-  const desk = { x: 520, y: 470, w: 46, h: 445 };
+  const positions = [470, 620, 770, 920];
+  const desk = { x: 520, y: 410, w: 46, h: 555 };
   return positions.map((y, i) => ({
     id: `tl${i + 1}`,
     x,
@@ -65,8 +65,8 @@ const tLeftSeats: Seat[] = (() => {
 /** T자 세로 우측 4석 */
 const tRightSeats: Seat[] = (() => {
   const x = 720;
-  const positions = [500, 625, 750, 875];
-  const desk = { x: 634, y: 470, w: 46, h: 445 };
+  const positions = [470, 620, 770, 920];
+  const desk = { x: 634, y: 410, w: 46, h: 555 };
   return positions.map((y, i) => ({
     id: `tr${i + 1}`,
     x,
@@ -88,16 +88,16 @@ export const PARTICIPANT_SEATS: Seat[] = [
 export const INSTRUCTOR_SEAT: Seat = {
   id: "instructor-desk",
   x: 600,
-  y: 960,
-  desk: { x: 470, y: 985, w: 260, h: 34 },
+  y: 1030,
+  desk: { x: 470, y: 1055, w: 260, h: 34 },
   facing: "up",
   label: "강사석",
 };
 
 /** 앞쪽 모니터 위치 (장식용) */
-export const FRONT_MONITOR = { x: 470, y: 1005, w: 260, h: 18 };
+export const FRONT_MONITOR = { x: 470, y: 1075, w: 260, h: 18 };
 
-export const OFFICE_VIEWBOX = { w: 1200, h: 1040 };
+export const OFFICE_VIEWBOX = { w: 1200, h: 1110 };
 
 export function findSeat(id: string | null | undefined): Seat | null {
   if (!id) return null;

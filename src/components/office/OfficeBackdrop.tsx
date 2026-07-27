@@ -12,9 +12,9 @@ export function OfficeBackdrop() {
       <rect x="620" y="20" width="200" height="70" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" rx="4" />
       <rect x="860" y="20" width="260" height="70" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" rx="4" />
       {/* Floor - wooden */}
-      <rect x="0" y="110" width="1200" height="930" fill="#b98b5d" />
+      <rect x="0" y="110" width="1200" height="1000" fill="#b98b5d" />
       {/* Wood planks lines */}
-      {Array.from({ length: 23 }).map((_, i) => (
+      {Array.from({ length: 25 }).map((_, i) => (
         <line
           key={i}
           x1="0"
