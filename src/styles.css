@@ -48,32 +48,30 @@
 }
 
 :root {
-  --radius: 0.875rem;
-  --background: oklch(0.99 0.005 100);
-  --foreground: oklch(0.2 0.02 160);
+  /* Canva 테마 — 플랫, 화이트 배경, 퍼플 액센트 (#a370fc) */
+  --radius: 0rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0 0 0);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 160);
+  --card-foreground: oklch(0 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.02 160);
-  /* 칠판 그린 #2F6B4F */
-  --primary: oklch(0.48 0.09 155);
-  --primary-foreground: oklch(0.99 0.01 100);
-  --secondary: oklch(0.96 0.02 150);
-  --secondary-foreground: oklch(0.3 0.05 160);
-  --muted: oklch(0.96 0.01 120);
-  --muted-foreground: oklch(0.5 0.02 150);
-  /* 옐로 #FFC94A */
-  --accent: oklch(0.86 0.15 85);
-  --accent-foreground: oklch(0.25 0.05 80);
-  /* 코랄 #FF6B57 */
-  --destructive: oklch(0.68 0.2 25);
-  --destructive-foreground: oklch(0.99 0.01 100);
-  --border: oklch(0.9 0.01 150);
-  --input: oklch(0.92 0.01 150);
-  --ring: oklch(0.48 0.09 155);
-  --chalkboard: oklch(0.35 0.06 160);
-  --chalk: oklch(0.98 0.005 100);
-  --coral: oklch(0.68 0.2 25);
+  --popover-foreground: oklch(0 0 0);
+  --primary: oklch(0.65 0.22 295);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.1 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.28 0 0);
+  --accent: oklch(0.65 0.22 295);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.6 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.92 0 0);
+  --input: oklch(0.94 0 0);
+  --ring: oklch(0.65 0.22 295);
+  --chalkboard: oklch(0.15 0 0);
+  --chalk: oklch(1 0 0);
+  --coral: oklch(0.65 0.22 295);
 }
 
 @layer base {
