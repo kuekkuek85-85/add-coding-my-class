@@ -230,6 +230,35 @@ export const getOccupiedSeats = createServerFn({ method: "POST" })
     };
   });
 
+export const checkExistingUser = createServerFn({ method: "POST" })
+  .inputValidator((input: { code: string; nickname: string }) =>
+    z.object({ code: codeSchema, nickname: nicknameSchema }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: sess } = await supabaseAdmin
+      .from("sessions")
+      .select("id, participant_code, instructor_code")
+      .or(`participant_code.eq.${data.code},instructor_code.eq.${data.code}`)
+      .maybeSingle();
+    if (!sess) return { ok: false as const, error: "코드 없음" };
+    const role: "participant" | "instructor" =
+      sess.instructor_code === data.code ? "instructor" : "participant";
+    const { data: existing } = await supabaseAdmin
+      .from("app_users")
+      .select("id, role, avatar, seat_id")
+      .eq("session_id", sess.id)
+      .eq("nickname", data.nickname)
+      .maybeSingle();
+    return {
+      ok: true as const,
+      role,
+      exists: !!existing && existing.role === role,
+      hasAvatar: !!existing?.avatar,
+      hasSeat: !!existing?.seat_id,
+    };
+  });
+
 export const setCurrentStage = createServerFn({ method: "POST" })
   .inputValidator((input: { userId: string; stageNo: number }) =>
     z
