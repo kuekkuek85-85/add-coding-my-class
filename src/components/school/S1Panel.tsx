@@ -89,6 +89,45 @@ export function S1Panel({
     onSuccess: () => queryClient.invalidateQueries({ queryKey: stateKey }),
   });
 
+  const [customLabel, setCustomLabel] = useState("");
+  const [customHint, setCustomHint] = useState("");
+
+  const addCustomMut = useMutation({
+    mutationFn: () =>
+      addCustomFn({
+        data: {
+          userId,
+          label: customLabel.trim(),
+          hint: customHint.trim(),
+        },
+      }),
+    onSuccess: (res) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      setCustomLabel("");
+      setCustomHint("");
+      toast.success("나만의 AI 비판적 사용 질문이 추가되었습니다.");
+      queryClient.invalidateQueries({ queryKey: stateKey });
+    },
+    onError: () => toast.error("추가에 실패했습니다."),
+  });
+
+  const deleteCustomMut = useMutation({
+    mutationFn: (checkpointId: string) =>
+      deleteCustomFn({ data: { userId, checkpointId } }),
+    onSuccess: (res) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success("질문이 삭제되었습니다.");
+      queryClient.invalidateQueries({ queryKey: stateKey });
+    },
+    onError: () => toast.error("삭제에 실패했습니다."),
+  });
+
   if (!data || !data.ok) return null;
 
   const total = data.checkpoints.length;
