@@ -390,6 +390,7 @@ function InstructorHome() {
           </div>
         )}
       </section>
+      <MessageCenter session={stored} />
     </main>
     </SlideThemeProvider>
   );
