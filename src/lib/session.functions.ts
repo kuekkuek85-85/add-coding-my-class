@@ -342,9 +342,32 @@ export const resetSessionData = createServerFn({ method: "POST" })
     }
     const sessionId = caller.session_id;
 
+    // Delete message_reads via messages in this session (no session_id column)
+    const { data: sessionMessages } = await supabaseAdmin
+      .from("messages")
+      .select("id")
+      .eq("session_id", sessionId);
+    const messageIds = (sessionMessages ?? []).map((m) => m.id);
+    if (messageIds.length > 0) {
+      await supabaseAdmin.from("message_reads").delete().in("message_id", messageIds);
+    }
+
+    // Delete help mission helpers/comments via missions in this session
+    const { data: sessionMissions } = await supabaseAdmin
+      .from("help_missions")
+      .select("id")
+      .eq("session_id", sessionId);
+    const missionIds = (sessionMissions ?? []).map((m) => m.id);
+    if (missionIds.length > 0) {
+      await supabaseAdmin.from("help_mission_helpers").delete().in("mission_id", missionIds);
+      await supabaseAdmin.from("help_mission_comments").delete().in("mission_id", missionIds);
+    }
+
     // Tables scoped by session_id
     const sessionScoped = [
       "help_signals",
+      "help_missions",
+      "messages",
       "morning_memos",
       "s2_test_cases",
       "s3_grill_questions",
@@ -365,6 +388,7 @@ export const resetSessionData = createServerFn({ method: "POST" })
       const { error } = await supabaseAdmin.from(t).delete().eq("session_id", sessionId);
       if (error) return { ok: false as const, error: `${t} 초기화 실패: ${error.message}` };
     }
+
 
     // checkpoint_progress: only has user_id — scope via participants in this session
     const { data: participants } = await supabaseAdmin
