@@ -368,7 +368,7 @@ function ParticipantPanel({ session, onClose }: { session: StoredSession; onClos
                 ) : !mine ? (
                   <div className="mb-1 text-xs font-semibold opacity-70">강사</div>
                 ) : null}
-                <div className="whitespace-pre-wrap break-words">{m.body}</div>
+                <MessageBody text={m.body} />
                 <div className="mt-1 flex items-center gap-1 text-[10px] opacity-70">
                   {!isBroadcast && !mine ? null : (
                     <span className="inline-flex items-center gap-0.5">
