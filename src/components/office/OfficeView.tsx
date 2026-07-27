@@ -422,4 +422,57 @@ function SeatedAvatarNode({
   );
 }
 
+function Chair({
+  seat,
+}: {
+  seat: { id: string; x: number; y: number; facing: "up" | "down" | "left" | "right" };
+}) {
+  const distance = 40;
+  let cx = seat.x;
+  let cy = seat.y;
+  let w = 22;
+  let h = 16;
+  switch (seat.facing) {
+    case "up":
+      cy = seat.y + distance;
+      break;
+    case "down":
+      cy = seat.y - distance;
+      break;
+    case "left":
+      cx = seat.x + distance;
+      w = 16;
+      h = 22;
+      break;
+    case "right":
+      cx = seat.x - distance;
+      w = 16;
+      h = 22;
+      break;
+  }
+  return (
+    <g>
+      <rect
+        x={cx - w / 2}
+        y={cy - h / 2}
+        width={w}
+        height={h}
+        rx="5"
+        fill="#334155"
+        stroke="#1e293b"
+        strokeWidth="2"
+      />
+      <rect
+        x={cx - w / 2 + 3}
+        y={cy - h / 2 + 3}
+        width={w - 6}
+        height={h - 6}
+        rx="3"
+        fill="#475569"
+      />
+    </g>
+  );
+}
+
+
 
