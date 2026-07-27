@@ -440,11 +440,27 @@ function SeatedAvatarNode({
           </text>
         </g>
       )}
-      {isPresenting && (
+      {status === "presenting" && (
         <g transform="translate(-26, -22)">
-          <circle r="10" fill="#e11d48" />
+          <rect x="-20" y="-10" width="40" height="20" rx="10" fill="#e11d48" />
           <text y="4" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="800">
-            LIVE
+            발표
+          </text>
+        </g>
+      )}
+      {status === "retro" && (
+        <g transform="translate(-26, -22)">
+          <rect x="-20" y="-10" width="40" height="20" rx="10" fill="#f59e0b" />
+          <text y="4" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="800">
+            회고
+          </text>
+        </g>
+      )}
+      {status === "graduated" && (
+        <g transform="translate(-26, -22)">
+          <rect x="-20" y="-10" width="40" height="20" rx="10" fill="#2F6B4F" />
+          <text y="4" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="800">
+            수료
           </text>
         </g>
       )}
