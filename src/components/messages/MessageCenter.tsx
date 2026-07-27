@@ -635,6 +635,10 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
                 }}
                 className="min-h-[56px] flex-1 resize-none"
               />
+              <ImageAttachButton
+                session={session}
+                onAttached={(url) => setBody((b) => (b.trim() ? `${b}\n![img](${url})` : `![img](${url})`))}
+              />
               <Button
                 onClick={() => sendMut.mutate()}
                 disabled={sendMut.isPending || !body.trim()}
@@ -643,6 +647,7 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
               >
                 {selected === "broadcast" ? <Megaphone className="h-4 w-4" /> : <Send className="h-4 w-4" />}
               </Button>
+
             </div>
           </div>
         </div>
