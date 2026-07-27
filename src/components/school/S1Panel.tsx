@@ -29,6 +29,8 @@ export function S1Panel({
   const queryClient = useQueryClient();
   const fetchState = useServerFn(getMyS1State);
   const toggleFn = useServerFn(toggleCheckpoint);
+  const addCustomFn = useServerFn(addCustomCheckpoint);
+  const deleteCustomFn = useServerFn(deleteCustomCheckpoint);
   const addFn = useServerFn(addMemo);
   const delFn = useServerFn(deleteMemo);
 
