@@ -29,8 +29,9 @@ export const getMyS1State = createServerFn({ method: "POST" })
     const [{ data: checkpoints }, { data: progress }, { data: memos }] = await Promise.all([
       supabaseAdmin
         .from("checkpoints")
-        .select("id, seq, label, hint")
+        .select("id, seq, label, hint, is_custom")
         .eq("stage_no", 1)
+        .or(`user_id.is.null, user_id.eq.${user.id}`)
         .order("seq", { ascending: true }),
       supabaseAdmin
         .from("checkpoint_progress")
