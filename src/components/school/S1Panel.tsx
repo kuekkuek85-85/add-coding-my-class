@@ -156,16 +156,18 @@ export function S1Panel({
         <ul className="flex flex-col gap-2">
           {data.checkpoints.map((cp) => {
             const on = checkedSet.has(cp.id);
+            const isCustom = !!cp.is_custom;
             return (
               <li key={cp.id}>
                 <button
                   type="button"
                   onClick={() => toggleMut.mutate({ checkpointId: cp.id, on: !on })}
                   className={cn(
-                    "group flex w-full items-start gap-3 rounded-xl border-2 p-3 text-left transition-all",
+                    "group relative flex w-full items-start gap-3 rounded-xl border-2 p-3 text-left transition-all",
                     on
                       ? "border-primary/70 bg-primary/5"
                       : "border-border/70 bg-background hover:border-primary/40",
+                    isCustom && "border-accent/60 bg-accent/10",
                   )}
                   aria-pressed={on}
                 >
@@ -193,7 +195,12 @@ export function S1Panel({
                         {cp.seq}
                       </span>
                       {cp.label}
-                      {on && (
+                      {isCustom && (
+                        <span className="rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold text-accent-foreground">
+                          내 질문
+                        </span>
+                      )}
+                      {on && !isCustom && (
                         <span className="ml-auto text-[10px] font-semibold text-primary">
                           초록불
                         </span>
@@ -206,11 +213,62 @@ export function S1Panel({
                       </span>
                     )}
                   </span>
+                  {isCustom && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteCustomMut.mutate(cp.id);
+                      }}
+                      disabled={deleteCustomMut.isPending}
+                      className="ml-2 shrink-0 rounded-full p-1 text-muted-foreground opacity-60 transition-opacity hover:bg-destructive/10 hover:text-destructive hover:opacity-100"
+                      aria-label="질문 삭제"
+                    >
+                      <X className="h-4 w-4" aria-hidden />
+                    </button>
+                  )}
                 </button>
               </li>
             );
           })}
         </ul>
+
+        {/* AI 비판적 사용 질문 추가 */}
+        {!data.checkpoints.some((cp) => cp.is_custom) && (
+          <div className="mt-4 rounded-xl border-2 border-dashed border-accent/50 bg-accent/10 p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" aria-hidden />
+              <h3 className="font-display text-sm font-bold text-foreground">
+                내 AI 비판적 사용 질문 1개 추가
+              </h3>
+            </div>
+            <p className="mb-2 text-xs text-muted-foreground">
+              AI를 쓸 때 스스로 한 번 더 물어볼 질문을 하나 정해 보세요. 사람마다 다를 수
+              있어요.
+            </p>
+            <Input
+              value={customLabel}
+              onChange={(e) => setCustomLabel(e.target.value.slice(0, 100))}
+              placeholder="예: AI가 추천한 기능이 우리 반 학생에게 꼭 필요한가?"
+              className="mb-2 bg-background/80"
+            />
+            <Textarea
+              value={customHint}
+              onChange={(e) => setCustomHint(e.target.value.slice(0, 200))}
+              placeholder="왜 그 질문이 중요한지 짧게 적어도 됩니다. (선택)"
+              rows={2}
+              className="mb-2 min-h-[48px] bg-background/80 text-xs"
+            />
+            <Button
+              size="sm"
+              onClick={() => addCustomMut.mutate()}
+              disabled={!customLabel.trim() || addCustomMut.isPending}
+            >
+              <Plus className="mr-1 h-3.5 w-3.5" aria-hidden />
+              추가
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* 오전 메모 위젯 */}
