@@ -43,6 +43,7 @@ export function SlideDraftEditor({
   const save = useServerFn(saveMySlides);
   const confirm = useServerFn(confirmMySlides);
   const generate = useServerFn(generateSlideDraft);
+  const unlock = useServerFn(unlockMySlides);
 
   const stateKey = ["s6-state", userId];
   const { data: state } = useQuery({
