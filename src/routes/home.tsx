@@ -149,6 +149,7 @@ function ParticipantHome() {
           <div className="flex items-center gap-2">
             <TrafficLight userId={stored.userId} session={stored} />
             <MissionEntryButton session={stored} />
+            <NicknameEditor currentNickname={stored.nickname} userId={stored.userId} />
             <Nametag nickname={stored.nickname} role="participant" />
 
             <Button
