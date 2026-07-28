@@ -249,3 +249,91 @@ function ParticipantHome() {
   );
 }
 
+function NicknameEditor({ currentNickname, userId }: { currentNickname: string; userId: string }) {
+  const rename = useServerFn(renameNickname);
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(currentNickname);
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    const next = value.trim();
+    if (!next || next === currentNickname) {
+      setEditing(false);
+      setValue(currentNickname);
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await rename({ data: { userId, nickname: next } });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      const s = readStoredSession();
+      if (s) writeStoredSession({ ...s, nickname: res.nickname });
+      toast.success("닉네임을 변경했습니다.");
+      setEditing(false);
+      // Refresh so all views re-read the new nickname
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      toast.error("닉네임 변경 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!editing) {
+    return (
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => {
+          setValue(currentNickname);
+          setEditing(true);
+        }}
+        aria-label="닉네임 수정"
+        className="h-9 w-9 p-0"
+        title="닉네임(본명) 수정"
+      >
+        <Pencil className="h-4 w-4" />
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        maxLength={20}
+        className="h-9 w-32 text-sm"
+        placeholder="본명"
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === "Enter") void save();
+          if (e.key === "Escape") {
+            setEditing(false);
+            setValue(currentNickname);
+          }
+        }}
+      />
+      <Button size="sm" variant="ghost" onClick={save} disabled={saving} className="h-9 w-9 p-0" aria-label="저장">
+        <Check className="h-4 w-4" />
+      </Button>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => {
+          setEditing(false);
+          setValue(currentNickname);
+        }}
+        className="h-9 w-9 p-0"
+        aria-label="취소"
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
+  );
+}
+
