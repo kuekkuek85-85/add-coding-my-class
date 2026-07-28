@@ -325,6 +325,38 @@ export const setCurrentSlide = createServerFn({ method: "POST" })
     return { ok: true as const, slideIndex: data.slideIndex };
   });
 
+export const renameNickname = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; nickname: string }) =>
+    z.object({ userId: z.string().uuid(), nickname: nicknameSchema }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: me } = await supabaseAdmin
+      .from("app_users")
+      .select("id, session_id, nickname")
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (!me) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (me.nickname === data.nickname) {
+      return { ok: true as const, nickname: data.nickname };
+    }
+    const { data: dup } = await supabaseAdmin
+      .from("app_users")
+      .select("id")
+      .eq("session_id", me.session_id)
+      .eq("nickname", data.nickname)
+      .maybeSingle();
+    if (dup && dup.id !== me.id) {
+      return { ok: false as const, error: "이미 사용 중인 닉네임입니다." };
+    }
+    const { error } = await supabaseAdmin
+      .from("app_users")
+      .update({ nickname: data.nickname })
+      .eq("id", me.id);
+    if (error) return { ok: false as const, error: "닉네임 변경에 실패했습니다." };
+    return { ok: true as const, nickname: data.nickname };
+  });
+
 export const resetSessionData = createServerFn({ method: "POST" })
   .inputValidator((input: { userId: string }) =>
     z.object({ userId: z.string().uuid() }).parse(input),
