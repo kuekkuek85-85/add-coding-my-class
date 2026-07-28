@@ -2,11 +2,13 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Award } from "lucide-react";
+import { LogOut, Award, Pencil, Check, X } from "lucide-react";
+import { useState } from "react";
 
-import { getSessionSnapshot } from "@/lib/session.functions";
-import { clearStoredSession, useStoredSession } from "@/lib/local-session";
+import { getSessionSnapshot, renameNickname } from "@/lib/session.functions";
+import { clearStoredSession, useStoredSession, writeStoredSession, readStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
+import { Input } from "@/components/ui/input";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
