@@ -2,11 +2,13 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Award } from "lucide-react";
+import { LogOut, Award, Pencil, Check, X } from "lucide-react";
+import { useState } from "react";
 
-import { getSessionSnapshot } from "@/lib/session.functions";
-import { clearStoredSession, useStoredSession } from "@/lib/local-session";
+import { getSessionSnapshot, renameNickname } from "@/lib/session.functions";
+import { clearStoredSession, useStoredSession, writeStoredSession, readStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
+import { Input } from "@/components/ui/input";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { getMyS1State } from "@/lib/s1.functions";
 import { getMyS2State } from "@/lib/s2.functions";
@@ -147,6 +149,7 @@ function ParticipantHome() {
           <div className="flex items-center gap-2">
             <TrafficLight userId={stored.userId} session={stored} />
             <MissionEntryButton session={stored} />
+            <NicknameEditor currentNickname={stored.nickname} userId={stored.userId} />
             <Nametag nickname={stored.nickname} role="participant" />
 
             <Button
@@ -243,6 +246,94 @@ function ParticipantHome() {
       <MissionToastListener session={stored} />
       <DjWidget session={stored} />
     </main>
+  );
+}
+
+function NicknameEditor({ currentNickname, userId }: { currentNickname: string; userId: string }) {
+  const rename = useServerFn(renameNickname);
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(currentNickname);
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    const next = value.trim();
+    if (!next || next === currentNickname) {
+      setEditing(false);
+      setValue(currentNickname);
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await rename({ data: { userId, nickname: next } });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      const s = readStoredSession();
+      if (s) writeStoredSession({ ...s, nickname: res.nickname });
+      toast.success("닉네임을 변경했습니다.");
+      setEditing(false);
+      // Refresh so all views re-read the new nickname
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      toast.error("닉네임 변경 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (!editing) {
+    return (
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => {
+          setValue(currentNickname);
+          setEditing(true);
+        }}
+        aria-label="닉네임 수정"
+        className="h-9 w-9 p-0"
+        title="닉네임(본명) 수정"
+      >
+        <Pencil className="h-4 w-4" />
+      </Button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        maxLength={20}
+        className="h-9 w-32 text-sm"
+        placeholder="본명"
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === "Enter") void save();
+          if (e.key === "Escape") {
+            setEditing(false);
+            setValue(currentNickname);
+          }
+        }}
+      />
+      <Button size="sm" variant="ghost" onClick={save} disabled={saving} className="h-9 w-9 p-0" aria-label="저장">
+        <Check className="h-4 w-4" />
+      </Button>
+      <Button
+        size="sm"
+        variant="ghost"
+        onClick={() => {
+          setEditing(false);
+          setValue(currentNickname);
+        }}
+        className="h-9 w-9 p-0"
+        aria-label="취소"
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
   );
 }
 
