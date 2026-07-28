@@ -236,10 +236,23 @@ export function SlideDraftEditor({
                   : "발표 준비 완료"}
             </Button>
             {locked && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
-                <Lock className="h-3 w-3" aria-hidden />
-                확정된 슬라이드는 편집할 수 없어요
-              </span>
+              <>
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
+                  <Lock className="h-3 w-3" aria-hidden />
+                  확정됨
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => unlockMut.mutate()}
+                  disabled={unlockMut.isPending}
+                  className="gap-1.5"
+                >
+                  <Unlock className="h-4 w-4" aria-hidden />
+                  {unlockMut.isPending ? "해제 중…" : "확정 해제하고 수정"}
+                </Button>
+              </>
             )}
             <span className="ml-auto text-xs text-muted-foreground">
               6장 중 {slides.filter((s) => s.heading.trim() && s.body.trim()).length}장 채움
