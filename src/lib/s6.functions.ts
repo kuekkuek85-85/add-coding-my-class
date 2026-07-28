@@ -308,6 +308,26 @@ export const confirmMySlides = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+// -------- 슬라이드 확정 해제 (재편집) --------
+
+export const unlockMySlides = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string }) => z.object({ userId: uuid }).parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (user.role !== "participant")
+      return { ok: false as const, error: "참가자만 해제할 수 있습니다." };
+
+    const now = new Date().toISOString();
+    const { error } = await supabaseAdmin
+      .from("s6_slide_decks")
+      .update({ confirmed_at: null, updated_at: now })
+      .eq("user_id", user.id);
+    if (error) return { ok: false as const, error: "확정 해제에 실패했습니다." };
+    return { ok: true as const };
+  });
+
 // -------- 슬라이드 AI 초안 --------
 
 const DRAFT_SYSTEM = `너는 교사 연수 "내 수업에 코딩 한 스푼" 참가자의 3분 발표 초안을 6장 만들어 주는 도우미다.

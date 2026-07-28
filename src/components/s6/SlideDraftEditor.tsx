@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Sparkles, Save, Lock, CheckCircle2, Info } from "lucide-react";
+import { Sparkles, Save, Lock, CheckCircle2, Info, Unlock } from "lucide-react";
 
 import {
   getMyS6State,
   saveMySlides,
   confirmMySlides,
+  unlockMySlides,
   generateSlideDraft,
   type Slide,
 } from "@/lib/s6.functions";
@@ -42,6 +43,7 @@ export function SlideDraftEditor({
   const save = useServerFn(saveMySlides);
   const confirm = useServerFn(confirmMySlides);
   const generate = useServerFn(generateSlideDraft);
+  const unlock = useServerFn(unlockMySlides);
 
   const stateKey = ["s6-state", userId];
   const { data: state } = useQuery({
@@ -89,6 +91,15 @@ export function SlideDraftEditor({
     onSuccess: (res) => {
       if (!res.ok) return toast.error(res.error);
       toast.success("AI 초안이 도착했습니다. 반드시 편집·확정 후 발표합니다.");
+      qc.invalidateQueries({ queryKey: stateKey });
+    },
+  });
+
+  const unlockMut = useMutation({
+    mutationFn: () => unlock({ data: { userId } }),
+    onSuccess: (res) => {
+      if (!res.ok) return toast.error(res.error);
+      toast.success("확정을 해제했습니다. 편집 후 다시 확정해 주세요.");
       qc.invalidateQueries({ queryKey: stateKey });
     },
   });
@@ -225,10 +236,23 @@ export function SlideDraftEditor({
                   : "발표 준비 완료"}
             </Button>
             {locked && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
-                <Lock className="h-3 w-3" aria-hidden />
-                확정된 슬라이드는 편집할 수 없어요
-              </span>
+              <>
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs text-primary">
+                  <Lock className="h-3 w-3" aria-hidden />
+                  확정됨
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => unlockMut.mutate()}
+                  disabled={unlockMut.isPending}
+                  className="gap-1.5"
+                >
+                  <Unlock className="h-4 w-4" aria-hidden />
+                  {unlockMut.isPending ? "해제 중…" : "확정 해제하고 수정"}
+                </Button>
+              </>
             )}
             <span className="ml-auto text-xs text-muted-foreground">
               6장 중 {slides.filter((s) => s.heading.trim() && s.body.trim()).length}장 채움
