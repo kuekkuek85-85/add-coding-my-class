@@ -95,6 +95,15 @@ export function SlideDraftEditor({
     },
   });
 
+  const unlockMut = useMutation({
+    mutationFn: () => unlock({ data: { userId } }),
+    onSuccess: (res) => {
+      if (!res.ok) return toast.error(res.error);
+      toast.success("확정을 해제했습니다. 편집 후 다시 확정해 주세요.");
+      qc.invalidateQueries({ queryKey: stateKey });
+    },
+  });
+
   const isComplete = useMemo(
     () =>
       slides.length === 6 &&
