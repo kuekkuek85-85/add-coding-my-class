@@ -92,7 +92,7 @@ function S6Page() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <TrafficLight userId={stored.userId} />
+            <TrafficLight userId={stored.userId} session={stored} />
             <Nametag nickname={stored.nickname} role="participant" />
           </div>
         </div>
