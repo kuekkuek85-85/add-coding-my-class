@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Sparkles, Save, Lock, CheckCircle2, Info } from "lucide-react";
+import { Sparkles, Save, Lock, CheckCircle2, Info, Unlock } from "lucide-react";
 
 import {
   getMyS6State,
   saveMySlides,
   confirmMySlides,
+  unlockMySlides,
   generateSlideDraft,
   type Slide,
 } from "@/lib/s6.functions";
