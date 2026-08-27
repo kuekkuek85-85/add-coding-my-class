@@ -38,7 +38,6 @@ export const Route = createFileRoute("/alumni")({
 
 type Item = {
   key: string;
-  cohort: string;
   displayName: string;
   title: string;
   problem: string;
