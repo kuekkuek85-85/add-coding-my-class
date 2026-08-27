@@ -109,7 +109,7 @@ export function getParticipantSeats(layout: SeatLayout | null | undefined): Seat
   return layout === "classroom" ? CLASSROOM_SEATS : OFFICE_SEATS;
 }
 
-/** 교실형 좌석을 행 단위로 묶어 반환 (1행 → 6행) */
+/** 교실형 좌석을 행 단위로 묶어 반환 (1행 → 5행) */
 export function classroomRows(): Seat[][] {
   return ROW_Y.map((_, r) => CLASSROOM_SEATS.filter((s) => s.id.startsWith(`r${r + 1}c`)));
 }
