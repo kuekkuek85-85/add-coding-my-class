@@ -107,7 +107,7 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       .order("created_at", { ascending: true });
 
     const otherSessions = sessions ?? [];
-    if (otherSessions.length === 0) return { ok: true as const, cohorts: [], items: [] };
+    if (otherSessions.length === 0) return { ok: true as const, subjects: [], items: [] };
 
     const sessionIds = otherSessions.map((s) => s.id);
 
