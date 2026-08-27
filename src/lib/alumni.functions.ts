@@ -210,7 +210,9 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
         // 산출물이 아예 없는 참가자는 갤러리에서 제외
         if (!problem && !dk?.title && !(pr?.context ?? "").trim()) continue;
 
-        const subject = guessSubject([
+        const subject =
+          subjectByUrl(m.deployed_url) ??
+          guessSubject([
           [dk?.title ?? "", 6],
           [prd?.problem ?? "", 3],
           [prd?.users ?? "", 2],
