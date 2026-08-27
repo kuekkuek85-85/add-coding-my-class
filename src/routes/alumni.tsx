@@ -68,17 +68,11 @@ function AlumniPage() {
   });
 
   const items = (data?.ok ? data.items : []) as Item[];
-  const cohorts = data?.ok ? data.cohorts : [];
   const subjects = data?.ok ? (data as { subjects?: string[] }).subjects ?? [] : [];
 
   const filtered = useMemo(
-    () =>
-      items.filter(
-        (i) =>
-          (cohort === "전체" || i.cohort === cohort) &&
-          (subject === "전체" || i.subject === subject),
-      ),
-    [items, cohort, subject],
+    () => items.filter((i) => subject === "전체" || i.subject === subject),
+    [items, subject],
   );
 
   if (!ready) return <div className="min-h-screen" />;
