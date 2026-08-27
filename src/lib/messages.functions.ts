@@ -123,7 +123,7 @@ export const listMyMessages = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const pinned =
-      sess?.participant_code === "SEOKRYU"
+      sess?.participant_code === "SPOON8"
         ? [
             {
               id: "pinned-seokryu",
@@ -191,7 +191,7 @@ export const listSessionBroadcasts = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const pinned =
-      sess?.participant_code === "SEOKRYU"
+      sess?.participant_code === "SPOON8"
         ? [
             {
               id: "pinned-seokryu",

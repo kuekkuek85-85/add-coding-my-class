@@ -73,7 +73,7 @@ function S1Page() {
           currentStage={currentStage}
           showInstructorCase={
             (snap?.ok ? (snap.session as { participant_code?: string }).participant_code : null) ===
-            "SEOKRYU"
+            "SPOON8"
           }
         />
       </section>
