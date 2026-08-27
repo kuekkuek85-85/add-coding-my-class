@@ -183,6 +183,9 @@ function AlumniPage() {
                 <h2 className="font-display text-base font-bold text-foreground">
                   {it.title || "(제목 없음)"}
                 </h2>
+                <span className="inline-flex w-fit rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                  {it.subject}
+                </span>
                 <p className="line-clamp-4 text-xs text-muted-foreground">
                   {it.problem || "PRD 문제 정의가 없습니다."}
                 </p>
