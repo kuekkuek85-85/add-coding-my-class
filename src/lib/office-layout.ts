@@ -88,16 +88,16 @@ export const OFFICE_SEATS: Seat[] = [
 /** 하위 호환 별칭 */
 export const PARTICIPANT_SEATS: Seat[] = OFFICE_SEATS;
 
-/** 교실형 6행 5열 = 30석. 1행이 강사석과 가장 가까운 앞줄. */
-const COLUMN_X = [160, 380, 600, 820, 1040];
-const ROW_Y = [900, 760, 620, 480, 340, 200]; // index 0 = 1행(앞줄)
+/** 교실형 5행 6열 = 30석. 1행이 강사석과 가장 가까운 앞줄. */
+const COLUMN_X = [120, 300, 480, 660, 840, 1020];
+const ROW_Y = [860, 700, 540, 380, 220]; // index 0 = 1행(앞줄)
 
 export const CLASSROOM_SEATS: Seat[] = ROW_Y.flatMap((y, r) =>
   COLUMN_X.map((x, c) => ({
     id: `r${r + 1}c${c + 1}`,
     x,
     y,
-    desk: { x: x - 75, y: y + 26, w: 150, h: 30 },
+    desk: { x: x - 65, y: y + 26, w: 130, h: 30 },
     facing: "down" as const,
     label: `${r + 1}행 ${c + 1}열`,
   })),
@@ -109,7 +109,7 @@ export function getParticipantSeats(layout: SeatLayout | null | undefined): Seat
   return layout === "classroom" ? CLASSROOM_SEATS : OFFICE_SEATS;
 }
 
-/** 교실형 좌석을 행 단위로 묶어 반환 (1행 → 6행) */
+/** 교실형 좌석을 행 단위로 묶어 반환 (1행 → 5행) */
 export function classroomRows(): Seat[][] {
   return ROW_Y.map((_, r) => CLASSROOM_SEATS.filter((s) => s.id.startsWith(`r${r + 1}c`)));
 }
