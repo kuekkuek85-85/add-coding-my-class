@@ -3,14 +3,6 @@ import { z } from "zod";
 
 const uuid = z.string().uuid();
 
-/** '7기 · 장평중 …' → '7기' */
-function cohortLabel(name: string): string {
-  const trimmed = (name ?? "").trim();
-  const m = trimmed.match(/^\s*([^·|\-—]+)/);
-  const head = (m ? m[1] : trimmed).trim();
-  return head.length > 0 ? head : "기수";
-}
-
 function alphaLabel(index: number): string {
   // 0 -> A, 25 -> Z, 26 -> AA
   let n = index;
