@@ -21,6 +21,7 @@ import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as MissionsRouteImport } from './routes/missions'
 import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as HomeRouteImport } from './routes/home'
+import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TermsRoute = TermsRouteImport.update({
@@ -83,6 +84,11 @@ const HomeRoute = HomeRouteImport.update({
   path: '/home',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AlumniRoute = AlumniRouteImport.update({
+  id: '/alumni',
+  path: '/alumni',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -91,6 +97,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/alumni': typeof AlumniRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
   '/missions': typeof MissionsRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/alumni': typeof AlumniRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
   '/missions': typeof MissionsRoute
@@ -122,6 +130,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/alumni': typeof AlumniRoute
   '/home': typeof HomeRoute
   '/instructor': typeof InstructorRoute
   '/missions': typeof MissionsRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/alumni'
     | '/home'
     | '/instructor'
     | '/missions'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/alumni'
     | '/home'
     | '/instructor'
     | '/missions'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/alumni'
     | '/home'
     | '/instructor'
     | '/missions'
@@ -185,6 +197,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AlumniRoute: typeof AlumniRoute
   HomeRoute: typeof HomeRoute
   InstructorRoute: typeof InstructorRoute
   MissionsRoute: typeof MissionsRoute
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/alumni': {
+      id: '/alumni'
+      path: '/alumni'
+      fullPath: '/alumni'
+      preLoaderRoute: typeof AlumniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -297,6 +317,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AlumniRoute: AlumniRoute,
   HomeRoute: HomeRoute,
   InstructorRoute: InstructorRoute,
   MissionsRoute: MissionsRoute,
