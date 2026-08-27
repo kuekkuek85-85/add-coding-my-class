@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ExternalLink, ShieldAlert, Users } from "lucide-react";
 
-import { getAlumniGallery } from "@/lib/alumni.functions";
+import { getAlumniGallery, isAlumniVisible } from "@/lib/alumni.functions";
 import { useStoredSession } from "@/lib/local-session";
 import { Button } from "@/components/ui/button";
 import {
