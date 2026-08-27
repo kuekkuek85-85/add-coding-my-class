@@ -335,7 +335,7 @@ function InstructorHome() {
         <div className="mt-6">
           <StageControls
             currentStage={currentStage}
-            maxStage={STAGES.length}
+            maxStage={(data?.ok ? (data.session as { max_stage?: number }).max_stage : null) ?? STAGES.length}
             busy={stageMutation.isPending}
             onChange={(next) => stageMutation.mutate(next)}
           />
