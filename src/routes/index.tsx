@@ -71,6 +71,8 @@ function LoginPage() {
         sessionId: res.sessionId,
         nickname: res.nickname,
         role: res.role,
+        seatLayout: res.seatLayout,
+        maxStage: res.maxStage,
       });
       toast.success(`${res.role === "instructor" ? "강사" : "참가 교사"}로 입장했습니다`);
       navigate({ to: res.role === "instructor" ? "/instructor" : "/home" });
@@ -85,7 +87,7 @@ function LoginPage() {
   async function onJoinContinue(e: React.FormEvent) {
     e.preventDefault();
     if (!code.trim() || !nickname.trim()) return;
-    const looksInstructor = code.trim().toUpperCase().startsWith("TEACHER");
+    const looksInstructor = code.trim().toUpperCase().includes("TEACH");
     setIsInstructor(looksInstructor);
     // 재입장 감지: 이미 등록된 닉네임이면 아바타·자리 단계 건너뛰기
     setLoading(true);
@@ -203,6 +205,7 @@ function LoginPage() {
               앉을 자리를 선택하세요. 이미 사용 중인 자리는 회색으로 표시됩니다.
             </p>
             <SeatPicker
+              layout={seatData?.ok ? seatData.seatLayout : "office"}
               occupied={occupied}
               selected={seatId}
               onSelect={setSeatId}
