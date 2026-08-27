@@ -119,7 +119,7 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       .order("nickname", { ascending: true });
 
     const memberRows = members ?? [];
-    if (memberRows.length === 0) return { ok: true as const, cohorts: [], items: [] };
+    if (memberRows.length === 0) return { ok: true as const, subjects: [], items: [] };
     const memberIds = memberRows.map((m) => m.id);
 
     const [{ data: prds }, { data: prompts }, { data: revised }, { data: decks }] =
