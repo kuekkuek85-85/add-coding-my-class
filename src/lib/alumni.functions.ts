@@ -149,7 +149,6 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
 
     const items: Array<{
       key: string;
-      cohort: string;
       displayName: string;
       title: string;
       problem: string;
@@ -167,29 +166,39 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       subject: string;
     }> = [];
 
-    const cohortSet: string[] = [];
+    let index = 0;
 
     for (const sess of otherSessions) {
-      const label = cohortLabel(sess.name);
       const inSession = memberRows
         .filter((m) => m.session_id === sess.id)
         .sort((a, b) => (a.nickname ?? "").localeCompare(b.nickname ?? "", "ko"));
       if (inSession.length === 0) continue;
-      if (!cohortSet.includes(label)) cohortSet.push(label);
 
-      inSession.forEach((m, i) => {
+      for (const m of inSession) {
         const prd = prdMap.get(m.id);
         const pr = promptMap.get(m.id);
         const rv = revisedMap.get(m.id);
         const dk = deckMap.get(m.id);
         const problem = (prd?.problem ?? "").trim();
         // 산출물이 아예 없는 참가자는 갤러리에서 제외
-        if (!problem && !dk?.title && !(pr?.context ?? "").trim()) return;
+        if (!problem && !dk?.title && !(pr?.context ?? "").trim()) continue;
+
+        const subject = guessSubject([
+          [dk?.title ?? "", 6],
+          [prd?.problem ?? "", 3],
+          [prd?.users ?? "", 2],
+          [prd?.features ?? "", 2],
+          [prd?.success_metric ?? "", 1],
+          [prd?.out_of_scope ?? "", 1],
+          [pr?.context ?? "", 1],
+          [pr?.task ?? "", 1],
+          [rv?.target ?? "", 1],
+          [rv?.add_list ?? "", 1],
+        ]);
 
         items.push({
-          key: `${sess.id}:${i}`,
-          cohort: label,
-          displayName: `${label}-${alphaLabel(i)}`,
+          key: `${sess.id}:${m.id}`,
+          displayName: `사례 ${alphaLabel(index)}`,
           title: (dk?.title ?? "").slice(0, 120),
           problem: problem.slice(0, 400),
           prd: prd
@@ -208,11 +217,10 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
           ),
           revisedPrompt: [rv?.target, rv?.add_list].filter(Boolean).join("\n\n").slice(0, 4000),
           deployedUrl: (m.deployed_url ?? "").trim() || null,
-          subject: guessSubject(
-            [dk?.title, prd?.problem, prd?.features, pr?.task].filter(Boolean).join(" "),
-          ),
+          subject,
         });
-      });
+        index += 1;
+      }
     }
 
     const subjectSet: string[] = [];
@@ -221,5 +229,5 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
     }
     subjectSet.sort((a, b) => (a === "기타" ? 1 : b === "기타" ? -1 : a.localeCompare(b, "ko")));
 
-    return { ok: true as const, cohorts: cohortSet, subjects: subjectSet, items };
+    return { ok: true as const, subjects: subjectSet, items };
   });
