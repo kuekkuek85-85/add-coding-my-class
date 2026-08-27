@@ -220,12 +220,14 @@ function ParticipantHome() {
             게이트를 통과하면 다음 교시가 열립니다. 순서대로 하나씩.
           </p>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/alumni">
-              <Users className="mr-1 h-3.5 w-3.5" aria-hidden />
-              선배 사례 갤러리
-            </Link>
-          </Button>
+          {alumniVisible && (
+            <Button asChild variant="outline" size="sm">
+              <Link to="/alumni">
+                <Users className="mr-1 h-3.5 w-3.5" aria-hidden />
+                선배 사례 갤러리
+              </Link>
+            </Button>
+          )}
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {visibleStages.map((s) => (
