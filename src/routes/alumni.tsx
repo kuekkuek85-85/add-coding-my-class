@@ -56,26 +56,35 @@ type Item = {
 };
 
 function AlumniPage() {
+  const navigate = useNavigate();
   const { ready, session: stored } = useStoredSession();
   const fetchFn = useServerFn(getAlumniGallery);
+  const checkVisible = useServerFn(isAlumniVisible);
   const [subject, setSubject] = useState<string>("전체");
   const [detail, setDetail] = useState<Item | null>(null);
+
+  const { data: visibleData } = useQuery({
+    queryKey: ["alumni-visible", stored?.userId],
+    queryFn: () => checkVisible({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+  });
+  const visible = visibleData?.ok ? visibleData.visible : undefined;
 
   const { data, isLoading } = useQuery({
     queryKey: ["alumni-gallery", stored?.userId],
     queryFn: () => fetchFn({ data: { userId: stored!.userId } }),
-    enabled: !!stored?.userId,
+    enabled: !!stored?.userId && visible === true,
   });
 
-  const items = (data?.ok ? data.items : []) as Item[];
-  const subjects = data?.ok ? (data as { subjects?: string[] }).subjects ?? [] : [];
+  useEffect(() => {
+    if (!ready || visible === undefined) return;
+    if (!visible) {
+      const to = stored?.role === "instructor" ? "/instructor" : "/home";
+      navigate({ to });
+    }
+  }, [ready, visible, stored?.role, navigate]);
 
-  const filtered = useMemo(
-    () => items.filter((i) => subject === "전체" || i.subject === subject),
-    [items, subject],
-  );
-
-  if (!ready) return <div className="min-h-screen" />;
+  if (!ready || visible === undefined) return <div className="min-h-screen" />;
 
   const homeTo = stored?.role === "instructor" ? "/instructor" : "/home";
 
