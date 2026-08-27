@@ -16,6 +16,7 @@ import { clearStoredSession, useStoredSession } from "@/lib/local-session";
 import { Nametag } from "@/components/school/Nametag";
 import { STAGES, TimetableCard, type StageStatus } from "@/components/school/TimetableCard";
 import { StageControls } from "@/components/school/StageControls";
+import { setMaxStage } from "@/lib/session.functions";
 import { ParticipantGrid } from "@/components/school/ParticipantGrid";
 import { OfficeView } from "@/components/office/OfficeView";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -143,6 +144,21 @@ function InstructorHome() {
       queryClient.invalidateQueries({ queryKey: snapshotKey });
     },
     onError: () => toast.error("스테이지 변경에 실패했습니다."),
+  });
+
+  const setMaxStageFn = useServerFn(setMaxStage);
+  const maxStageMutation = useMutation({
+    mutationFn: (value: number) =>
+      setMaxStageFn({ data: { userId: stored!.userId, maxStage: value } }),
+    onSuccess: (res) => {
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(`오늘은 ${res.maxStage}교시까지 운영합니다.`);
+      queryClient.invalidateQueries({ queryKey: snapshotKey });
+    },
+    onError: () => toast.error("운영 범위 변경에 실패했습니다."),
   });
 
   const resetFn = useServerFn(resetSessionData);
@@ -339,6 +355,24 @@ function InstructorHome() {
             busy={stageMutation.isPending}
             onChange={(next) => stageMutation.mutate(next)}
           />
+          <div className="mt-2 flex flex-wrap items-center gap-2 rounded-2xl border-2 border-border/60 bg-card p-3 text-sm">
+            <span className="font-semibold text-foreground">오늘 운영 범위</span>
+            <select
+              className="rounded-lg border-2 border-border bg-background px-2 py-1 text-sm"
+              value={(data?.ok ? (data.session as { max_stage?: number }).max_stage : null) ?? STAGES.length}
+              disabled={maxStageMutation.isPending}
+              onChange={(e) => maxStageMutation.mutate(Number(e.target.value))}
+            >
+              {STAGES.map((s) => (
+                <option key={s.no} value={s.no}>
+                  {s.no}교시까지
+                </option>
+              ))}
+            </select>
+            <span className="text-xs text-muted-foreground">
+              참가자 시간표에는 이 범위까지만 보입니다.
+            </span>
+          </div>
         </div>
 
         {/* 강의 슬라이드 */}
