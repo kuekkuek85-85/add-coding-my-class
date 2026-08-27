@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Award, Pencil, Check, X } from "lucide-react";
+import { LogOut, Award, Pencil, Check, X, Users } from "lucide-react";
 import { useState } from "react";
 
 import { getSessionSnapshot, renameNickname } from "@/lib/session.functions";
