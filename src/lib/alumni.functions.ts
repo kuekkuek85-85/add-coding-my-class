@@ -183,5 +183,11 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       });
     }
 
-    return { ok: true as const, cohorts: cohortSet, items };
+    const subjectSet: string[] = [];
+    for (const it of items) {
+      if (!subjectSet.includes(it.subject)) subjectSet.push(it.subject);
+    }
+    subjectSet.sort((a, b) => (a === "기타" ? 1 : b === "기타" ? -1 : a.localeCompare(b, "ko")));
+
+    return { ok: true as const, cohorts: cohortSet, subjects: subjectSet, items };
   });
