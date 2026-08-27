@@ -176,6 +176,9 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
           ),
           revisedPrompt: [rv?.target, rv?.add_list].filter(Boolean).join("\n\n").slice(0, 4000),
           deployedUrl: (m.deployed_url ?? "").trim() || null,
+          subject: guessSubject(
+            [dk?.title, prd?.problem, prd?.features, pr?.task].filter(Boolean).join(" "),
+          ),
         });
       });
     }
