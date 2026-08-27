@@ -40,6 +40,7 @@ function ParticipantHome() {
   const fetchS4 = useServerFn(getMyS4State);
   const fetchS6 = useServerFn(getMyS6State);
   const fetchCompletion = useServerFn(getMyCompletion);
+  const fetchAlumniVisible = useServerFn(isAlumniVisible);
 
   const { data } = useQuery({
     queryKey: ["snapshot", stored?.userId],
