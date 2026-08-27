@@ -58,7 +58,6 @@ type Item = {
 function AlumniPage() {
   const { ready, session: stored } = useStoredSession();
   const fetchFn = useServerFn(getAlumniGallery);
-  const [cohort, setCohort] = useState<string>("전체");
   const [subject, setSubject] = useState<string>("전체");
   const [detail, setDetail] = useState<Item | null>(null);
 
