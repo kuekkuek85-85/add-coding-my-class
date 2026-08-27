@@ -116,7 +116,24 @@ export const listMyMessages = createServerFn({ method: "POST" })
       .order("created_at", { ascending: true })
       .limit(200);
 
-    return { ok: true as const, messages: rows ?? [] };
+    const { data: sess } = await supabaseAdmin
+      .from("sessions")
+      .select("participant_code")
+      .eq("id", user.session_id)
+      .maybeSingle();
+
+    const pinned =
+      sess?.participant_code === "SEOKRYU"
+        ? [
+            {
+              id: "pinned-seokryu",
+              body: "오늘은 아이디어와 성공 조건까지. 구현은 다음 주에 합니다.",
+              created_at: new Date(0).toISOString(),
+            },
+          ]
+        : [];
+
+    return { ok: true as const, messages: [...pinned, ...(rows ?? [])] };
   });
 
 /** 강사용: 세션 내 모든 참가자 스레드 + 브로드캐스트 */
@@ -167,7 +184,24 @@ export const listSessionBroadcasts = createServerFn({ method: "POST" })
       .eq("kind", "broadcast")
       .order("created_at", { ascending: false })
       .limit(30);
-    return { ok: true as const, messages: rows ?? [] };
+    const { data: sess } = await supabaseAdmin
+      .from("sessions")
+      .select("participant_code")
+      .eq("id", user.session_id)
+      .maybeSingle();
+
+    const pinned =
+      sess?.participant_code === "SEOKRYU"
+        ? [
+            {
+              id: "pinned-seokryu",
+              body: "오늘은 아이디어와 성공 조건까지. 구현은 다음 주에 합니다.",
+              created_at: new Date(0).toISOString(),
+            },
+          ]
+        : [];
+
+    return { ok: true as const, messages: [...pinned, ...(rows ?? [])] };
   });
 
 /** 안읽음 마킹 */

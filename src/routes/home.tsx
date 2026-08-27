@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, Award, Pencil, Check, X } from "lucide-react";
+import { LogOut, Award, Pencil, Check, X, Users } from "lucide-react";
 import { useState } from "react";
 
 import { getSessionSnapshot, renameNickname } from "@/lib/session.functions";
@@ -92,6 +92,9 @@ function ParticipantHome() {
 
   const currentStage = data?.ok ? data.session.current_stage : 1;
   const currentSlideIndex = data?.ok ? data.session.current_slide_index : null;
+  const maxStage =
+    (data?.ok ? (data.session as { max_stage?: number }).max_stage : null) ?? STAGES.length;
+  const visibleStages = STAGES.filter((s) => s.no <= maxStage);
   const s2Passed = s2?.ok ? s2.passed : false;
   const s4Confirmed = s4?.ok ? s4.confirmed : false;
   void s6;
@@ -201,14 +204,22 @@ function ParticipantHome() {
 
 
 
-        <div className="mb-4">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
           <h1 className="font-display text-2xl font-bold text-foreground">오늘의 시간표</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             게이트를 통과하면 다음 교시가 열립니다. 순서대로 하나씩.
           </p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/alumni">
+              <Users className="mr-1 h-3.5 w-3.5" aria-hidden />
+              선배 사례 갤러리
+            </Link>
+          </Button>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {STAGES.map((s) => (
+          {visibleStages.map((s) => (
             <TimetableCard
               key={s.code}
               stage={s}

@@ -8,7 +8,10 @@ export type StoredSession = {
   sessionId: string;
   nickname: string;
   role: "participant" | "instructor";
+  seatLayout?: "office" | "classroom";
+  maxStage?: number;
 };
+
 
 export function readStoredSession(): StoredSession | null {
   if (typeof window === "undefined") return null;

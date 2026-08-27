@@ -1,4 +1,10 @@
-import { PARTICIPANT_SEATS, INSTRUCTOR_SEAT, FRONT_MONITOR, OFFICE_VIEWBOX } from "@/lib/office-layout";
+import {
+  getParticipantSeats,
+  INSTRUCTOR_SEAT,
+  FRONT_MONITOR,
+  OFFICE_VIEWBOX,
+  type SeatLayout,
+} from "@/lib/office-layout";
 import { OfficeBackdrop } from "./OfficeBackdrop";
 
 /**
@@ -9,12 +15,16 @@ export function SeatPicker({
   selected,
   onSelect,
   myNickname,
+  layout = "office",
 }: {
   occupied: Map<string, string>; // seatId -> nickname
   selected: string | null;
   onSelect: (seatId: string) => void;
   myNickname: string;
+  layout?: SeatLayout;
 }) {
+  const seats = getParticipantSeats(layout);
+  const classroom = layout === "classroom";
   return (
     <div className="w-full overflow-hidden rounded-2xl border-2 border-primary/20 bg-card shadow-sm">
       <svg
@@ -23,8 +33,9 @@ export function SeatPicker({
         role="img"
         aria-label="좌석 배치도"
       >
-        <OfficeBackdrop />
+        <OfficeBackdrop variant={layout} />
         {/* Instructor desk / monitor label */}
+        {!classroom && <>
         <rect
           x={FRONT_MONITOR.x}
           y={FRONT_MONITOR.y}
@@ -42,8 +53,9 @@ export function SeatPicker({
         >
           모니터 (강사석)
         </text>
+        </>}
         <SeatDot seat={INSTRUCTOR_SEAT} fill="#94a3b8" label="강사석" disabled />
-        {PARTICIPANT_SEATS.map((seat) => {
+        {seats.map((seat) => {
           const holder = occupied.get(seat.id);
           const mine = holder && holder === myNickname;
           const taken = !!holder && !mine;

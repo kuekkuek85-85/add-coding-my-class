@@ -13,7 +13,7 @@ import { getSessionS6Overview } from "@/lib/s6.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
 import { getSessionRetrospectives } from "@/lib/s7.functions";
 import {
-  PARTICIPANT_SEATS,
+  getParticipantSeats,
   INSTRUCTOR_SEAT,
   FRONT_MONITOR,
   OFFICE_VIEWBOX,
@@ -115,6 +115,9 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const participants = members.filter((m) => m.role === "participant");
   const instructor = members.find((m) => m.role === "instructor");
   const currentStage = snap?.ok ? snap.session.current_stage : 1;
+  const seatLayout = (snap?.ok ? (snap.session as { seat_layout?: string }).seat_layout : null) === "classroom"
+    ? "classroom"
+    : "office";
 
   const s1Map = new Map((s1?.ok ? s1.progress : []).map((p) => [p.userId, p]));
   const s2Map = new Map((s2?.ok ? s2.progress : []).map((p) => [p.userId, p]));
@@ -163,9 +166,9 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
               <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.25" />
             </filter>
           </defs>
-          <OfficeBackdrop />
+          <OfficeBackdrop variant={seatLayout} />
           {/* Desks and chairs (draw once per group) */}
-          {[...PARTICIPANT_SEATS, INSTRUCTOR_SEAT].map((s) =>
+          {[...getParticipantSeats(seatLayout), INSTRUCTOR_SEAT].map((s) =>
             s.desk ? (
               <g key={s.id + "-deskgroup"}>
                 {/* Desk top */}
@@ -198,6 +201,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
             ) : null,
           )}
           {/* Front monitor */}
+          {seatLayout !== "classroom" && (<>
           <rect
             x={FRONT_MONITOR.x}
             y={FRONT_MONITOR.y}
@@ -215,6 +219,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
           >
             모니터
           </text>
+          </>)}
 
           {/* Instructor */}
           {instructor && (
