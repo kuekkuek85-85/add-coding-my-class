@@ -98,6 +98,16 @@ function AlumniPage() {
       </header>
 
       <section className="mx-auto max-w-5xl px-4 py-5">
+        <a
+          href="https://padlet.com/jangpyungms3/padlet-a63xkdomobt223lf"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="mb-4 flex items-center gap-2 rounded-2xl border-2 border-primary/30 bg-primary/5 p-3 text-sm text-primary transition-colors hover:bg-primary/10"
+        >
+          <ExternalLink className="h-4 w-4 shrink-0" aria-hidden />
+          <span className="font-semibold">전체 참고: 패들렛 사례 모음</span>
+        </a>
+
         <div className="mb-4 flex items-start gap-2 rounded-2xl border-2 border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
           <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <p>
