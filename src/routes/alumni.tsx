@@ -84,17 +84,25 @@ function AlumniPage() {
     }
   }, [ready, visible, stored?.role, navigate]);
 
-  if (!ready || visible === undefined) return <div className="min-h-screen" />;
-
-  const homeTo = stored?.role === "instructor" ? "/instructor" : "/home";
-
-  const items = (data?.ok ? data.items : []) as Item[];
-  const subjects = data?.ok ? (data as { subjects?: string[] }).subjects ?? [] : [];
-
+  // 훅은 항상 조기 return보다 위에서 호출되어야 합니다.
+  const items = useMemo(
+    () => ((data?.ok ? data.items : []) as Item[]),
+    [data],
+  );
+  const subjects = useMemo(
+    () => (data?.ok ? ((data as { subjects?: string[] }).subjects ?? []) : []),
+    [data],
+  );
   const filtered = useMemo(
     () => items.filter((i) => subject === "전체" || i.subject === subject),
     [items, subject],
   );
+
+  if (!ready || visible === undefined) return <div className="min-h-screen" />;
+
+  const homeTo = stored?.role === "instructor" ? "/instructor" : "/home";
+
+
 
 
   return (
