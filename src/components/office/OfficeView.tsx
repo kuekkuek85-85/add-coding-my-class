@@ -13,7 +13,7 @@ import { getSessionS6Overview } from "@/lib/s6.functions";
 import { listSessionHelpSignals } from "@/lib/help.functions";
 import { getSessionRetrospectives } from "@/lib/s7.functions";
 import {
-  PARTICIPANT_SEATS,
+  getParticipantSeats,
   INSTRUCTOR_SEAT,
   FRONT_MONITOR,
   OFFICE_VIEWBOX,
@@ -163,9 +163,9 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
               <feDropShadow dx="2" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.25" />
             </filter>
           </defs>
-          <OfficeBackdrop />
+          <OfficeBackdrop variant={seatLayout} />
           {/* Desks and chairs (draw once per group) */}
-          {[...PARTICIPANT_SEATS, INSTRUCTOR_SEAT].map((s) =>
+          {[...getParticipantSeats(seatLayout), INSTRUCTOR_SEAT].map((s) =>
             s.desk ? (
               <g key={s.id + "-deskgroup"}>
                 {/* Desk top */}
