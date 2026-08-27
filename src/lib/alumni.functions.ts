@@ -222,8 +222,8 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
           [pr?.context ?? "", 1],
           [pr?.task ?? "", 1],
           [rv?.target ?? "", 1],
-          [rv?.add_list ?? "", 1],
-        ]);
+            [rv?.add_list ?? "", 1],
+          ]);
 
         items.push({
           key: `${sess.id}:${m.id}`,
