@@ -201,6 +201,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
             ) : null,
           )}
           {/* Front monitor */}
+          {seatLayout !== "classroom" && (<>
           <rect
             x={FRONT_MONITOR.x}
             y={FRONT_MONITOR.y}
@@ -218,6 +219,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
           >
             모니터
           </text>
+          </>)}
 
           {/* Instructor */}
           {instructor && (
