@@ -115,6 +115,9 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const participants = members.filter((m) => m.role === "participant");
   const instructor = members.find((m) => m.role === "instructor");
   const currentStage = snap?.ok ? snap.session.current_stage : 1;
+  const seatLayout = (snap?.ok ? (snap.session as { seat_layout?: string }).seat_layout : null) === "classroom"
+    ? "classroom"
+    : "office";
 
   const s1Map = new Map((s1?.ok ? s1.progress : []).map((p) => [p.userId, p]));
   const s2Map = new Map((s2?.ok ? s2.progress : []).map((p) => [p.userId, p]));
