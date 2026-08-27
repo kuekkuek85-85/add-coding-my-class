@@ -15,6 +15,7 @@ import { getMyS2State } from "@/lib/s2.functions";
 import { getMyS4State } from "@/lib/s4.functions";
 import { getMyS6State } from "@/lib/s6.functions";
 import { getMyCompletion } from "@/lib/s7.functions";
+import { isAlumniVisible } from "@/lib/alumni.functions";
 import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
 import { TrafficLight } from "@/components/school/TrafficLight";
 import { MorningStamp } from "@/components/school/MorningStamp";
