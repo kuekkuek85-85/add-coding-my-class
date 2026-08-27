@@ -53,12 +53,14 @@ type Item = {
   firstPrompt: string;
   revisedPrompt: string;
   deployedUrl: string | null;
+  subject: string;
 };
 
 function AlumniPage() {
   const { ready, session: stored } = useStoredSession();
   const fetchFn = useServerFn(getAlumniGallery);
   const [cohort, setCohort] = useState<string>("전체");
+  const [subject, setSubject] = useState<string>("전체");
   const [detail, setDetail] = useState<Item | null>(null);
 
   const { data, isLoading } = useQuery({
@@ -69,10 +71,16 @@ function AlumniPage() {
 
   const items = (data?.ok ? data.items : []) as Item[];
   const cohorts = data?.ok ? data.cohorts : [];
+  const subjects = data?.ok ? (data as { subjects?: string[] }).subjects ?? [] : [];
 
   const filtered = useMemo(
-    () => (cohort === "전체" ? items : items.filter((i) => i.cohort === cohort)),
-    [items, cohort],
+    () =>
+      items.filter(
+        (i) =>
+          (cohort === "전체" || i.cohort === cohort) &&
+          (subject === "전체" || i.subject === subject),
+      ),
+    [items, cohort, subject],
   );
 
   if (!ready) return <div className="min-h-screen" />;
@@ -107,7 +115,8 @@ function AlumniPage() {
         </div>
 
         {cohorts.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-muted-foreground">기수</span>
             {["전체", ...cohorts].map((c) => (
               <button
                 key={c}
@@ -121,6 +130,27 @@ function AlumniPage() {
                 )}
               >
                 {c}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {subjects.length > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-muted-foreground">교과</span>
+            {["전체", ...subjects].map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSubject(s)}
+                className={cn(
+                  "rounded-full border-2 px-3 py-1 text-xs font-semibold transition-colors",
+                  subject === s
+                    ? "border-amber-500 bg-amber-500 text-white"
+                    : "border-border/70 bg-card text-muted-foreground hover:border-amber-400",
+                )}
+              >
+                {s}
               </button>
             ))}
           </div>
@@ -153,6 +183,9 @@ function AlumniPage() {
                 <h2 className="font-display text-base font-bold text-foreground">
                   {it.title || "(제목 없음)"}
                 </h2>
+                <span className="inline-flex w-fit rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">
+                  {it.subject}
+                </span>
                 <p className="line-clamp-4 text-xs text-muted-foreground">
                   {it.problem || "PRD 문제 정의가 없습니다."}
                 </p>

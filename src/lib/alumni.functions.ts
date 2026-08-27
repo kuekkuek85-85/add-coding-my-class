@@ -31,6 +31,27 @@ function firstMeaningfulLine(text: string): string {
   ).trim();
 }
 
+/** 제목·문제·기능 텍스트에서 교과를 키워드로 추정한다. */
+function guessSubject(text: string): string {
+  const t = (text ?? "").toLowerCase();
+  const rules: Array<[string, RegExp]> = [
+    ["국어", /국어|독서|글쓰기|문학|시\b|소설|맞춤법|어휘|토론|토의/],
+    ["영어", /영어|english|회화|알파벳|파닉스/],
+    ["수학", /수학|분수|소수|도형|확률|통계|함수|방정식|계산|측정|규칙성/],
+    ["과학", /과학|실험|관찰|식물|동물|지구|우주|전기|자석|화산|날씨|물질|생물/],
+    ["사회", /사회|역사|지리|지도|경제|민주|세시|풍습|문화재|고장/],
+    ["도덕", /도덕|인성|배려|규칙|약속|정직|생명/],
+    ["체육", /체육|운동|줄넘기|축구|농구|피구|체력|스포츠|달리기/],
+    ["음악", /음악|리듬|가창|악기|노래|음표|합주/],
+    ["미술", /미술|그림|디자인|조소|판화|만들기|공예|색채/],
+    ["정보", /정보|코딩|프로그래밍|알고리즘|로봇|ai\b|인공지능|엔트리|스크래치/],
+    ["실과", /실과|요리|바느질|목공|재배|텃밭|실생활/],
+    ["창체·학급", /학급|자치|창체|동아리|봉사|진로|학급회의|학급 경영|출석|자리 배치|좌석/],
+  ];
+  for (const [label, re] of rules) if (re.test(t)) return label;
+  return "기타";
+}
+
 /**
  * 다른 기수(선배)의 산출물을 익명화해서 반환한다.
  * 원본 닉네임은 절대 클라이언트로 보내지 않는다. 읽기 전용.
@@ -111,6 +132,7 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       firstPrompt: string;
       revisedPrompt: string;
       deployedUrl: string | null;
+      subject: string;
     }> = [];
 
     const cohortSet: string[] = [];
@@ -154,9 +176,18 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
           ),
           revisedPrompt: [rv?.target, rv?.add_list].filter(Boolean).join("\n\n").slice(0, 4000),
           deployedUrl: (m.deployed_url ?? "").trim() || null,
+          subject: guessSubject(
+            [dk?.title, prd?.problem, prd?.features, pr?.task].filter(Boolean).join(" "),
+          ),
         });
       });
     }
 
-    return { ok: true as const, cohorts: cohortSet, items };
+    const subjectSet: string[] = [];
+    for (const it of items) {
+      if (!subjectSet.includes(it.subject)) subjectSet.push(it.subject);
+    }
+    subjectSet.sort((a, b) => (a === "기타" ? 1 : b === "기타" ? -1 : a.localeCompare(b, "ko")));
+
+    return { ok: true as const, cohorts: cohortSet, subjects: subjectSet, items };
   });
