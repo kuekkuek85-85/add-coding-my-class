@@ -57,7 +57,7 @@ export const enterSession = createServerFn({ method: "POST" })
     // Try participant code first
     const { data: byParticipant } = await supabaseAdmin
       .from("sessions")
-      .select("id, name, participant_code, instructor_code")
+      .select("id, name, participant_code, instructor_code, seat_layout, max_stage")
       .eq("participant_code", data.code)
       .maybeSingle();
 
@@ -67,7 +67,7 @@ export const enterSession = createServerFn({ method: "POST" })
     if (!sessionRow) {
       const { data: byInstructor } = await supabaseAdmin
         .from("sessions")
-        .select("id, name, participant_code, instructor_code")
+        .select("id, name, participant_code, instructor_code, seat_layout, max_stage")
         .eq("instructor_code", data.code)
         .maybeSingle();
       if (byInstructor) {
@@ -136,6 +136,8 @@ export const enterSession = createServerFn({ method: "POST" })
         sessionName: sessionRow.name,
         role,
         nickname: data.nickname,
+        seatLayout: (sessionRow.seat_layout ?? "office") as "office" | "classroom",
+        maxStage: sessionRow.max_stage ?? 7,
       };
     }
 
@@ -163,6 +165,8 @@ export const enterSession = createServerFn({ method: "POST" })
       sessionName: sessionRow.name,
       role,
       nickname: data.nickname,
+      seatLayout: (sessionRow.seat_layout ?? "office") as "office" | "classroom",
+      maxStage: sessionRow.max_stage ?? 7,
     };
   });
 
@@ -181,7 +185,7 @@ export const getSessionSnapshot = createServerFn({ method: "POST" })
 
     const { data: session } = await supabaseAdmin
       .from("sessions")
-      .select("id, name, participant_code, instructor_code, current_stage, current_slide_index")
+      .select("id, name, participant_code, instructor_code, current_stage, current_slide_index, max_stage, seat_layout")
       .eq("id", user.session_id)
       .single();
 
@@ -212,7 +216,7 @@ export const getOccupiedSeats = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: sess } = await supabaseAdmin
       .from("sessions")
-      .select("id")
+      .select("id, seat_layout")
       .or(`participant_code.eq.${data.code},instructor_code.eq.${data.code}`)
       .maybeSingle();
     if (!sess) return { ok: false as const, error: "코드 없음" };
@@ -223,6 +227,7 @@ export const getOccupiedSeats = createServerFn({ method: "POST" })
       .not("seat_id", "is", null);
     return {
       ok: true as const,
+      seatLayout: (sess.seat_layout ?? "office") as "office" | "classroom",
       seats: (rows ?? []).map((r) => ({
         seatId: r.seat_id as string,
         nickname: (r.nickname ?? "") as string,
@@ -264,7 +269,7 @@ export const setCurrentStage = createServerFn({ method: "POST" })
     z
       .object({
         userId: z.string().uuid(),
-        stageNo: z.number().int().min(1).max(6),
+        stageNo: z.number().int().min(1).max(7),
       })
       .parse(input),
   )
@@ -283,6 +288,19 @@ export const setCurrentStage = createServerFn({ method: "POST" })
     }
     if (caller.role !== "instructor") {
       return { ok: false as const, error: "강사만 스테이지를 열 수 있습니다." };
+    }
+
+    const { data: sess } = await supabaseAdmin
+      .from("sessions")
+      .select("max_stage")
+      .eq("id", caller.session_id)
+      .maybeSingle();
+    const maxStage = sess?.max_stage ?? 7;
+    if (data.stageNo > maxStage) {
+      return {
+        ok: false as const,
+        error: `이 기수는 S${maxStage}까지 운영합니다.`,
+      };
     }
 
     const { error } = await supabaseAdmin
