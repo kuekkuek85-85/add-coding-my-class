@@ -53,6 +53,7 @@ type Item = {
   firstPrompt: string;
   revisedPrompt: string;
   deployedUrl: string | null;
+  subject: string;
 };
 
 function AlumniPage() {
