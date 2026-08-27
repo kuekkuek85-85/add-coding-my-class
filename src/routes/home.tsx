@@ -84,6 +84,13 @@ function ParticipantHome() {
     refetchInterval: 20_000,
   });
 
+  const { data: alumni } = useQuery({
+    queryKey: ["alumni-visible", stored?.userId],
+    queryFn: () => fetchAlumniVisible({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+  });
+  const alumniVisible = alumni?.ok ? alumni.visible : false;
+
   if (!ready || !stored) return <div className="min-h-screen" />;
 
   if (data && !data.ok) {
