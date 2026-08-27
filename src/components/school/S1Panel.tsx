@@ -22,9 +22,11 @@ const MEMO_MAX = 280;
 export function S1Panel({
   userId,
   currentStage,
+  showInstructorCase = false,
 }: {
   userId: string;
   currentStage: number;
+  showInstructorCase?: boolean;
 }) {
   const queryClient = useQueryClient();
   const fetchState = useServerFn(getMyS1State);
@@ -305,7 +307,7 @@ export function S1Panel({
             <Textarea
               value={memo}
               onChange={(e) => setMemo(e.target.value.slice(0, MEMO_MAX))}
-              placeholder="예: 우리 반 아이들에게는 응답이 3문장을 넘으면 안 읽을 것 같다."
+              placeholder="예: 국어 수업에서 글쓰기 피드백을 위해 문장을 다듬어 주는 도구 — “○○ 수업에서 △△를 위해 □□하는 도구”"
               className="min-h-[84px] bg-background/80"
               maxLength={MEMO_MAX}
             />

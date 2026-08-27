@@ -68,7 +68,14 @@ function S1Page() {
       </header>
 
       <section className="mx-auto max-w-4xl px-4 py-5">
-        <S1Panel userId={stored.userId} currentStage={currentStage} />
+        <S1Panel
+          userId={stored.userId}
+          currentStage={currentStage}
+          showInstructorCase={
+            (snap?.ok ? (snap.session as { participant_code?: string }).participant_code : null) ===
+            "SEOKRYU"
+          }
+        />
       </section>
     <MessageCenter session={stored} />
     </main>
