@@ -139,8 +139,28 @@ export function S1Panel({
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      {showInstructorCase && (
+        <div className="rounded-2xl border-2 border-accent bg-accent/10 p-5 shadow-sm lg:col-span-3">
+          <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">강사 사례</p>
+          <h2 className="font-display text-lg font-bold text-foreground">정보 수업 포털</h2>
+          <a
+            href="https://github.com/kuekkuek85-85/info-class-portal"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="mt-1 inline-block break-all text-sm font-semibold text-primary underline underline-offset-2"
+          >
+            https://github.com/kuekkuek85-85/info-class-portal
+          </a>
+          <ul className="mt-3 space-y-1 text-sm text-foreground/90">
+            <li>· 이 도구는 교사의 어떤 반복 노동을 없앴는가?</li>
+            <li>· 학생이 이 도구 앞에서 실제로 하는 행동은 무엇인가?</li>
+            <li>· 이 도구가 없을 때 수업은 어떻게 굴러갔는가?</li>
+          </ul>
+        </div>
+      )}
       {/* 체크포인트 */}
       <div className="rounded-2xl border-2 border-primary/25 bg-card p-5 shadow-sm lg:col-span-2">
+
         <div className="mb-4 flex items-baseline justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">
