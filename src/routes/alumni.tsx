@@ -38,7 +38,6 @@ export const Route = createFileRoute("/alumni")({
 
 type Item = {
   key: string;
-  cohort: string;
   displayName: string;
   title: string;
   problem: string;
@@ -59,7 +58,6 @@ type Item = {
 function AlumniPage() {
   const { ready, session: stored } = useStoredSession();
   const fetchFn = useServerFn(getAlumniGallery);
-  const [cohort, setCohort] = useState<string>("전체");
   const [subject, setSubject] = useState<string>("전체");
   const [detail, setDetail] = useState<Item | null>(null);
 
@@ -70,17 +68,11 @@ function AlumniPage() {
   });
 
   const items = (data?.ok ? data.items : []) as Item[];
-  const cohorts = data?.ok ? data.cohorts : [];
   const subjects = data?.ok ? (data as { subjects?: string[] }).subjects ?? [] : [];
 
   const filtered = useMemo(
-    () =>
-      items.filter(
-        (i) =>
-          (cohort === "전체" || i.cohort === cohort) &&
-          (subject === "전체" || i.subject === subject),
-      ),
-    [items, cohort, subject],
+    () => items.filter((i) => subject === "전체" || i.subject === subject),
+    [items, subject],
   );
 
   if (!ready) return <div className="min-h-screen" />;
@@ -114,26 +106,6 @@ function AlumniPage() {
           </p>
         </div>
 
-        {cohorts.length > 0 && (
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-muted-foreground">기수</span>
-            {["전체", ...cohorts].map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCohort(c)}
-                className={cn(
-                  "rounded-full border-2 px-3 py-1 text-xs font-semibold transition-colors",
-                  cohort === c
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border/70 bg-card text-muted-foreground hover:border-primary/40",
-                )}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
 
         {subjects.length > 0 && (
           <div className="mb-4 flex flex-wrap items-center gap-2">

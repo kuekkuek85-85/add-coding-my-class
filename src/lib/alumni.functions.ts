@@ -3,14 +3,6 @@ import { z } from "zod";
 
 const uuid = z.string().uuid();
 
-/** '7기 · 장평중 …' → '7기' */
-function cohortLabel(name: string): string {
-  const trimmed = (name ?? "").trim();
-  const m = trimmed.match(/^\s*([^·|\-—]+)/);
-  const head = (m ? m[1] : trimmed).trim();
-  return head.length > 0 ? head : "기수";
-}
-
 function alphaLabel(index: number): string {
   // 0 -> A, 25 -> Z, 26 -> AA
   let n = index;
@@ -31,25 +23,65 @@ function firstMeaningfulLine(text: string): string {
   ).trim();
 }
 
-/** 제목·문제·기능 텍스트에서 교과를 키워드로 추정한다. */
-function guessSubject(text: string): string {
-  const t = (text ?? "").toLowerCase();
-  const rules: Array<[string, RegExp]> = [
-    ["국어", /국어|독서|글쓰기|문학|시\b|소설|맞춤법|어휘|토론|토의/],
-    ["영어", /영어|english|회화|알파벳|파닉스/],
-    ["수학", /수학|분수|소수|도형|확률|통계|함수|방정식|계산|측정|규칙성/],
-    ["과학", /과학|실험|관찰|식물|동물|지구|우주|전기|자석|화산|날씨|물질|생물/],
-    ["사회", /사회|역사|지리|지도|경제|민주|세시|풍습|문화재|고장/],
-    ["도덕", /도덕|인성|배려|규칙|약속|정직|생명/],
-    ["체육", /체육|운동|줄넘기|축구|농구|피구|체력|스포츠|달리기/],
-    ["음악", /음악|리듬|가창|악기|노래|음표|합주/],
-    ["미술", /미술|그림|디자인|조소|판화|만들기|공예|색채/],
-    ["정보", /정보|코딩|프로그래밍|알고리즘|로봇|ai\b|인공지능|엔트리|스크래치/],
-    ["실과", /실과|요리|바느질|목공|재배|텃밭|실생활/],
-    ["창체·학급", /학급|자치|창체|동아리|봉사|진로|학급회의|학급 경영|출석|자리 배치|좌석/],
-  ];
-  for (const [label, re] of rules) if (re.test(t)) return label;
-  return "기타";
+const SUBJECT_RULES: Array<[string, RegExp[]]> = [
+  [
+    "국어",
+    [
+      /국어|독서|글쓰기|일기|문학|소설|시화|동시|맞춤법|어휘|낱말|받아쓰기|토론|토의|발표문|글감|독후|문장 부호|띄어쓰기|한글/g,
+    ],
+  ],
+  ["영어", [/영어|english|회화|알파벳|파닉스|영단어|단어 시험|스펠링/g]],
+  [
+    "수학",
+    [
+      /수학|분수|소수점|도형|확률|통계|함수|방정식|사칙|구구단|연산|계산 문제|측정|규칙성|그래프|넓이|부피|시계 보기/g,
+    ],
+  ],
+  [
+    "과학",
+    [/과학|실험|관찰 일지|식물|동물|지구|우주|행성|전기|자석|화산|지층|날씨|물질|생물|용해|에너지/g],
+  ],
+  [
+    "사회",
+    [/사회|역사|지리|지도|경제|민주|선거|세시|풍습|문화재|고장|인구|시장 놀이|법과 규칙/g],
+  ],
+  ["도덕", [/도덕|인성|배려|정직|생명 존중|공감|감정 카드|마음 일기|갈등 해결/g]],
+  ["체육", [/체육|줄넘기|축구|농구|피구|체력|스포츠|달리기|경기 기록|운동회/g]],
+  ["음악", [/음악|리듬|가창|악기|노래|음표|합주|리코더|계이름/g]],
+  ["미술", [/미술|그리기|드로잉|조소|판화|공예|색채|전시회|작품 감상|캐릭터 디자인/g]],
+  [
+    "정보",
+    [/정보 수업|코딩|프로그래밍|알고리즘|로봇|인공지능|엔트리|스크래치|타자|디지털 시민|정보 윤리/g],
+  ],
+  ["실과", [/실과|요리|바느질|목공|재배|텃밭|용돈|진로 탐색/g]],
+  [
+    "창체·학급",
+    [
+      /학급|자치|창체|동아리|봉사|학급회의|학급 경영|출석|자리 배치|좌석|1인 1역|모둠 편성|칭찬|상벌|알림장|급식|청소 당번|생활기록|상담/g,
+    ],
+  ],
+];
+
+/**
+ * 제목·PRD 전문·프롬프트 등 모든 텍스트에서 키워드 빈도를 세어 교과를 추정한다.
+ * 제목 텍스트는 가중치를 크게 준다.
+ */
+function guessSubject(weighted: Array<[string, number]>): string {
+  const scores = new Map<string, number>();
+  for (const [label, regexes] of SUBJECT_RULES) {
+    let score = 0;
+    for (const [text, weight] of weighted) {
+      const t = (text ?? "").toLowerCase();
+      if (!t) continue;
+      for (const re of regexes) {
+        const hits = t.match(new RegExp(re.source, "g"));
+        if (hits) score += hits.length * weight;
+      }
+    }
+    if (score > 0) scores.set(label, score);
+  }
+  if (scores.size === 0) return "기타";
+  return [...scores.entries()].sort((a, b) => b[1] - a[1])[0][0];
 }
 
 /**
@@ -75,7 +107,7 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       .order("created_at", { ascending: true });
 
     const otherSessions = sessions ?? [];
-    if (otherSessions.length === 0) return { ok: true as const, cohorts: [], items: [] };
+    if (otherSessions.length === 0) return { ok: true as const, subjects: [], items: [] };
 
     const sessionIds = otherSessions.map((s) => s.id);
 
@@ -87,7 +119,7 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       .order("nickname", { ascending: true });
 
     const memberRows = members ?? [];
-    if (memberRows.length === 0) return { ok: true as const, cohorts: [], items: [] };
+    if (memberRows.length === 0) return { ok: true as const, subjects: [], items: [] };
     const memberIds = memberRows.map((m) => m.id);
 
     const [{ data: prds }, { data: prompts }, { data: revised }, { data: decks }] =
@@ -117,7 +149,6 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
 
     const items: Array<{
       key: string;
-      cohort: string;
       displayName: string;
       title: string;
       problem: string;
@@ -135,29 +166,39 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       subject: string;
     }> = [];
 
-    const cohortSet: string[] = [];
+    let index = 0;
 
     for (const sess of otherSessions) {
-      const label = cohortLabel(sess.name);
       const inSession = memberRows
         .filter((m) => m.session_id === sess.id)
         .sort((a, b) => (a.nickname ?? "").localeCompare(b.nickname ?? "", "ko"));
       if (inSession.length === 0) continue;
-      if (!cohortSet.includes(label)) cohortSet.push(label);
 
-      inSession.forEach((m, i) => {
+      for (const m of inSession) {
         const prd = prdMap.get(m.id);
         const pr = promptMap.get(m.id);
         const rv = revisedMap.get(m.id);
         const dk = deckMap.get(m.id);
         const problem = (prd?.problem ?? "").trim();
         // 산출물이 아예 없는 참가자는 갤러리에서 제외
-        if (!problem && !dk?.title && !(pr?.context ?? "").trim()) return;
+        if (!problem && !dk?.title && !(pr?.context ?? "").trim()) continue;
+
+        const subject = guessSubject([
+          [dk?.title ?? "", 6],
+          [prd?.problem ?? "", 3],
+          [prd?.users ?? "", 2],
+          [prd?.features ?? "", 2],
+          [prd?.success_metric ?? "", 1],
+          [prd?.out_of_scope ?? "", 1],
+          [pr?.context ?? "", 1],
+          [pr?.task ?? "", 1],
+          [rv?.target ?? "", 1],
+          [rv?.add_list ?? "", 1],
+        ]);
 
         items.push({
-          key: `${sess.id}:${i}`,
-          cohort: label,
-          displayName: `${label}-${alphaLabel(i)}`,
+          key: `${sess.id}:${m.id}`,
+          displayName: `사례 ${alphaLabel(index)}`,
           title: (dk?.title ?? "").slice(0, 120),
           problem: problem.slice(0, 400),
           prd: prd
@@ -176,11 +217,10 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
           ),
           revisedPrompt: [rv?.target, rv?.add_list].filter(Boolean).join("\n\n").slice(0, 4000),
           deployedUrl: (m.deployed_url ?? "").trim() || null,
-          subject: guessSubject(
-            [dk?.title, prd?.problem, prd?.features, pr?.task].filter(Boolean).join(" "),
-          ),
+          subject,
         });
-      });
+        index += 1;
+      }
     }
 
     const subjectSet: string[] = [];
@@ -189,5 +229,5 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
     }
     subjectSet.sort((a, b) => (a === "기타" ? 1 : b === "기타" ? -1 : a.localeCompare(b, "ko")));
 
-    return { ok: true as const, cohorts: cohortSet, subjects: subjectSet, items };
+    return { ok: true as const, subjects: subjectSet, items };
   });
