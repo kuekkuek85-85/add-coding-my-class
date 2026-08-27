@@ -472,3 +472,42 @@ export const resetSessionData = createServerFn({ method: "POST" })
 
     return { ok: true as const };
   });
+
+/** 강사가 이 기수에서 열 수 있는 최대 교시(max_stage)를 변경 */
+export const setMaxStage = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; maxStage: number }) =>
+    z
+      .object({
+        userId: z.string().uuid(),
+        maxStage: z.number().int().min(1).max(7),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: caller } = await supabaseAdmin
+      .from("app_users")
+      .select("id, role, session_id")
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (!caller) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (caller.role !== "instructor") {
+      return { ok: false as const, error: "강사만 운영 범위를 바꿀 수 있습니다." };
+    }
+
+    const { data: sess } = await supabaseAdmin
+      .from("sessions")
+      .select("current_stage")
+      .eq("id", caller.session_id)
+      .maybeSingle();
+
+    const payload: { max_stage: number; current_stage?: number } = { max_stage: data.maxStage };
+    if ((sess?.current_stage ?? 1) > data.maxStage) payload.current_stage = data.maxStage;
+
+    const { error } = await supabaseAdmin
+      .from("sessions")
+      .update(payload)
+      .eq("id", caller.session_id);
+    if (error) return { ok: false as const, error: "운영 범위 변경에 실패했습니다." };
+    return { ok: true as const, maxStage: data.maxStage };
+  });
