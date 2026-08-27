@@ -106,26 +106,6 @@ function AlumniPage() {
           </p>
         </div>
 
-        {cohorts.length > 0 && (
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-muted-foreground">기수</span>
-            {["전체", ...cohorts].map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCohort(c)}
-                className={cn(
-                  "rounded-full border-2 px-3 py-1 text-xs font-semibold transition-colors",
-                  cohort === c
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border/70 bg-card text-muted-foreground hover:border-primary/40",
-                )}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
 
         {subjects.length > 0 && (
           <div className="mb-4 flex flex-wrap items-center gap-2">
