@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, ExternalLink, ShieldAlert, Users } from "lucide-react";
 
-import { getAlumniGallery } from "@/lib/alumni.functions";
+import { getAlumniGallery, isAlumniVisible } from "@/lib/alumni.functions";
 import { useStoredSession } from "@/lib/local-session";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,16 +56,37 @@ type Item = {
 };
 
 function AlumniPage() {
+  const navigate = useNavigate();
   const { ready, session: stored } = useStoredSession();
   const fetchFn = useServerFn(getAlumniGallery);
+  const checkVisible = useServerFn(isAlumniVisible);
   const [subject, setSubject] = useState<string>("전체");
   const [detail, setDetail] = useState<Item | null>(null);
+
+  const { data: visibleData } = useQuery({
+    queryKey: ["alumni-visible", stored?.userId],
+    queryFn: () => checkVisible({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+  });
+  const visible = visibleData?.ok ? visibleData.visible : undefined;
 
   const { data, isLoading } = useQuery({
     queryKey: ["alumni-gallery", stored?.userId],
     queryFn: () => fetchFn({ data: { userId: stored!.userId } }),
-    enabled: !!stored?.userId,
+    enabled: !!stored?.userId && visible === true,
   });
+
+  useEffect(() => {
+    if (!ready || visible === undefined) return;
+    if (!visible) {
+      const to = stored?.role === "instructor" ? "/instructor" : "/home";
+      navigate({ to });
+    }
+  }, [ready, visible, stored?.role, navigate]);
+
+  if (!ready || visible === undefined) return <div className="min-h-screen" />;
+
+  const homeTo = stored?.role === "instructor" ? "/instructor" : "/home";
 
   const items = (data?.ok ? data.items : []) as Item[];
   const subjects = data?.ok ? (data as { subjects?: string[] }).subjects ?? [] : [];
@@ -75,9 +96,6 @@ function AlumniPage() {
     [items, subject],
   );
 
-  if (!ready) return <div className="min-h-screen" />;
-
-  const homeTo = stored?.role === "instructor" ? "/instructor" : "/home";
 
   return (
     <main className="min-h-screen pb-20">

@@ -15,6 +15,7 @@ import { getMyS2State } from "@/lib/s2.functions";
 import { getMyS4State } from "@/lib/s4.functions";
 import { getMyS6State } from "@/lib/s6.functions";
 import { getMyCompletion } from "@/lib/s7.functions";
+import { isAlumniVisible } from "@/lib/alumni.functions";
 import { ParticipantSlideOverlay } from "@/components/school/SlideDeck";
 import { TrafficLight } from "@/components/school/TrafficLight";
 import { MorningStamp } from "@/components/school/MorningStamp";
@@ -39,6 +40,7 @@ function ParticipantHome() {
   const fetchS4 = useServerFn(getMyS4State);
   const fetchS6 = useServerFn(getMyS6State);
   const fetchCompletion = useServerFn(getMyCompletion);
+  const fetchAlumniVisible = useServerFn(isAlumniVisible);
 
   const { data } = useQuery({
     queryKey: ["snapshot", stored?.userId],
@@ -81,6 +83,13 @@ function ParticipantHome() {
     enabled: !!stored?.userId,
     refetchInterval: 20_000,
   });
+
+  const { data: alumni } = useQuery({
+    queryKey: ["alumni-visible", stored?.userId],
+    queryFn: () => fetchAlumniVisible({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId,
+  });
+  const alumniVisible = alumni?.ok ? alumni.visible : false;
 
   if (!ready || !stored) return <div className="min-h-screen" />;
 
@@ -211,12 +220,14 @@ function ParticipantHome() {
             게이트를 통과하면 다음 교시가 열립니다. 순서대로 하나씩.
           </p>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/alumni">
-              <Users className="mr-1 h-3.5 w-3.5" aria-hidden />
-              선배 사례 갤러리
-            </Link>
-          </Button>
+          {alumniVisible && (
+            <Button asChild variant="outline" size="sm">
+              <Link to="/alumni">
+                <Users className="mr-1 h-3.5 w-3.5" aria-hidden />
+                선배 사례 갤러리
+              </Link>
+            </Button>
+          )}
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {visibleStages.map((s) => (
