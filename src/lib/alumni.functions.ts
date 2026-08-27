@@ -132,6 +132,7 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       firstPrompt: string;
       revisedPrompt: string;
       deployedUrl: string | null;
+      subject: string;
     }> = [];
 
     const cohortSet: string[] = [];
