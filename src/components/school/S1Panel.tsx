@@ -144,12 +144,12 @@ export function S1Panel({
           <p className="text-xs font-semibold uppercase tracking-widest text-primary/70">강사 사례</p>
           <h2 className="font-display text-lg font-bold text-foreground">정보 수업 포털</h2>
           <a
-            href="https://github.com/kuekkuek85-85/info-class-portal"
+            href="https://info-class-portal.vercel.app/"
             target="_blank"
             rel="noreferrer noopener"
             className="mt-1 inline-block break-all text-sm font-semibold text-primary underline underline-offset-2"
           >
-            https://github.com/kuekkuek85-85/info-class-portal
+            https://info-class-portal.vercel.app/
           </a>
           <ul className="mt-3 space-y-1 text-sm text-foreground/90">
             <li>· 이 도구는 교사의 어떤 반복 노동을 없앴는가?</li>
