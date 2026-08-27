@@ -106,6 +106,30 @@ function guessSubject(weighted: Array<[string, number]>): string {
   return [...scores.entries()].sort((a, b) => b[1] - a[1])[0][0];
 }
 
+export const isAlumniVisible = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string }) => z.object({ userId: uuid }).parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: caller } = await supabaseAdmin
+      .from("app_users")
+      .select("id, session_id")
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (!caller) return { ok: false as const, error: "세션이 만료되었습니다." };
+
+    const { data: session } = await supabaseAdmin
+      .from("sessions")
+      .select("participant_code, instructor_code")
+      .eq("id", caller.session_id)
+      .maybeSingle();
+
+    const code = session?.participant_code ?? session?.instructor_code ?? "";
+    const visible = code === "SPOON8" || code === "TEACHER8";
+
+    return { ok: true as const, visible };
+  });
+
 /**
  * 다른 기수(선배)의 산출물을 익명화해서 반환한다.
  * 원본 닉네임은 절대 클라이언트로 보내지 않는다. 읽기 전용.
@@ -121,6 +145,19 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
       .eq("id", data.userId)
       .maybeSingle();
     if (!caller) return { ok: false as const, error: "세션이 만료되었습니다." };
+
+    const { data: mySession } = await supabaseAdmin
+      .from("sessions")
+      .select("participant_code, instructor_code")
+      .eq("id", caller.session_id)
+      .maybeSingle();
+
+    const myCode = mySession?.participant_code ?? mySession?.instructor_code ?? "";
+    if (myCode !== "SPOON8" && myCode !== "TEACHER8") {
+      return { ok: false as const, error: "이 기능은 8기 연수에서만 열람할 수 있습니다." };
+    }
+
+
 
     const { data: sessions } = await supabaseAdmin
       .from("sessions")
