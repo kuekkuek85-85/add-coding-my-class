@@ -63,6 +63,33 @@ const SUBJECT_RULES: Array<[string, RegExp[]]> = [
 ];
 
 /**
+ * 배포 URL 호스트별 교과 지정(강사 확인 매핑). 매칭되면 키워드 추정보다 우선한다.
+ */
+const URL_SUBJECT_OVERRIDES: Array<[string, string]> = [
+  ["unit-linker.lovable.app", "정보"],
+  ["ai-think-talk.lovable.app", "영어"],
+  ["buddy-voice-play.lovable.app", "특수"],
+  ["pink-make-my-homes.lovable.app", "가정"],
+  ["self-discover-pro.lovable.app", "진로와직업"],
+  ["t-vibe-quest.lovable.app", "기술"],
+  ["clarity-quest-maker.lovable.app", "가정"],
+  ["class-hub-vert.vercel.app", "기술"],
+  ["skill-reader.lovable.app", "영어"],
+  ["dawon-mart-stamp.lovable.app", "특수"],
+  ["lesson-flow-sync.lovable.app", "역사"],
+  ["fd9a6cf1", "기타"],
+];
+
+function subjectByUrl(url: string | null | undefined): string | null {
+  const u = (url ?? "").toLowerCase();
+  if (!u) return null;
+  for (const [host, subject] of URL_SUBJECT_OVERRIDES) {
+    if (u.includes(host)) return subject;
+  }
+  return null;
+}
+
+/**
  * 제목·PRD 전문·프롬프트 등 모든 텍스트에서 키워드 빈도를 세어 교과를 추정한다.
  * 제목 텍스트는 가중치를 크게 준다.
  */
@@ -183,7 +210,9 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
         // 산출물이 아예 없는 참가자는 갤러리에서 제외
         if (!problem && !dk?.title && !(pr?.context ?? "").trim()) continue;
 
-        const subject = guessSubject([
+        const subject =
+          subjectByUrl(m.deployed_url) ??
+          guessSubject([
           [dk?.title ?? "", 6],
           [prd?.problem ?? "", 3],
           [prd?.users ?? "", 2],
@@ -193,8 +222,8 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
           [pr?.context ?? "", 1],
           [pr?.task ?? "", 1],
           [rv?.target ?? "", 1],
-          [rv?.add_list ?? "", 1],
-        ]);
+            [rv?.add_list ?? "", 1],
+          ]);
 
         items.push({
           key: `${sess.id}:${m.id}`,
