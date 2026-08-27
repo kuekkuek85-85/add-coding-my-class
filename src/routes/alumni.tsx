@@ -88,6 +88,15 @@ function AlumniPage() {
 
   const homeTo = stored?.role === "instructor" ? "/instructor" : "/home";
 
+  const items = (data?.ok ? data.items : []) as Item[];
+  const subjects = data?.ok ? (data as { subjects?: string[] }).subjects ?? [] : [];
+
+  const filtered = useMemo(
+    () => items.filter((i) => subject === "전체" || i.subject === subject),
+    [items, subject],
+  );
+
+
   return (
     <main className="min-h-screen pb-20">
       <header className="border-b-2 border-primary/15 bg-card/60 backdrop-blur">
