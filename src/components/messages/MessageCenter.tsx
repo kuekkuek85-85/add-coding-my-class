@@ -519,6 +519,7 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
       qc.invalidateQueries({ queryKey: ["messages-inbox", session.userId] });
       qc.invalidateQueries({ queryKey: ["messages-unread", session.userId] });
       qc.invalidateQueries({ queryKey: ["broadcasts"] });
+      qc.invalidateQueries({ queryKey: ["session-broadcasts"] });
       toast.success("공지를 삭제했어요.");
     },
     onError: (e: Error) => toast.error(e.message),
