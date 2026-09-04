@@ -508,6 +508,21 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const removeBroadcast = useServerFn(deleteBroadcast);
+  const deleteMut = useMutation({
+    mutationFn: async (messageId: string) => {
+      const res = await removeBroadcast({ data: { userId: session.userId, messageId } });
+      if (!("ok" in res) || !res.ok) throw new Error((res as { error?: string }).error ?? "삭제 실패");
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["messages-inbox", session.userId] });
+      qc.invalidateQueries({ queryKey: ["messages-unread", session.userId] });
+      qc.invalidateQueries({ queryKey: ["broadcasts"] });
+      toast.success("공지를 삭제했어요.");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const activeMessages =
     selected === "broadcast" ? broadcasts : threadOf(selected);
   const activeMemberName =
