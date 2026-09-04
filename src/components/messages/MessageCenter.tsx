@@ -582,7 +582,24 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
             {activeMessages.map((m) => {
               const mine = m.sender_id === session.userId;
               return (
-                <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+                <div key={m.id} className={cn("group flex items-center gap-1", mine ? "justify-end" : "justify-start")}>
+                  {m.kind === "broadcast" ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        if (window.confirm("이 전체 공지를 삭제할까요? 참가자 화면에서도 사라집니다.")) {
+                          deleteMut.mutate(m.id);
+                        }
+                      }}
+                      disabled={deleteMut.isPending}
+                      aria-label="공지 삭제"
+                      className="h-8 w-8 shrink-0 p-0 text-muted-foreground opacity-0 transition group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  ) : null}
                   <div
                     className={cn(
                       "max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm",
@@ -599,6 +616,7 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
                 </div>
               );
             })}
+
           </div>
           <div className="border-t bg-background p-3">
             <div className="mb-2 flex items-center gap-2">
