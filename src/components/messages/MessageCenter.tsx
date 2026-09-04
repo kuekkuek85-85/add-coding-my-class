@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MessageCircle, Send, Megaphone, X, Bug, Lightbulb, HelpCircle, Utensils, Presentation as PresentationIcon, MessageSquare, ImagePlus, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Megaphone, X, Bug, Lightbulb, HelpCircle, Utensils, Presentation as PresentationIcon, MessageSquare, ImagePlus, Loader2, Trash2 } from "lucide-react";
 
 import {
   sendMessage,
@@ -11,6 +11,7 @@ import {
   markMessagesRead,
   getUnreadMessageIds,
   uploadMessageImage,
+  deleteBroadcast,
 } from "@/lib/messages.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
