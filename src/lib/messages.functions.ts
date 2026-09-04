@@ -312,3 +312,30 @@ export const uploadMessageImage = createServerFn({ method: "POST" })
     return { ok: true as const, url: signed.signedUrl, path };
   });
 
+
+/** 강사용: 전체 공지(broadcast) 삭제 */
+export const deleteBroadcast = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string; messageId: string }) =>
+    z.object({ userId: uuid, messageId: uuid }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const user = await getUser(data.userId);
+    if (!user) return { ok: false as const, error: "세션이 만료되었습니다." };
+    if (user.role !== "instructor") return { ok: false as const, error: "권한이 없습니다." };
+
+    const { data: msg } = await supabaseAdmin
+      .from("messages")
+      .select("id, kind, session_id")
+      .eq("id", data.messageId)
+      .maybeSingle();
+    if (!msg || msg.session_id !== user.session_id) {
+      return { ok: false as const, error: "공지를 찾을 수 없습니다." };
+    }
+    if (msg.kind !== "broadcast") return { ok: false as const, error: "전체 공지만 삭제할 수 있습니다." };
+
+    await supabaseAdmin.from("message_reads").delete().eq("message_id", msg.id);
+    const { error } = await supabaseAdmin.from("messages").delete().eq("id", msg.id);
+    if (error) return { ok: false as const, error: "삭제에 실패했습니다." };
+    return { ok: true as const };
+  });

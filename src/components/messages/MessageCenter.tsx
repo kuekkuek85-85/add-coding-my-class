@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MessageCircle, Send, Megaphone, X, Bug, Lightbulb, HelpCircle, Utensils, Presentation as PresentationIcon, MessageSquare, ImagePlus, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Megaphone, X, Bug, Lightbulb, HelpCircle, Utensils, Presentation as PresentationIcon, MessageSquare, ImagePlus, Loader2, Trash2 } from "lucide-react";
 
 import {
   sendMessage,
@@ -11,6 +11,7 @@ import {
   markMessagesRead,
   getUnreadMessageIds,
   uploadMessageImage,
+  deleteBroadcast,
 } from "@/lib/messages.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -508,6 +509,21 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const removeBroadcast = useServerFn(deleteBroadcast);
+  const deleteMut = useMutation({
+    mutationFn: async (messageId: string) => {
+      const res = await removeBroadcast({ data: { userId: session.userId, messageId } });
+      if (!("ok" in res) || !res.ok) throw new Error((res as { error?: string }).error ?? "삭제 실패");
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["messages-inbox", session.userId] });
+      qc.invalidateQueries({ queryKey: ["messages-unread", session.userId] });
+      qc.invalidateQueries({ queryKey: ["broadcasts"] });
+      toast.success("공지를 삭제했어요.");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const activeMessages =
     selected === "broadcast" ? broadcasts : threadOf(selected);
   const activeMemberName =
@@ -582,7 +598,24 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
             {activeMessages.map((m) => {
               const mine = m.sender_id === session.userId;
               return (
-                <div key={m.id} className={cn("flex", mine ? "justify-end" : "justify-start")}>
+                <div key={m.id} className={cn("group flex items-center gap-1", mine ? "justify-end" : "justify-start")}>
+                  {m.kind === "broadcast" ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        if (window.confirm("이 전체 공지를 삭제할까요? 참가자 화면에서도 사라집니다.")) {
+                          deleteMut.mutate(m.id);
+                        }
+                      }}
+                      disabled={deleteMut.isPending}
+                      aria-label="공지 삭제"
+                      className="h-8 w-8 shrink-0 p-0 text-muted-foreground opacity-0 transition group-hover:opacity-100 hover:text-destructive focus-visible:opacity-100"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  ) : null}
                   <div
                     className={cn(
                       "max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm",
@@ -599,6 +632,7 @@ function InstructorPanel({ session, onClose }: { session: StoredSession; onClose
                 </div>
               );
             })}
+
           </div>
           <div className="border-t bg-background p-3">
             <div className="mb-2 flex items-center gap-2">
