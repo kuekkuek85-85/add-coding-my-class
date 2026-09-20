@@ -1,6 +1,6 @@
 import {
   getParticipantSeats,
-  INSTRUCTOR_SEAT,
+  getInstructorSeat,
   FRONT_MONITOR,
   OFFICE_VIEWBOX,
   type SeatLayout,
@@ -24,6 +24,7 @@ export function SeatPicker({
   layout?: SeatLayout;
 }) {
   const seats = getParticipantSeats(layout);
+  const instructorSeat = getInstructorSeat(layout);
   const classroom = layout !== "office";
   return (
     <div className="w-full overflow-hidden rounded-2xl border-2 border-primary/20 bg-card shadow-sm">
@@ -34,6 +35,36 @@ export function SeatPicker({
         aria-label="좌석 배치도"
       >
         <OfficeBackdrop variant={layout} />
+        {/* 실제 탁자 배치 */}
+        {[...seats, instructorSeat].map((seat) =>
+          seat.desk ? (
+            <g key={`${seat.id}-desk`}>
+              <rect
+                x={seat.desk.x}
+                y={seat.desk.y}
+                width={seat.desk.w}
+                height={seat.desk.h}
+                rx="8"
+                fill="#6d4c32"
+                stroke="#3f2712"
+                strokeWidth="3"
+              />
+              {layout === "workshop8" && seat.id !== "instructor-desk" && (
+                <text
+                  x={seat.desk.x + seat.desk.w / 2}
+                  y={seat.desk.y + seat.desk.h / 2}
+                  fill="#ffffff"
+                  fontSize="18"
+                  fontWeight="700"
+                  textAnchor="middle"
+                  transform={`rotate(-90 ${seat.desk.x + seat.desk.w / 2} ${seat.desk.y + seat.desk.h / 2})`}
+                >
+                  테이블
+                </text>
+              )}
+            </g>
+          ) : null,
+        )}
         {/* Instructor desk / monitor label */}
         {!classroom && <>
         <rect
@@ -54,7 +85,7 @@ export function SeatPicker({
           모니터 (강사석)
         </text>
         </>}
-        <SeatDot seat={INSTRUCTOR_SEAT} fill="#94a3b8" label="강사 탁자" disabled />
+        <SeatDot seat={instructorSeat} fill="#94a3b8" label="강사 탁자" disabled />
         {seats.map((seat) => {
           const holder = occupied.get(seat.id);
           const mine = holder && holder === myNickname;

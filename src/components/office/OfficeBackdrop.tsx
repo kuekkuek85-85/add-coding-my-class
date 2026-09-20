@@ -7,6 +7,7 @@ export function OfficeBackdrop({
   variant?: "office" | "classroom" | "workshop8";
 }) {
   if (variant === "classroom" || variant === "workshop8") {
+    const workshop8 = variant === "workshop8";
     return (
       <g>
         {/* 뒤쪽 벽 + 게시판 */}
@@ -22,9 +23,9 @@ export function OfficeBackdrop({
           <line key={`h${i}`} x1="0" x2="1200" y1={110 + i * 120} y2={110 + i * 120} stroke="#e2d8c3" strokeWidth="2" />
         ))}
         {/* 교실 앞쪽 (칠판 영역) */}
-        <rect x="0" y="1010" width="1200" height="100" fill="#e8eef0" />
-        <rect x="90" y="1018" width="1020" height="52" rx="6" fill="#2F6B4F" stroke="#1f4a37" strokeWidth="3" />
-        <text x="600" y="1050" fill="#eafaf1" fontSize="20" fontWeight="700" textAnchor="middle">
+        <rect x="0" y={workshop8 ? 1035 : 1010} width="1200" height={workshop8 ? 75 : 100} fill="#e8eef0" />
+        <rect x="90" y={workshop8 ? 1045 : 1018} width="1020" height="52" rx="6" fill="#2F6B4F" stroke="#1f4a37" strokeWidth="3" />
+        <text x="600" y={workshop8 ? 1077 : 1050} fill="#eafaf1" fontSize="20" fontWeight="700" textAnchor="middle">
           전자칠판 화면
         </text>
       </g>

@@ -139,11 +139,24 @@ export const WORKSHOP8_SEATS: Seat[] = WORKSHOP8_ROW_Y.flatMap((y, r) => [
   },
 ]);
 
+export const WORKSHOP8_INSTRUCTOR_SEAT: Seat = {
+  id: "instructor-desk",
+  x: 600,
+  y: 940,
+  desk: { x: 490, y: 980, w: 220, h: 44 },
+  facing: "up",
+  label: "강사 탁자",
+};
+
 export type SeatLayout = "office" | "classroom" | "workshop8";
 
 export function getParticipantSeats(layout: SeatLayout | null | undefined): Seat[] {
   if (layout === "workshop8") return WORKSHOP8_SEATS;
   return layout === "classroom" ? CLASSROOM_SEATS : OFFICE_SEATS;
+}
+
+export function getInstructorSeat(layout: SeatLayout | null | undefined): Seat {
+  return layout === "workshop8" ? WORKSHOP8_INSTRUCTOR_SEAT : INSTRUCTOR_SEAT;
 }
 
 export function findSeatInLayout(

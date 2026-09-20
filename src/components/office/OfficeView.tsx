@@ -14,7 +14,7 @@ import { listSessionHelpSignals } from "@/lib/help.functions";
 import { getSessionRetrospectives } from "@/lib/s7.functions";
 import {
   getParticipantSeats,
-  INSTRUCTOR_SEAT,
+  getInstructorSeat,
   FRONT_MONITOR,
   OFFICE_VIEWBOX,
   findSeatInLayout,
@@ -123,6 +123,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
     rawSeatLayout === "classroom" || rawSeatLayout === "workshop8"
       ? rawSeatLayout
       : "office";
+  const instructorSeat = getInstructorSeat(seatLayout);
 
   const s1Map = new Map((s1?.ok ? s1.progress : []).map((p) => [p.userId, p]));
   const s2Map = new Map((s2?.ok ? s2.progress : []).map((p) => [p.userId, p]));
@@ -173,7 +174,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
           </defs>
           <OfficeBackdrop variant={seatLayout} />
           {/* Desks and chairs (draw once per group) */}
-          {[...getParticipantSeats(seatLayout), INSTRUCTOR_SEAT].map((s) =>
+          {[...getParticipantSeats(seatLayout), instructorSeat].map((s) =>
             s.desk ? (
               <g key={s.id + "-deskgroup"}>
                 {/* Desk top */}
@@ -200,11 +201,13 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
                   strokeWidth="2"
                   opacity="0.6"
                 />
-                {/* Chair */}
-                <Chair seat={s} />
               </g>
             ) : null,
           )}
+          {getParticipantSeats(seatLayout).map((seat) => (
+            <Chair key={`${seat.id}-chair`} seat={seat} />
+          ))}
+          <Chair seat={instructorSeat} />
           {/* Front monitor */}
           {seatLayout !== "classroom" && (<>
           <rect
@@ -229,7 +232,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
           {/* Instructor */}
           {instructor && (
             <SeatedAvatarNode
-              seat={INSTRUCTOR_SEAT}
+              seat={instructorSeat}
               avatar={instructor.avatar ?? DEFAULT_AVATAR}
               nickname={instructor.nickname}
               flags={[false, false, false, false, false, false]}
