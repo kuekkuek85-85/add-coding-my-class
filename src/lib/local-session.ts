@@ -8,7 +8,7 @@ export type StoredSession = {
   sessionId: string;
   nickname: string;
   role: "participant" | "instructor";
-  seatLayout?: "office" | "classroom";
+  seatLayout?: "office" | "classroom" | "workshop8";
   maxStage?: number;
 };
 

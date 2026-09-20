@@ -136,7 +136,7 @@ export const enterSession = createServerFn({ method: "POST" })
         sessionName: sessionRow.name,
         role,
         nickname: data.nickname,
-        seatLayout: (sessionRow.seat_layout ?? "office") as "office" | "classroom",
+        seatLayout: (sessionRow.seat_layout ?? "office") as "office" | "classroom" | "workshop8",
         maxStage: sessionRow.max_stage ?? 7,
       };
     }
@@ -165,7 +165,7 @@ export const enterSession = createServerFn({ method: "POST" })
       sessionName: sessionRow.name,
       role,
       nickname: data.nickname,
-      seatLayout: (sessionRow.seat_layout ?? "office") as "office" | "classroom",
+      seatLayout: (sessionRow.seat_layout ?? "office") as "office" | "classroom" | "workshop8",
       maxStage: sessionRow.max_stage ?? 7,
     };
   });
@@ -227,7 +227,7 @@ export const getOccupiedSeats = createServerFn({ method: "POST" })
       .not("seat_id", "is", null);
     return {
       ok: true as const,
-      seatLayout: (sess.seat_layout ?? "office") as "office" | "classroom",
+      seatLayout: (sess.seat_layout ?? "office") as "office" | "classroom" | "workshop8",
       seats: (rows ?? []).map((r) => ({
         seatId: r.seat_id as string,
         nickname: (r.nickname ?? "") as string,

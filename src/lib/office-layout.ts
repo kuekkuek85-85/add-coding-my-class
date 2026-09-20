@@ -103,10 +103,69 @@ export const CLASSROOM_SEATS: Seat[] = ROW_Y.flatMap((y, r) =>
   })),
 );
 
-export type SeatLayout = "office" | "classroom";
+/** 8기 실제 배치: 세로 탁자 2개, 탁자마다 좌우 5자리. */
+const WORKSHOP8_ROW_Y = [230, 370, 510, 650, 790];
+
+export const WORKSHOP8_SEATS: Seat[] = WORKSHOP8_ROW_Y.flatMap((y, r) => [
+  {
+    id: `w8-l${r + 1}-left`,
+    x: 150,
+    y,
+    desk: r === 0 ? { x: 245, y: 170, w: 165, h: 680 } : undefined,
+    facing: "right" as const,
+    label: `왼쪽 탁자 왼편 ${r + 1}`,
+  },
+  {
+    id: `w8-l${r + 1}-right`,
+    x: 505,
+    y,
+    facing: "left" as const,
+    label: `왼쪽 탁자 오른편 ${r + 1}`,
+  },
+  {
+    id: `w8-r${r + 1}-left`,
+    x: 695,
+    y,
+    desk: r === 0 ? { x: 790, y: 170, w: 165, h: 680 } : undefined,
+    facing: "right" as const,
+    label: `오른쪽 탁자 왼편 ${r + 1}`,
+  },
+  {
+    id: `w8-r${r + 1}-right`,
+    x: 1050,
+    y,
+    facing: "left" as const,
+    label: `오른쪽 탁자 오른편 ${r + 1}`,
+  },
+]);
+
+export const WORKSHOP8_INSTRUCTOR_SEAT: Seat = {
+  id: "instructor-desk",
+  x: 600,
+  y: 940,
+  desk: { x: 490, y: 980, w: 220, h: 44 },
+  facing: "up",
+  label: "강사 탁자",
+};
+
+export type SeatLayout = "office" | "classroom" | "workshop8";
 
 export function getParticipantSeats(layout: SeatLayout | null | undefined): Seat[] {
+  if (layout === "workshop8") return WORKSHOP8_SEATS;
   return layout === "classroom" ? CLASSROOM_SEATS : OFFICE_SEATS;
+}
+
+export function getInstructorSeat(layout: SeatLayout | null | undefined): Seat {
+  return layout === "workshop8" ? WORKSHOP8_INSTRUCTOR_SEAT : INSTRUCTOR_SEAT;
+}
+
+export function findSeatInLayout(
+  id: string | null | undefined,
+  layout: SeatLayout | null | undefined,
+): Seat | null {
+  if (!id) return null;
+  if (id === INSTRUCTOR_SEAT.id) return INSTRUCTOR_SEAT;
+  return getParticipantSeats(layout).find((seat) => seat.id === id) ?? null;
 }
 
 /** 교실형 좌석을 행 단위로 묶어 반환 (1행 → 5행) */
@@ -135,6 +194,7 @@ export function findSeat(id: string | null | undefined): Seat | null {
   return (
     OFFICE_SEATS.find((s) => s.id === id) ??
     CLASSROOM_SEATS.find((s) => s.id === id) ??
+    WORKSHOP8_SEATS.find((s) => s.id === id) ??
     null
   );
 }

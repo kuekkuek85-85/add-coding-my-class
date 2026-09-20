@@ -14,10 +14,11 @@ import { listSessionHelpSignals } from "@/lib/help.functions";
 import { getSessionRetrospectives } from "@/lib/s7.functions";
 import {
   getParticipantSeats,
-  INSTRUCTOR_SEAT,
+  getInstructorSeat,
   FRONT_MONITOR,
   OFFICE_VIEWBOX,
-  findSeat,
+  findSeatInLayout,
+  type SeatLayout,
 } from "@/lib/office-layout";
 import { DEFAULT_AVATAR, type Avatar } from "@/lib/avatar-presets";
 import { AvatarSvg } from "@/components/avatar/AvatarSvg";
@@ -115,9 +116,14 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const participants = members.filter((m) => m.role === "participant");
   const instructor = members.find((m) => m.role === "instructor");
   const currentStage = snap?.ok ? snap.session.current_stage : 1;
-  const seatLayout = (snap?.ok ? (snap.session as { seat_layout?: string }).seat_layout : null) === "classroom"
-    ? "classroom"
-    : "office";
+  const rawSeatLayout = snap?.ok
+    ? (snap.session as { seat_layout?: string }).seat_layout
+    : null;
+  const seatLayout: SeatLayout =
+    rawSeatLayout === "classroom" || rawSeatLayout === "workshop8"
+      ? rawSeatLayout
+      : "office";
+  const instructorSeat = getInstructorSeat(seatLayout);
 
   const s1Map = new Map((s1?.ok ? s1.progress : []).map((p) => [p.userId, p]));
   const s2Map = new Map((s2?.ok ? s2.progress : []).map((p) => [p.userId, p]));
@@ -146,8 +152,8 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
     ];
   }
 
-  const seated = participants.filter((p) => p.seat_id && findSeat(p.seat_id));
-  const unseated = participants.filter((p) => !p.seat_id || !findSeat(p.seat_id));
+  const seated = participants.filter((p) => p.seat_id && findSeatInLayout(p.seat_id, seatLayout));
+  const unseated = participants.filter((p) => !p.seat_id || !findSeatInLayout(p.seat_id, seatLayout));
 
   const currentPresenter =
     (s6?.ok ? s6.progress : []).find((p) => p.queueState === "current")?.userId ?? null;
@@ -168,7 +174,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
           </defs>
           <OfficeBackdrop variant={seatLayout} />
           {/* Desks and chairs (draw once per group) */}
-          {[...getParticipantSeats(seatLayout), INSTRUCTOR_SEAT].map((s) =>
+          {[...getParticipantSeats(seatLayout), instructorSeat].map((s) =>
             s.desk ? (
               <g key={s.id + "-deskgroup"}>
                 {/* Desk top */}
@@ -195,11 +201,13 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
                   strokeWidth="2"
                   opacity="0.6"
                 />
-                {/* Chair */}
-                <Chair seat={s} />
               </g>
             ) : null,
           )}
+          {getParticipantSeats(seatLayout).map((seat) => (
+            <Chair key={`${seat.id}-chair`} seat={seat} />
+          ))}
+          <Chair seat={instructorSeat} />
           {/* Front monitor */}
           {seatLayout !== "classroom" && (<>
           <rect
@@ -224,7 +232,7 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
           {/* Instructor */}
           {instructor && (
             <SeatedAvatarNode
-              seat={INSTRUCTOR_SEAT}
+              seat={instructorSeat}
               avatar={instructor.avatar ?? DEFAULT_AVATAR}
               nickname={instructor.nickname}
               flags={[false, false, false, false, false, false]}
@@ -237,7 +245,8 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
 
           {/* Seated participants */}
           {seated.map((p) => {
-            const seat = findSeat(p.seat_id)!;
+            const seat = findSeatInLayout(p.seat_id, seatLayout);
+            if (!seat) return null;
             const flags = stageDoneFlags(p.id);
             const h = helpMap.get(p.id);
             const r = retroMap.get(p.id);

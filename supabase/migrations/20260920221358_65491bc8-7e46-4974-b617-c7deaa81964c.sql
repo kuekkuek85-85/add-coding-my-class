@@ -1,0 +1,2 @@
+ALTER TABLE public.sessions DROP CONSTRAINT IF EXISTS sessions_seat_layout_check;
+ALTER TABLE public.sessions ADD CONSTRAINT sessions_seat_layout_check CHECK (seat_layout IN ('office','classroom','workshop8'));

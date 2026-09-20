@@ -15,6 +15,22 @@ import { SeatPicker } from "@/components/office/SeatPicker";
 import { DEFAULT_AVATAR, type Avatar, randomAvatar } from "@/lib/avatar-presets";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "연수 입장 | 내 수업에 코딩 한 스푼" },
+      {
+        name: "description",
+        content: "입장 코드와 이름을 입력하고 아바타와 연수 좌석을 선택하세요.",
+      },
+      { property: "og:title", content: "연수 입장 | 내 수업에 코딩 한 스푼" },
+      {
+        property: "og:description",
+        content: "입장 코드와 이름으로 교사 연수에 참여하는 화면입니다.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: LoginPage,
 });
 
@@ -204,13 +220,19 @@ function LoginPage() {
             <p className="text-sm text-muted-foreground">
               앉을 자리를 선택하세요. 이미 사용 중인 자리는 회색으로 표시됩니다.
             </p>
-            <SeatPicker
-              layout={seatData?.ok ? seatData.seatLayout : "office"}
-              occupied={occupied}
-              selected={seatId}
-              onSelect={setSeatId}
-              myNickname={nickname}
-            />
+            {seatData?.ok ? (
+              <SeatPicker
+                layout={seatData.seatLayout}
+                occupied={occupied}
+                selected={seatId}
+                onSelect={setSeatId}
+                myNickname={nickname}
+              />
+            ) : (
+              <div className="flex aspect-[1200/1110] w-full items-center justify-center border-2 border-primary/20 bg-card text-sm text-muted-foreground">
+                좌석 배치를 불러오는 중…
+              </div>
+            )}
             <div className="flex items-center justify-between gap-2">
               <Button variant="ghost" onClick={() => setStep("avatar")}>
                 <ChevronLeft className="mr-1 h-4 w-4" /> 뒤로
