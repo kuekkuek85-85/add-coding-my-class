@@ -55,6 +55,36 @@ type Item = {
   subject: string;
 };
 
+type Peer = {
+  key: string;
+  nickname: string;
+  seated: boolean;
+  slideTitle: string;
+  problem: string;
+  hasPrd: boolean;
+  hasSlides: boolean;
+  hasApp: boolean;
+  deployedUrl: string | null;
+};
+
+function StatusChip({ on, label }: { on: boolean; label: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+        on ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground",
+      )}
+    >
+      {on ? (
+        <CheckCircle2 className="h-3 w-3" aria-hidden />
+      ) : (
+        <Circle className="h-3 w-3" aria-hidden />
+      )}
+      {label}
+    </span>
+  );
+}
+
 function AlumniPage() {
   const navigate = useNavigate();
   const { ready, session: stored } = useStoredSession();
@@ -93,6 +123,17 @@ function AlumniPage() {
     () => (data?.ok ? ((data as { subjects?: string[] }).subjects ?? []) : []),
     [data],
   );
+  const peerFn = useServerFn(getPeerRecords);
+  const { data: peerData } = useQuery({
+    queryKey: ["peer-records", stored?.userId],
+    queryFn: () => peerFn({ data: { userId: stored!.userId } }),
+    enabled: !!stored?.userId && visible === true,
+  });
+  const peers = useMemo(
+    () => ((peerData?.ok ? peerData.peers : []) as Peer[]),
+    [peerData],
+  );
+
   const filtered = useMemo(
     () => items.filter((i) => subject === "전체" || i.subject === subject),
     [items, subject],
@@ -123,7 +164,7 @@ function AlumniPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-5xl px-4 py-5">
+      <section className="mx-auto max-w-6xl px-4 py-5">
         <a
           href="https://padlet.com/jangpyungms3/padlet-a63xkdomobt223lf"
           target="_blank"
@@ -142,7 +183,8 @@ function AlumniPage() {
           </p>
         </div>
 
-
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+          <div>
         {subjects.length > 0 && (
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <span className="text-xs font-bold text-muted-foreground">교과</span>
@@ -213,6 +255,53 @@ function AlumniPage() {
             ))}
           </div>
         )}
+          </div>
+
+          <aside className="xl:sticky xl:top-4 xl:self-start">
+            <h2 className="mb-2 font-display text-sm font-bold text-primary">
+              동료 기록 · 우리 반
+            </h2>
+            {peers.length === 0 ? (
+              <p className="rounded-2xl border-2 border-dashed border-border/60 p-4 text-center text-xs text-muted-foreground">
+                아직 동료 기록이 없습니다.
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {peers.map((p) => (
+                  <li
+                    key={p.key}
+                    className="rounded-2xl border-2 border-amber-300/60 bg-amber-50/50 p-3"
+                  >
+                    <p className="text-xs font-bold text-foreground">{p.nickname}</p>
+                    <p className="mt-0.5 line-clamp-2 text-[11px] text-muted-foreground">
+                      {p.slideTitle || p.problem || "아직 기록이 없어요."}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-1">
+                      <StatusChip on={p.hasPrd} label="PRD" />
+                      <StatusChip on={p.hasSlides} label="슬라이드" />
+                      {p.hasApp && p.deployedUrl ? (
+                        <a
+                          href={p.deployedUrl}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary"
+                        >
+                          <ExternalLink className="h-3 w-3" aria-hidden />
+                          웹 앱 열기
+                        </a>
+                      ) : (
+                        <StatusChip on={false} label="웹 앱" />
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+              동료 기록은 같은 연수 반 선생님들 것입니다. 허락 없이 외부로 공유하지 마세요.
+            </p>
+          </aside>
+        </div>
       </section>
 
       <Dialog open={detail !== null} onOpenChange={(v) => !v && setDetail(null)}>
