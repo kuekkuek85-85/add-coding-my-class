@@ -292,3 +292,86 @@ export const getAlumniGallery = createServerFn({ method: "POST" })
 
     return { ok: true as const, subjects: subjectSet, items };
   });
+
+type PeerRecord = {
+  key: string;
+  nickname: string;
+  seated: boolean;
+  slideTitle: string;
+  problem: string;
+  hasPrd: boolean;
+  hasSlides: boolean;
+  hasApp: boolean;
+  deployedUrl: string | null;
+};
+
+/**
+ * 같은 8기 세션 참가자(동료)의 기록을 반환한다. 산출물이 없는 동료도 포함해
+ * 진행 상태 칩으로 표시한다. 같은 세션(8기)에서만 호출 가능.
+ */
+export const getPeerRecords = createServerFn({ method: "POST" })
+  .inputValidator((input: { userId: string }) => z.object({ userId: uuid }).parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: caller } = await supabaseAdmin
+      .from("app_users")
+      .select("id, session_id")
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (!caller) return { ok: false as const, error: "세션이 만료되었습니다." };
+
+    const { data: mySession } = await supabaseAdmin
+      .from("sessions")
+      .select("participant_code, instructor_code")
+      .eq("id", caller.session_id)
+      .maybeSingle();
+
+    const myCode = mySession?.participant_code ?? mySession?.instructor_code ?? "";
+    if (myCode !== "SPOON8" && myCode !== "TEACHER8") {
+      return { ok: false as const, error: "이 기능은 8기 연수에서만 열람할 수 있습니다." };
+    }
+
+    const { data: members } = await supabaseAdmin
+      .from("app_users")
+      .select("id, nickname, deployed_url, is_seated")
+      .eq("session_id", caller.session_id)
+      .eq("role", "participant")
+      .order("created_at", { ascending: true });
+
+    const memberRows = members ?? [];
+    if (memberRows.length === 0) return { ok: true as const, peers: [] as PeerRecord[] };
+
+    const ids = memberRows.map((m) => m.id);
+    const [{ data: prds }, { data: decks }] = await Promise.all([
+      supabaseAdmin.from("s3_prd_drafts").select("user_id, problem").in("user_id", ids),
+      supabaseAdmin
+        .from("s6_slide_decks")
+        .select("user_id, title, confirmed_at")
+        .in("user_id", ids),
+    ]);
+
+    const prdMap = new Map((prds ?? []).map((r) => [r.user_id, r]));
+    const deckMap = new Map((decks ?? []).map((r) => [r.user_id, r]));
+
+    const peers: PeerRecord[] = memberRows.map((m) => {
+      const prd = prdMap.get(m.id);
+      const deck = deckMap.get(m.id);
+      const problem = (prd?.problem ?? "").trim();
+      const slideTitle = (deck?.title ?? "").trim();
+      const deployedUrl = (m.deployed_url ?? "").trim() || null;
+      return {
+        key: m.id,
+        nickname: m.nickname ?? "참가자",
+        seated: m.is_seated === true,
+        slideTitle: slideTitle.slice(0, 80),
+        problem: problem.slice(0, 160),
+        hasPrd: problem.length > 0,
+        hasSlides: slideTitle.length > 0,
+        hasApp: deployedUrl !== null,
+        deployedUrl,
+      };
+    });
+
+    return { ok: true as const, peers };
+  });
