@@ -15,6 +15,22 @@ import { SeatPicker } from "@/components/office/SeatPicker";
 import { DEFAULT_AVATAR, type Avatar, randomAvatar } from "@/lib/avatar-presets";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "연수 입장 | 내 수업에 코딩 한 스푼" },
+      {
+        name: "description",
+        content: "입장 코드와 이름을 입력하고 아바타와 연수 좌석을 선택하세요.",
+      },
+      { property: "og:title", content: "연수 입장 | 내 수업에 코딩 한 스푼" },
+      {
+        property: "og:description",
+        content: "입장 코드와 이름으로 교사 연수에 참여하는 화면입니다.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: LoginPage,
 });
 
