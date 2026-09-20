@@ -24,7 +24,7 @@ export function SeatPicker({
   layout?: SeatLayout;
 }) {
   const seats = getParticipantSeats(layout);
-  const classroom = layout === "classroom";
+  const classroom = layout !== "office";
   return (
     <div className="w-full overflow-hidden rounded-2xl border-2 border-primary/20 bg-card shadow-sm">
       <svg
@@ -54,7 +54,7 @@ export function SeatPicker({
           모니터 (강사석)
         </text>
         </>}
-        <SeatDot seat={INSTRUCTOR_SEAT} fill="#94a3b8" label="강사석" disabled />
+        <SeatDot seat={INSTRUCTOR_SEAT} fill="#94a3b8" label="강사 탁자" disabled />
         {seats.map((seat) => {
           const holder = occupied.get(seat.id);
           const mine = holder && holder === myNickname;

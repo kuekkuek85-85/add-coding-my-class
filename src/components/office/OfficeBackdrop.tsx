@@ -1,8 +1,12 @@
 /**
  * 2D 사무실 배경 (마루 바닥 + 벽 + 뒤쪽 화이트보드). SVG 조각.
  */
-export function OfficeBackdrop({ variant = "office" }: { variant?: "office" | "classroom" }) {
-  if (variant === "classroom") {
+export function OfficeBackdrop({
+  variant = "office",
+}: {
+  variant?: "office" | "classroom" | "workshop8";
+}) {
+  if (variant === "classroom" || variant === "workshop8") {
     return (
       <g>
         {/* 뒤쪽 벽 + 게시판 */}
@@ -21,7 +25,7 @@ export function OfficeBackdrop({ variant = "office" }: { variant?: "office" | "c
         <rect x="0" y="1010" width="1200" height="100" fill="#e8eef0" />
         <rect x="90" y="1018" width="1020" height="52" rx="6" fill="#2F6B4F" stroke="#1f4a37" strokeWidth="3" />
         <text x="600" y="1050" fill="#eafaf1" fontSize="20" fontWeight="700" textAnchor="middle">
-          칠판
+          전자칠판 화면
         </text>
       </g>
     );

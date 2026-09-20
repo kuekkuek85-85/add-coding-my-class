@@ -17,7 +17,8 @@ import {
   INSTRUCTOR_SEAT,
   FRONT_MONITOR,
   OFFICE_VIEWBOX,
-  findSeat,
+  findSeatInLayout,
+  type SeatLayout,
 } from "@/lib/office-layout";
 import { DEFAULT_AVATAR, type Avatar } from "@/lib/avatar-presets";
 import { AvatarSvg } from "@/components/avatar/AvatarSvg";
@@ -115,9 +116,13 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
   const participants = members.filter((m) => m.role === "participant");
   const instructor = members.find((m) => m.role === "instructor");
   const currentStage = snap?.ok ? snap.session.current_stage : 1;
-  const seatLayout = (snap?.ok ? (snap.session as { seat_layout?: string }).seat_layout : null) === "classroom"
-    ? "classroom"
-    : "office";
+  const rawSeatLayout = snap?.ok
+    ? (snap.session as { seat_layout?: string }).seat_layout
+    : null;
+  const seatLayout: SeatLayout =
+    rawSeatLayout === "classroom" || rawSeatLayout === "workshop8"
+      ? rawSeatLayout
+      : "office";
 
   const s1Map = new Map((s1?.ok ? s1.progress : []).map((p) => [p.userId, p]));
   const s2Map = new Map((s2?.ok ? s2.progress : []).map((p) => [p.userId, p]));
@@ -146,8 +151,8 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
     ];
   }
 
-  const seated = participants.filter((p) => p.seat_id && findSeat(p.seat_id));
-  const unseated = participants.filter((p) => !p.seat_id || !findSeat(p.seat_id));
+  const seated = participants.filter((p) => p.seat_id && findSeatInLayout(p.seat_id, seatLayout));
+  const unseated = participants.filter((p) => !p.seat_id || !findSeatInLayout(p.seat_id, seatLayout));
 
   const currentPresenter =
     (s6?.ok ? s6.progress : []).find((p) => p.queueState === "current")?.userId ?? null;
@@ -237,7 +242,8 @@ export function OfficeView({ instructorUserId }: { instructorUserId: string }) {
 
           {/* Seated participants */}
           {seated.map((p) => {
-            const seat = findSeat(p.seat_id)!;
+            const seat = findSeatInLayout(p.seat_id, seatLayout);
+            if (!seat) return null;
             const flags = stageDoneFlags(p.id);
             const h = helpMap.get(p.id);
             const r = retroMap.get(p.id);
