@@ -46,8 +46,38 @@ import { cn } from "@/lib/utils";
 import { SlideThemeProvider, themeFromSession } from "@/lib/slide-theme";
 
 export const Route = createFileRoute("/instructor")({
+  head: () => ({
+    meta: [
+      { title: "강사석 | 내 수업에 코딩 한 스푼" },
+      {
+        name: "description",
+        content: "참가 교사의 접속 현황과 교시별 진행 상황을 확인하는 강사 화면입니다.",
+      },
+      { property: "og:title", content: "강사석 | 내 수업에 코딩 한 스푼" },
+      {
+        property: "og:description",
+        content: "참가 교사의 접속 현황과 교시별 진행 상황을 확인하는 강사 화면입니다.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: InstructorHome,
 });
+
+const SPOON8_ROSTER = [
+  "한상목",
+  "이지현",
+  "강형민",
+  "박서인",
+  "고경희",
+  "최정윤",
+  "김성현",
+  "신소영",
+  "박효정",
+  "신현칠",
+  "이승엽",
+] as const;
 
 function InstructorHome() {
   const navigate = useNavigate();
@@ -185,6 +215,11 @@ function InstructorHome() {
 
   const participants = (data?.ok ? data.members : []).filter((m) => m.role === "participant");
   const currentStage = data?.ok ? data.session.current_stage : 1;
+  const connectedNames = new Set(participants.map((participant) => participant.nickname.trim()));
+  const absentParticipants =
+    data?.ok && data.session.participant_code === "SPOON8"
+      ? SPOON8_ROSTER.filter((nickname) => !connectedNames.has(nickname))
+      : [];
 
   const s2Progress = s2?.ok ? s2.progress : [];
   const s2Min = s2?.ok ? s2.min : 2;
@@ -323,6 +358,27 @@ function InstructorHome() {
                   </li>
                 ))}
               </ul>
+            )}
+            {data?.ok && data.session.participant_code === "SPOON8" && (
+              <div className="mt-4 border-t border-border/70 pt-3">
+                <p className="mb-2 text-xs font-semibold text-muted-foreground">
+                  접속 안 한 참가자 {absentParticipants.length}명
+                </p>
+                {absentParticipants.length === 0 ? (
+                  <p className="text-xs font-medium text-primary">모두 접속했습니다.</p>
+                ) : (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {absentParticipants.map((nickname) => (
+                      <li
+                        key={nickname}
+                        className="rounded-full border border-border bg-muted/60 px-2.5 py-1 text-xs font-medium text-muted-foreground"
+                      >
+                        {nickname}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             )}
           </div>
         </div>
