@@ -159,7 +159,7 @@ function LoginPage() {
                   id="code"
                   autoComplete="off"
                   autoCapitalize="characters"
-                  placeholder="예: SPOON7"
+                  placeholder="예: SPOON9"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
                   className="mt-1.5 h-11 text-base tracking-widest uppercase"
