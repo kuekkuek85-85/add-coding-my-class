@@ -79,6 +79,16 @@ const SPOON8_ROSTER = [
   "이승엽",
 ] as const;
 
+const SPOON9_ROSTER = [
+  "전세연","금혜원","어연수","이은서","박조훈","오채진","왕현우","최원주",
+  "김주연","박건우","배수현","서예빈","박정일","김용민","김혁수",
+] as const;
+
+const ROSTERS: Record<string, readonly string[]> = {
+  SPOON8: SPOON8_ROSTER,
+  SPOON9: SPOON9_ROSTER,
+};
+
 function InstructorHome() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -217,8 +227,8 @@ function InstructorHome() {
   const currentStage = data?.ok ? data.session.current_stage : 1;
   const connectedNames = new Set(participants.map((participant) => participant.nickname.trim()));
   const absentParticipants =
-    data?.ok && data.session.participant_code === "SPOON8"
-      ? SPOON8_ROSTER.filter((nickname) => !connectedNames.has(nickname))
+    data?.ok && ROSTERS[data.session.participant_code]
+      ? ROSTERS[data.session.participant_code].filter((nickname) => !connectedNames.has(nickname))
       : [];
 
   const s2Progress = s2?.ok ? s2.progress : [];
@@ -359,7 +369,7 @@ function InstructorHome() {
                 ))}
               </ul>
             )}
-            {data?.ok && data.session.participant_code === "SPOON8" && (
+            {data?.ok && !!ROSTERS[data.session.participant_code] && (
               <div className="mt-4 border-t border-border/70 pt-3">
                 <p className="mb-2 text-xs font-semibold text-muted-foreground">
                   접속 안 한 참가자 {absentParticipants.length}명
