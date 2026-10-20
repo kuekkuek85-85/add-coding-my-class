@@ -9,79 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as S6RouteImport } from './routes/s6'
-import { Route as S5RouteImport } from './routes/s5'
-import { Route as S4RouteImport } from './routes/s4'
-import { Route as S3RouteImport } from './routes/s3'
-import { Route as S2RouteImport } from './routes/s2'
-import { Route as S1RouteImport } from './routes/s1'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PortfolioRouteImport } from './routes/portfolio'
-import { Route as MissionsRouteImport } from './routes/missions'
-import { Route as InstructorRouteImport } from './routes/instructor'
-import { Route as HomeRouteImport } from './routes/home'
-import { Route as AlumniRouteImport } from './routes/alumni'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AlumniRouteImport } from './routes/alumni'
+import { Route as HomeRouteImport } from './routes/home'
+import { Route as InstructorRouteImport } from './routes/instructor'
+import { Route as MissionsRouteImport } from './routes/missions'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as S1RouteImport } from './routes/s1'
+import { Route as S2RouteImport } from './routes/s2'
+import { Route as S3RouteImport } from './routes/s3'
+import { Route as S4RouteImport } from './routes/s4'
+import { Route as S5RouteImport } from './routes/s5'
+import { Route as S6RouteImport } from './routes/s6'
+import { Route as TermsRouteImport } from './routes/terms'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const S6Route = S6RouteImport.update({
-  id: '/s6',
-  path: '/s6',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const S5Route = S5RouteImport.update({
-  id: '/s5',
-  path: '/s5',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const S4Route = S4RouteImport.update({
-  id: '/s4',
-  path: '/s4',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const S3Route = S3RouteImport.update({
-  id: '/s3',
-  path: '/s3',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const S2Route = S2RouteImport.update({
-  id: '/s2',
-  path: '/s2',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const S1Route = S1RouteImport.update({
-  id: '/s1',
-  path: '/s1',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortfolioRoute = PortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MissionsRoute = MissionsRouteImport.update({
-  id: '/missions',
-  path: '/missions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InstructorRoute = InstructorRouteImport.update({
-  id: '/instructor',
-  path: '/instructor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AlumniRoute = AlumniRouteImport.update({
@@ -89,9 +34,64 @@ const AlumniRoute = AlumniRouteImport.update({
   path: '/alumni',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InstructorRoute = InstructorRouteImport.update({
+  id: '/instructor',
+  path: '/instructor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MissionsRoute = MissionsRouteImport.update({
+  id: '/missions',
+  path: '/missions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const S1Route = S1RouteImport.update({
+  id: '/s1',
+  path: '/s1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const S2Route = S2RouteImport.update({
+  id: '/s2',
+  path: '/s2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const S3Route = S3RouteImport.update({
+  id: '/s3',
+  path: '/s3',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const S4Route = S4RouteImport.update({
+  id: '/s4',
+  path: '/s4',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const S5Route = S5RouteImport.update({
+  id: '/s5',
+  path: '/s5',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const S6Route = S6RouteImport.update({
+  id: '/s6',
+  path: '/s6',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -214,88 +214,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/s6': {
-      id: '/s6'
-      path: '/s6'
-      fullPath: '/s6'
-      preLoaderRoute: typeof S6RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/s5': {
-      id: '/s5'
-      path: '/s5'
-      fullPath: '/s5'
-      preLoaderRoute: typeof S5RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/s4': {
-      id: '/s4'
-      path: '/s4'
-      fullPath: '/s4'
-      preLoaderRoute: typeof S4RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/s3': {
-      id: '/s3'
-      path: '/s3'
-      fullPath: '/s3'
-      preLoaderRoute: typeof S3RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/s2': {
-      id: '/s2'
-      path: '/s2'
-      fullPath: '/s2'
-      preLoaderRoute: typeof S2RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/s1': {
-      id: '/s1'
-      path: '/s1'
-      fullPath: '/s1'
-      preLoaderRoute: typeof S1RouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portfolio': {
-      id: '/portfolio'
-      path: '/portfolio'
-      fullPath: '/portfolio'
-      preLoaderRoute: typeof PortfolioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/missions': {
-      id: '/missions'
-      path: '/missions'
-      fullPath: '/missions'
-      preLoaderRoute: typeof MissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/instructor': {
-      id: '/instructor'
-      path: '/instructor'
-      fullPath: '/instructor'
-      preLoaderRoute: typeof InstructorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alumni': {
@@ -305,11 +228,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlumniRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/instructor': {
+      id: '/instructor'
+      path: '/instructor'
+      fullPath: '/instructor'
+      preLoaderRoute: typeof InstructorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/missions': {
+      id: '/missions'
+      path: '/missions'
+      fullPath: '/missions'
+      preLoaderRoute: typeof MissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s1': {
+      id: '/s1'
+      path: '/s1'
+      fullPath: '/s1'
+      preLoaderRoute: typeof S1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s2': {
+      id: '/s2'
+      path: '/s2'
+      fullPath: '/s2'
+      preLoaderRoute: typeof S2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s3': {
+      id: '/s3'
+      path: '/s3'
+      fullPath: '/s3'
+      preLoaderRoute: typeof S3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s4': {
+      id: '/s4'
+      path: '/s4'
+      fullPath: '/s4'
+      preLoaderRoute: typeof S4RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s5': {
+      id: '/s5'
+      path: '/s5'
+      fullPath: '/s5'
+      preLoaderRoute: typeof S5RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s6': {
+      id: '/s6'
+      path: '/s6'
+      fullPath: '/s6'
+      preLoaderRoute: typeof S6RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
